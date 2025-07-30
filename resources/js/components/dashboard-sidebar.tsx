@@ -14,7 +14,7 @@ const menuItems = {
         { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { name: 'IIN Nasional', href: '/iin-nasional', icon: FileText },
         { name: 'Single IIN/Blockholder', href: '/iin-single-blockholder', icon: CreditCard },
-        { name: 'Profil', href: '/dashboard/profil', icon: UserIcon },
+        // { name: 'Profil', href: '/dashboard/profil', icon: UserIcon },
     ],
     admin: [
         { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
