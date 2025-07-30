@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('iin_single_blockholder_applications', function (Blueprint $table) {
-            $table->enum('status', ['pengajuan', 'perbaikan', 'pembayaran', 'verifikasi-lapangan', 'pembayaran-tahap-2', 'menunggu-terbit', 'terbit'])->default('pengajuan');
+            $table->enum('status', ['pengajuan', 'perbaikan', 'pembayaran', 'verifikasi-lapangan', 'pembayaran-tahap-2', 'menunggu-terbit', 'terbit'])->default('pengajuan')->change();
         });
     }
 
