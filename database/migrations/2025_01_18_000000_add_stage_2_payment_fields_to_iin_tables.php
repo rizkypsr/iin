@@ -13,11 +13,11 @@ return new class extends Migration
     {
         // Add stage 2 payment fields to iin_single_blockholder_applications only
         Schema::table('iin_single_blockholder_applications', function (Blueprint $table) {
-            $table->json('payment_proof_documents_stage_2')->nullable()->after('payment_documents_uploaded_at');
+            $table->json('payment_proof_documents_stage_2')->nullable();
             $table->timestamp('payment_proof_uploaded_at_stage_2')->nullable()->after('payment_proof_documents_stage_2');
             $table->json('payment_documents_stage_2')->nullable()->after('payment_proof_uploaded_at_stage_2');
             $table->timestamp('payment_documents_uploaded_at_stage_2')->nullable()->after('payment_documents_stage_2');
-            $table->timestamp('payment_verified_at_stage_2')->nullable()->after('payment_documents_uploaded_at_stage_2');
+            $table->timestamp('payment_verified_at_stage_2')->nullable();
         });
     }
 
