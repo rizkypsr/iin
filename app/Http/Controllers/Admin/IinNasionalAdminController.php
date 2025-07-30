@@ -18,7 +18,7 @@ class IinNasionalAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return Inertia::render('Admin/IinNasional/Index', [
+        return Inertia::render('admin/IinNasional/Index', [
             'applications' => $applications
         ]);
     }
@@ -34,7 +34,7 @@ class IinNasionalAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return Inertia::render('Admin/IinNasional/Show', [
+        return Inertia::render('admin/IinNasional/Show', [
             'application' => array_merge($iinNasional->toArray(), [
                 'can_upload_payment_proof' => false, // Admin doesn't upload payment proof
                 'can_download_certificate' => $iinNasional->certificate_path && Storage::disk('public')->exists($iinNasional->certificate_path),
