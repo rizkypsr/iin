@@ -1,0 +1,99 @@
+@import 'tailwindcss';
+
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+        --primary: 252 100% 50%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 210 40% 96%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 252 100% 50%;
+        --accent-foreground: 0 0% 100%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 252 100% 50%;
+        --chart-1: 12 76% 61%;
+        --chart-2: 173 58% 39%;
+        --chart-3: 197 37% 24%;
+        --chart-4: 43 74% 66%;
+        --chart-5: 27 87% 67%;
+        --radius: 0.5rem;
+
+        /* Gradient Colors */
+        --gradient-primary-start: #731ca5;
+        --gradient-primary-end: #4c1d95;
+        --gradient-accent-start: #8b2fc7;
+        --gradient-accent-end: #5b21b6;
+        --gradient-secondary-start: #5b21b6;
+        --gradient-secondary-end: #3730a3;
+        --gradient-footer-start: #3730a3;
+        --gradient-footer-end: #1e1b4b;
+    }
+}
+
+/* Keyframes for accordion animations */
+@keyframes accordion-down {
+    from {
+        height: 0;
+    }
+    to {
+        height: var(--radix-accordion-content-height);
+    }
+}
+
+@keyframes accordion-up {
+    from {
+        height: var(--radix-accordion-content-height);
+    }
+    to {
+        height: 0;
+    }
+}
+
+.animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+}
+
+.animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+}
+
+/* Custom gradient utility classes */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--gradient-primary-start), var(--gradient-primary-end));
+}
+
+.bg-gradient-accent {
+    background: linear-gradient(135deg, var(--gradient-accent-start), var(--gradient-accent-end));
+}
+
+.bg-gradient-secondary {
+    background: linear-gradient(135deg, var(--gradient-secondary-start), var(--gradient-secondary-end));
+}
+
+.bg-gradient-footer {
+    background: linear-gradient(135deg, var(--gradient-footer-start), var(--gradient-footer-end));
+}
+
+/* Toast styling to ensure visibility */
+[data-sonner-toaster] {
+    z-index: 99999 !important;
+    position: fixed !important;
+}
+
+[data-sonner-toast] {
+    z-index: 99999 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
