@@ -13,13 +13,13 @@ return new class extends Migration
     {
         // Add field verification documents fields to iin_nasional_applications
         Schema::table('iin_nasional_applications', function (Blueprint $table) {
-            $table->json('field_verification_documents')->nullable()->after('payment_documents_uploaded_at');
+            $table->json('field_verification_documents')->nullable();
             $table->timestamp('field_verification_documents_uploaded_at')->nullable()->after('field_verification_documents');
         });
 
         // Add field verification documents fields to iin_single_blockholder_applications
         Schema::table('iin_single_blockholder_applications', function (Blueprint $table) {
-            $table->json('field_verification_documents')->nullable()->after('payment_documents_uploaded_at');
+            $table->json('field_verification_documents')->nullable();
             $table->timestamp('field_verification_documents_uploaded_at')->nullable()->after('field_verification_documents');
         });
     }
