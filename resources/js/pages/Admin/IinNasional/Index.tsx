@@ -34,6 +34,10 @@ interface Props extends PageProps {
         links: any[];
         meta: any;
     };
+    application_counts: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
 const getStatusBadge = (status: string) => {
@@ -74,11 +78,12 @@ const getStatusLabel = (status: string) => {
     }
 };
 
-export default function Index({ auth, applications }: Props) {
+export default function Index({ auth, applications, application_counts }: Props) {
     return (
         <DashboardLayout
             user={auth.user}
             title="Admin - IIN Nasional"
+            applicationCounts={application_counts}
         >
             <Head title="Admin - IIN Nasional" />
 

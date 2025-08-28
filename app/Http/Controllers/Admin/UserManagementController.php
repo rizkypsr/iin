@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ApplicationCountService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,12 @@ class UserManagementController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('admin/create-user');
+        $applicationCountService = new ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+
+        return Inertia::render('admin/create-user', [
+            'application_counts' => $applicationCounts
+        ]);
     }
 
     /**
@@ -76,9 +82,13 @@ class UserManagementController extends Controller
         
         $users = $query->paginate(10)->withQueryString();
         
+        $applicationCountService = new ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+        
         return Inertia::render('admin/users/index', [
             'users' => $users,
             'filters' => $request->only(['search']),
+            'application_counts' => $applicationCounts
         ]);
     }
 
@@ -87,8 +97,12 @@ class UserManagementController extends Controller
      */
     public function edit(User $user): Response
     {
+        $applicationCountService = new ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+
         return Inertia::render('admin/users/edit', [
             'user' => $user->load('roles'),
+            'application_counts' => $applicationCounts
         ]);
     }
 

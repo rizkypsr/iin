@@ -46,10 +46,10 @@ export default {
         },
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #F2E6EE 0%, #977DFF 100%)',
-        'gradient-accent': 'linear-gradient(135deg, #FFCCF2 0%, #0033FF 100%)',
-        'gradient-secondary': 'linear-gradient(135deg, #977DFF 0%, #0600AB 100%)',
-        'gradient-footer': 'linear-gradient(135deg, #0033FF 0%, #00033D 100%)',
+        'gradient-primary': 'linear-gradient(135deg, #E6F7FF 0%, #01AEEC 100%)',
+        'gradient-accent': 'linear-gradient(135deg, #CCF2FF 0%, #0088CC 100%)',
+        'gradient-secondary': 'linear-gradient(135deg, #01AEEC 0%, #005599 100%)',
+        'gradient-footer': 'linear-gradient(135deg, #0088CC 0%, #003366 100%)',
       },
       borderRadius: {
         lg: 'var(--radius)',

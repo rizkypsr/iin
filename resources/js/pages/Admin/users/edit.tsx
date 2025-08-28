@@ -23,9 +23,13 @@ interface EditUserProps {
         success?: string;
         error?: string;
     };
+    application_counts: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
-export default function EditUser({ user, flash }: EditUserProps) {
+export default function EditUser({ user, flash, application_counts }: EditUserProps) {
     const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const { data, setData, put, processing, errors } = useForm({
         name: user.name,
@@ -59,7 +63,7 @@ export default function EditUser({ user, flash }: EditUserProps) {
     };
 
     return (
-        <DashboardLayout>
+        <DashboardLayout applicationCounts={application_counts}>
             <Head title={`Edit User - ${user.name}`} />
 
             {/* Flash Messages */}
@@ -146,7 +150,7 @@ export default function EditUser({ user, flash }: EditUserProps) {
                             {/* Role Section */}
                             <div className="space-y-6">
                                 <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
-                                    <Shield className="h-5 w-5 text-purple-600" />
+                                    <Shield className="h-5 w-5 text-blue-600" />
                                     <h2 className="text-xl font-semibold text-gray-900">Role & Permissions</h2>
                                 </div>
 
@@ -189,7 +193,7 @@ export default function EditUser({ user, flash }: EditUserProps) {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.3 }}
-                                className="rounded-xl border border-purple-200/50 bg-gradient-to-r from-purple-50 to-blue-50 p-4"
+                                className="rounded-xl border border-blue-200/50 bg-gradient-to-r from-blue-50 to-blue-50 p-4"
                             >
                                 <div className="flex items-center gap-3">
                                     <Shield className="h-5 w-5 text-purple-600" />

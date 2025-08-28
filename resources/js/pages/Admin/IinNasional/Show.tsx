@@ -92,9 +92,13 @@ interface Props {
     };
     application: IinNasionalApplication;
     statusLogs: StatusLog[];
+    application_counts: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
-export default function AdminIinNasionalShow({ auth, application, statusLogs }: Props) {
+export default function AdminIinNasionalShow({ auth, application, statusLogs, application_counts }: Props) {
     const [activeTab, setActiveTab] = useState('detail');
     const [loading, setLoading] = useState(false);
     const [paymentDocuments, setPaymentDocuments] = useState<File[]>([]);
@@ -421,7 +425,7 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs }: 
     };
 
     return (
-        <DashboardLayout user={auth.user}>
+        <DashboardLayout user={auth.user} applicationCounts={application_counts}>
             <Head title={`Admin - ${application.application_number}`} />
 
             <div className="space-y-6">

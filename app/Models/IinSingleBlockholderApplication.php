@@ -37,7 +37,7 @@ class IinSingleBlockholderApplication extends Model
         'payment_verified_at_stage_2',
         'field_verification_at',
         'issued_at',
-
+        'viewed_at',
         'admin_id',
     ];
 
@@ -58,6 +58,7 @@ class IinSingleBlockholderApplication extends Model
         'payment_documents_uploaded_at_stage_2' => 'datetime',
         'field_verification_documents_uploaded_at' => 'datetime',
         'iin_block_range' => 'array',
+        'viewed_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

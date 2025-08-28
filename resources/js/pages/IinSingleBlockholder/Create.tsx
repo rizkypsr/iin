@@ -5,12 +5,24 @@ import { Label } from '@/components/ui/label';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { PageProps } from '@/types';
 import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft, Download, FileText, Upload } from 'lucide-react';
 import { FormEventHandler, useEffect } from 'react';
 
+interface Props extends PageProps {
+    documentRequirements?: {
+        id: number;
+        type: string;
+        content: string;
+        created_at: string;
+        updated_at: string;
+    } | null;
+    [key: string]: any;
+}
+
 export default function IinSingleBlockholderCreate() {
-    const { auth, flash } = usePage().props as any;
+    const { auth, flash, documentRequirements } = usePage<Props>().props;
     const { data, setData, post, processing, errors, progress } = useForm({
         application_form: null as File | null,
         requirements_archive: null as File | null,
@@ -96,30 +108,16 @@ export default function IinSingleBlockholderCreate() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ol className="list-decimal space-y-2 pl-6 text-sm text-gray-900">
-                            <li>Surat Pengantar Perihal Permohonan Layanan IIN / IIN Nasional kepada Direktur Penguatan Penerapan Standar dan Penilaian Kesesuaian - BSN di Jakarta</li>
-                            <li>Salinan Akta Pendirian Perusahaan</li>
-                            <li>Salinan Akta Perubahan Nama (jika ada)</li>
-                            <li>Salinan Akta Terakhir</li>
-                            <li>Salinan Izin Usaha (NIB) Perusahaan yang terkini</li>
-                            <li>Salinan NPWP Perusahaan</li>
-                            <li>Salinan Identitas Pimpinan Perusahaan (KTP/KITAS)</li>
-                            <li>Salinan Surat Izin Penyelenggaraan Sistem Pembayaran oleh pihak yang berwenang (Surat Izin Bank Indonesia atau Otoritas Jasa Keuangan)</li>
-                            <li>Form Pendaftaran</li>
-                            <li>Term and condition yang sudah ditandatangani</li>
-                            <li>
-                                Salah satu persyaratan yaitu kepemilikan dokumen standar SNI ISO/IEC 7812 : 2017 part 1 dan part 2 dapat dilakukan pembelian melalui{' '}
-                                <a
-                                    href="https://pesta.bsn.go.id/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-purple-600 hover:underline"
-                                >
-                                    https://pesta.bsn.go.id/
-                                </a>
-                            </li>
-                            <li>Struktur Organisasi</li>
-                        </ol>
+                        {documentRequirements?.content ? (
+                            <div 
+                                className="prose prose-sm max-w-none text-gray-900"
+                                dangerouslySetInnerHTML={{ __html: documentRequirements.content }}
+                            />
+                        ) : (
+                            <div className="text-gray-500 italic">
+                                Dokumen persyaratan belum dikonfigurasi. Silakan hubungi administrator.
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 

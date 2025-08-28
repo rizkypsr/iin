@@ -72,7 +72,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             placeholder="Enter your email"
-                            className="h-12 rounded-lg border-gray-200 px-4 focus:border-purple-500 focus:ring-purple-500"
+                            className="h-12 rounded-lg border-gray-200 px-4 focus:border-blue-500 focus:ring-blue-500"
                         />
                         <InputError message={errors.email} />
                     </div>
@@ -83,7 +83,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 Password
                             </Label>
                             {canResetPassword && (
-                                <TextLink href={route('password.request')} className="text-sm text-purple-600 hover:text-purple-500" tabIndex={5}>
+                                <TextLink href={route('password.request')} className="text-sm text-blue-600 hover:text-blue-500" tabIndex={5}>
                                     Forgotten password?
                                 </TextLink>
                             )}
@@ -97,7 +97,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="Enter your password"
-                            className="h-12 rounded-lg border-gray-200 px-4 focus:border-purple-500 focus:ring-purple-500"
+                            className="h-12 rounded-lg border-gray-200 px-4 focus:border-blue-500 focus:ring-blue-500"
                         />
                         <InputError message={errors.password} />
                     </div>
@@ -140,7 +140,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
                 >
                     Need an Account?{' '}
-                    <TextLink href={route('register')} tabIndex={5} className="font-medium text-purple-600 hover:text-purple-500">
+                    <TextLink href={route('register')} tabIndex={5} className="font-medium text-blue-600 hover:text-blue-500">
                         Create Account
                     </TextLink>
                 </motion.div>

@@ -100,9 +100,13 @@ interface Props {
     auth: {
         user: User;
     };
+    application_counts: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
-export default function AdminIinSingleBlockholderShow({ application, statusLogs, auth }: Props) {
+export default function AdminIinSingleBlockholderShow({ application, statusLogs, auth, application_counts }: Props) {
     const [activeTab, setActiveTab] = useState('detail');
     const [loading, setLoading] = useState(false);
     const [paymentDocuments, setPaymentDocuments] = useState<File[]>([]);
@@ -238,7 +242,7 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
     };
 
     return (
-        <DashboardLayout user={auth.user} title="Admin - Detail IIN Single Blockholder">
+        <DashboardLayout user={auth.user} title="Admin - Detail IIN Single Blockholder" applicationCounts={application_counts}>
             <Head title={`Aplikasi ${application.application_number}`} />
 
             <div className="space-y-6">

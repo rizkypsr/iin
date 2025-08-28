@@ -35,12 +35,18 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'company_name' => 'required|string|max:255',
+            'company_phone' => 'required|string|max:20',
+            'company_email' => 'required|string|lowercase|email|max:255',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'company_name' => $request->company_name,
+            'company_phone' => $request->company_phone,
+            'company_email' => $request->company_email,
         ]);
 
         // Assign 'user' role to all public registrations

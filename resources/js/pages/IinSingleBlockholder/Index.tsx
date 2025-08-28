@@ -400,7 +400,7 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                         href={link.url || '#'}
                                         className={`rounded px-3 py-1 ${
                                             link.active
-                                                ? 'bg-purple-100 text-purple-700'
+                                                ? 'bg-blue-100 text-blue-700'
                                                 : link.url
                                                   ? 'text-gray-600 hover:bg-gray-100'
                                                   : 'cursor-not-allowed text-gray-300'

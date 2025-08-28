@@ -24,9 +24,13 @@ interface CreateUserProps {
         success?: string;
         error?: string;
     };
+    application_counts: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
-export default function CreateUser({ flash }: CreateUserProps = {}) {
+export default function CreateUser({ flash, application_counts }: CreateUserProps) {
     const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const { data, setData, post, processing, errors, reset } = useForm<Required<CreateUserForm>>({
         name: '',
@@ -69,7 +73,7 @@ export default function CreateUser({ flash }: CreateUserProps = {}) {
     };
 
     return (
-        <DashboardLayout title="Create User" user={user}>
+        <DashboardLayout title="Create User" user={user} applicationCounts={application_counts}>
             <Head title="Create User" />
 
             {/* Flash Messages */}
@@ -99,7 +103,7 @@ export default function CreateUser({ flash }: CreateUserProps = {}) {
                                     onChange={(e) => setData('name', e.target.value)}
                                     disabled={processing}
                                     placeholder="Full name"
-                                    className="h-11 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                                    className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                 />
                                 <InputError message={errors.name} className="text-xs" />
                             </div>
@@ -188,7 +192,7 @@ export default function CreateUser({ flash }: CreateUserProps = {}) {
                             <div className="flex gap-4 pt-4">
                                 <Button
                                     type="submit"
-                                    className="h-11 flex-1 bg-gradient-to-r from-purple-700 to-purple-900 font-medium text-white transition-all duration-200 hover:from-purple-800 hover:to-purple-950 hover:shadow-lg hover:shadow-purple-500/25"
+                                    className="h-11 flex-1 bg-gradient-to-r from-blue-700 to-blue-900 font-medium text-white transition-all duration-200 hover:from-blue-800 hover:to-blue-950 hover:shadow-lg hover:shadow-blue-500/25"
                                     disabled={processing}
                                 >
                                     {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
@@ -198,7 +202,7 @@ export default function CreateUser({ flash }: CreateUserProps = {}) {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    className="h-11 border-purple-300 text-purple-700 hover:bg-purple-50"
+                                    className="h-11 border-blue-300 text-blue-700 hover:bg-blue-50"
                                     onClick={() => window.history.back()}
                                 >
                                     Cancel

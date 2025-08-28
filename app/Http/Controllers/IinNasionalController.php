@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DocumentRequirement;
 use App\Models\IinNasionalApplication;
 use App\Models\IinStatusLog;
 use Illuminate\Http\Request;
@@ -33,7 +34,11 @@ class IinNasionalController extends Controller
 
     public function create()
     {
-        return Inertia::render('IinNasional/Create');
+        $documentRequirements = DocumentRequirement::getIinNasionalRequirements();
+        
+        return Inertia::render('IinNasional/Create', [
+            'documentRequirements' => $documentRequirements,
+        ]);
     }
 
     public function store(Request $request)

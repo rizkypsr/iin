@@ -30,6 +30,10 @@ interface DashboardProps extends PageProps {
     stats: DashboardStats;
     recent_applications: Application[];
     recent_activities: Activity[];
+    application_counts: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
 const getStatusColor = (status: string) => {
@@ -45,7 +49,7 @@ const getStatusColor = (status: string) => {
     }
 };
 
-export default function Dashboard({ auth, stats, recent_applications, recent_activities }: DashboardProps) {
+export default function Dashboard({ auth, stats, recent_applications, recent_activities, application_counts }: DashboardProps) {
     const user = auth.user;
 
     const dashboardStats = [
@@ -55,11 +59,11 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
     ];
 
     return (
-        <DashboardLayout title="Dashboard" user={user}>
+        <DashboardLayout title="Dashboard" user={user} applicationCounts={application_counts}>
             <div className="space-y-8">
                 {/* Header */}
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                    <h1 className="mb-2 bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-3xl font-bold text-transparent">
+                    <h1 className="mb-2 bg-gradient-to-r from-[#01AEEC] to-[#01AEEC] bg-clip-text text-3xl font-bold text-transparent">
                         Dashboard
                     </h1>
                     <p className="text-gray-600">Selamat datang kembali! Berikut adalah ringkasan aktivitas investasi Anda.</p>
@@ -75,7 +79,7 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
                             transition={{ duration: 0.5, delay: 0.1 * index }}
                         >
                             <Card
-                                className={`${index === 0 ? 'border-0 bg-gradient-to-r from-purple-700 to-purple-900 text-white' : 'border-purple-200/50 bg-white/95 backdrop-blur-sm'} rounded-2xl shadow-lg shadow-purple-200/30 transition-all duration-300 hover:shadow-xl hover:shadow-purple-300/40`}
+                                className={`${index === 0 ? 'border-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white' : 'border-blue-200/50 bg-white/95 backdrop-blur-sm'} rounded-2xl shadow-lg shadow-blue-200/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-300/40`}
                             >
                                 <CardContent className="p-6">
                                     <div className={`mb-1 text-2xl font-bold ${index === 0 ? 'text-white' : 'text-gray-900'}`}>{stat.value}</div>
@@ -89,7 +93,7 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
 
                 {/* Recent Applications */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
-                    <Card className="rounded-2xl border-purple-200/50 bg-white/95 shadow-lg shadow-purple-200/30 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-purple-300/40">
+                    <Card className="rounded-2xl border-blue-200/50 bg-white/95 shadow-lg shadow-blue-200/30 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-300/40">
                         <CardHeader>
                             <CardTitle className="text-gray-900">Aplikasi Terbaru</CardTitle>
                             <CardDescription>Daftar aplikasi IIN yang baru diajukan</CardDescription>
@@ -103,7 +107,7 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.5, delay: 0.3 + 0.1 * index }}
-                                            className="flex items-center justify-between rounded-xl bg-gradient-to-r from-purple-50/80 to-purple-100/50 p-4 transition-all duration-200 hover:shadow-md"
+                                            className="flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-50/80 to-blue-100/50 p-4 transition-all duration-200 hover:shadow-md"
                                         >
                                             <div>
                                                 <h4 className="font-medium text-gray-900">
@@ -120,7 +124,7 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
                                 ) : (
                                     <div className="text-center py-8">
                                         <p className="text-gray-500">Belum ada aplikasi yang diajukan</p>
-                                        <Link href="/iin-nasional/create" className="text-purple-600 hover:text-purple-700 text-sm mt-2 inline-block">
+                                        <Link href="/iin-nasional/create" className="text-[#01AEEC] hover:text-[#01AEEC] text-sm mt-2 inline-block">
                             Ajukan aplikasi pertama Anda
                         </Link>
                                     </div>

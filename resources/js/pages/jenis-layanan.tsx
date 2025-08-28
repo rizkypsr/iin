@@ -37,7 +37,7 @@ export default function JenisLayanan() {
             <Head title="Jenis Layanan" />
 
             {/* Hero Section with Primary Gradient */}
-            <div className="bg-gradient-primary relative overflow-hidden py-20">
+            <div className="bg-gradient-primary relative overflow-hidden pb-20 pt-40">
                 {/* Subtle line pattern overlay */}
                 <div className="absolute inset-0 opacity-10">
                     <div
@@ -83,7 +83,7 @@ export default function JenisLayanan() {
                                                 key={featureIndex}
                                                 className={`flex items-center space-x-3 ${index % 2 === 0 ? 'text-white/90' : 'text-gray-700'}`}
                                             >
-                                                <div className={`h-1.5 w-1.5 ${index % 2 === 0 ? 'bg-white' : 'bg-purple-500'}`}></div>
+                                                <div className={`h-1.5 w-1.5 ${index % 2 === 0 ? 'bg-white' : 'bg-[#01AEEC]'}`}></div>
                                                 <span>{feature}</span>
                                             </li>
                                         ))}
@@ -92,7 +92,7 @@ export default function JenisLayanan() {
                                         <Button
                                             variant={index % 2 === 0 ? 'outline' : 'accent'}
                                             className={
-                                                index % 2 === 0 ? 'border-white bg-white/10 text-white hover:bg-white hover:text-purple-700' : ''
+                                                index % 2 === 0 ? 'border-white bg-white/10 text-white hover:bg-white hover:text-[#01AEEC]' : ''
                                             }
                                         >
                                             Pelajari Lebih Lanjut

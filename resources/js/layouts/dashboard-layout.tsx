@@ -6,11 +6,15 @@ import { PropsWithChildren } from 'react';
 interface DashboardLayoutProps {
     title?: string;
     user?: User;
+    applicationCounts?: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
 import { User } from '@/types';
 
-export default function DashboardLayout({ children, title = 'Dashboard', user }: PropsWithChildren<DashboardLayoutProps>) {
+export default function DashboardLayout({ children, title = 'Dashboard', user, applicationCounts }: PropsWithChildren<DashboardLayoutProps>) {
     return (
         <div className="min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-purple-100/30 to-purple-200/20">
             <Head title={title} />
@@ -24,7 +28,7 @@ export default function DashboardLayout({ children, title = 'Dashboard', user }:
                     className="h-full w-80 flex-shrink-0 p-4"
                 >
                     <div className="h-full overflow-hidden rounded-2xl border border-purple-200/30 bg-white/90 shadow-xl shadow-purple-200/40 backdrop-blur-lg">
-                        <DashboardSidebar user={user} />
+                        <DashboardSidebar user={user} applicationCounts={applicationCounts} />
                     </div>
                 </motion.div>
 

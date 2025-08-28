@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\IinNasionalAdminController;
 use App\Http\Controllers\Admin\IinSingleBlockholderAdminController;
+use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -66,9 +67,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             'rejected' => $rejected
         ];
         
+        // Get application counts for sidebar badges
+        $applicationCountService = new App\Services\ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+        
         return Inertia::render('admin-dashboard', [
             'stats' => $stats,
-            'recent_applications' => $recentApplications
+            'recent_applications' => $recentApplications,
+            'application_counts' => $applicationCounts
         ]);
     })->name('dashboard');
     // User Management Routes
@@ -102,4 +108,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/iin-single-blockholder/{iinSingleBlockholder}/download-payment-document/{index}', [IinSingleBlockholderAdminController::class, 'downloadPaymentDocument'])->name('iin-single-blockholder.download-payment-document');
     Route::get('/iin-single-blockholder/{iinSingleBlockholder}/download-payment-proof/{index}', [IinSingleBlockholderAdminController::class, 'downloadPaymentProof'])->name('iin-single-blockholder.download-payment-proof');
     Route::get('/iin-single-blockholder/{iinSingleBlockholder}/download-field-verification-document/{index}', [IinSingleBlockholderAdminController::class, 'downloadFieldVerificationDocument'])->name('iin-single-blockholder.download-field-verification-document');
+    
+    // Settings Routes
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/document-requirements', [SettingsController::class, 'updateDocumentRequirements'])->name('settings.update-document-requirements');
 });

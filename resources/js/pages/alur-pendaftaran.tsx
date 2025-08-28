@@ -42,7 +42,7 @@ export default function AlurPendaftaran() {
             <Head title="Alur Pendaftaran" />
 
             {/* Hero Section with Primary Gradient */}
-            <div className="bg-gradient-primary relative overflow-hidden py-20">
+            <div className="bg-gradient-primary relative overflow-hidden pb-20 pt-40">
                 {/* Subtle line pattern overlay */}
                 <div className="absolute inset-0 opacity-10">
                     <div
@@ -72,7 +72,7 @@ export default function AlurPendaftaran() {
                         <div key={step.number} className="relative">
                             {/* Connection line to next step */}
                             {index < steps.length - 1 && (
-                                <div className="absolute top-20 left-8 z-0 h-16 w-0.5 bg-gradient-to-b from-purple-400 to-purple-600"></div>
+                                <div className="absolute top-20 left-8 z-0 h-16 w-0.5 bg-gradient-to-b from-blue-400 to-blue-600"></div>
                             )}
 
                             <Card variant={index % 2 === 0 ? 'default' : 'gradient'} className="relative z-10">
@@ -81,7 +81,7 @@ export default function AlurPendaftaran() {
                                         {/* Step number circle */}
                                         <div
                                             className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full text-xl font-bold ${
-                                                index % 2 === 0 ? 'bg-gradient-accent text-white' : 'bg-white text-purple-700'
+                                                index % 2 === 0 ? 'bg-gradient-accent text-white' : 'bg-white text-[#01AEEC]'
                                             }`}
                                         >
                                             {step.number}

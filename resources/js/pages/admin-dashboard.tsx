@@ -44,6 +44,10 @@ interface AdminDashboardProps extends PageProps {
         rejected: number;
     };
     recent_applications: Application[];
+    application_counts: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
 const getStatusIcon = (status: string) => {
@@ -91,12 +95,13 @@ const getStatusBadgeClass = (status: string) => {
 export default function AdminDashboard({ 
     auth, 
     stats, 
-    recent_applications = [] 
+    recent_applications = [],
+    application_counts
 }: AdminDashboardProps) {
     const user = auth.user;
 
     return (
-        <DashboardLayout title="Admin Dashboard" user={user}>
+        <DashboardLayout title="Admin Dashboard" user={user} applicationCounts={application_counts}>
             <div className="space-y-8">
                 <div>
                     <h1 className="mb-2 text-3xl font-bold text-gray-900">Admin Dashboard</h1>

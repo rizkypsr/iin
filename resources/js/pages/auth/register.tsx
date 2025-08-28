@@ -15,6 +15,9 @@ type RegisterForm = {
     email: string;
     password: string;
     password_confirmation: string;
+    company_name: string;
+    company_phone: string;
+    company_email: string;
 };
 
 export default function Register() {
@@ -23,6 +26,9 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        company_name: '',
+        company_phone: '',
+        company_email: '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -63,7 +69,7 @@ export default function Register() {
                             onChange={(e) => setData('name', e.target.value)}
                             disabled={processing}
                             placeholder="Full name"
-                            className="h-11 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                         />
                         <InputError message={errors.name} className="text-xs" />
                     </motion.div>
@@ -87,7 +93,7 @@ export default function Register() {
                             onChange={(e) => setData('email', e.target.value)}
                             disabled={processing}
                             placeholder="email@example.com"
-                            className="h-11 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                         />
                         <InputError message={errors.email} className="text-xs" />
                     </motion.div>
@@ -98,6 +104,78 @@ export default function Register() {
                         transition={{ duration: 0.5, delay: 0.3 }}
                         className="space-y-2"
                     >
+                        <Label htmlFor="company_name" className="text-sm font-medium text-gray-700">
+                            Company Name
+                        </Label>
+                        <Input
+                            id="company_name"
+                            type="text"
+                            required
+                            tabIndex={3}
+                            autoComplete="organization"
+                            value={data.company_name}
+                            onChange={(e) => setData('company_name', e.target.value)}
+                            disabled={processing}
+                            placeholder="Company name"
+                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        />
+                        <InputError message={errors.company_name} className="text-xs" />
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.4 }}
+                        className="space-y-2"
+                    >
+                        <Label htmlFor="company_phone" className="text-sm font-medium text-gray-700">
+                            Company Phone
+                        </Label>
+                        <Input
+                            id="company_phone"
+                            type="tel"
+                            required
+                            tabIndex={4}
+                            autoComplete="tel"
+                            value={data.company_phone}
+                            onChange={(e) => setData('company_phone', e.target.value)}
+                            disabled={processing}
+                            placeholder="Company phone number"
+                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        />
+                        <InputError message={errors.company_phone} className="text-xs" />
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.5 }}
+                        className="space-y-2"
+                    >
+                        <Label htmlFor="company_email" className="text-sm font-medium text-gray-700">
+                            Company Email
+                        </Label>
+                        <Input
+                            id="company_email"
+                            type="email"
+                            required
+                            tabIndex={5}
+                            autoComplete="email"
+                            value={data.company_email}
+                            onChange={(e) => setData('company_email', e.target.value)}
+                            disabled={processing}
+                            placeholder="company@example.com"
+                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        />
+                        <InputError message={errors.company_email} className="text-xs" />
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.6 }}
+                        className="space-y-2"
+                    >
                         <Label htmlFor="password" className="text-sm font-medium text-gray-700">
                             Password
                         </Label>
@@ -105,13 +183,13 @@ export default function Register() {
                             id="password"
                             type="password"
                             required
-                            tabIndex={3}
+                            tabIndex={6}
                             autoComplete="new-password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
                             disabled={processing}
                             placeholder="Password"
-                            className="h-11 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                         />
                         <InputError message={errors.password} className="text-xs" />
                     </motion.div>
@@ -119,7 +197,7 @@ export default function Register() {
                     <motion.div
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.4 }}
+                        transition={{ duration: 0.5, delay: 0.7 }}
                         className="space-y-2"
                     >
                         <Label htmlFor="password_confirmation" className="text-sm font-medium text-gray-700">
@@ -129,13 +207,13 @@ export default function Register() {
                             id="password_confirmation"
                             type="password"
                             required
-                            tabIndex={4}
+                            tabIndex={7}
                             autoComplete="new-password"
                             value={data.password_confirmation}
                             onChange={(e) => setData('password_confirmation', e.target.value)}
                             disabled={processing}
                             placeholder="Confirm password"
-                            className="h-11 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                         />
                         <InputError message={errors.password_confirmation} className="text-xs" />
                     </motion.div>
@@ -143,13 +221,13 @@ export default function Register() {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.5 }}
+                        transition={{ duration: 0.5, delay: 0.8 }}
                         className="pt-2"
                     >
                         <Button
                             type="submit"
-                            className="h-11 w-full bg-gradient-to-r from-purple-700 to-purple-900 font-medium text-white transition-all duration-200 hover:from-purple-800 hover:to-purple-950 hover:shadow-lg hover:shadow-purple-500/25"
-                            tabIndex={5}
+                            className="h-11 w-full bg-gradient-to-r from-blue-700 to-blue-900 font-medium text-white transition-all duration-200 hover:from-blue-800 hover:to-blue-950 hover:shadow-lg hover:shadow-blue-500/25"
+                            tabIndex={8}
                             disabled={processing}
                         >
                             {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
@@ -161,14 +239,14 @@ export default function Register() {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.6 }}
+                    transition={{ duration: 0.5, delay: 0.9 }}
                     className="text-center text-sm text-gray-600"
                 >
                     Already have an account?{' '}
                     <TextLink
                         href={route('login')}
-                        tabIndex={6}
-                        className="font-medium text-purple-700 transition-colors duration-200 hover:text-purple-900"
+                        tabIndex={9}
+                        className="font-medium text-blue-700 transition-colors duration-200 hover:text-blue-900"
                     >
                         Log in
                     </TextLink>

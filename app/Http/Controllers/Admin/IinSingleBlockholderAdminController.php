@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\IinSingleBlockholderApplication;
 use App\Models\IinStatusLog;
+use App\Services\ApplicationCountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,8 +20,12 @@ class IinSingleBlockholderAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        $applicationCountService = new ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+
         return Inertia::render('admin/IinSingleBlockholder/Index', [
-            'applications' => $applications
+            'applications' => $applications,
+            'application_counts' => $applicationCounts
         ]);
     }
 
@@ -35,13 +40,17 @@ class IinSingleBlockholderAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $applicationCountService = new ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+
         return Inertia::render('admin/IinSingleBlockholder/Show', [
             'application' => array_merge($iinSingleBlockholder->toArray(), [
                 'can_upload_payment_proof' => false, // Admin doesn't upload payment proof
                 'can_download_certificate' => $iinSingleBlockholder->certificate_path && Storage::disk('public')->exists($iinSingleBlockholder->certificate_path),
                 'can_upload_certificate' => in_array($iinSingleBlockholder->status, ['menunggu-terbit', 'terbit']),
             ]),
-            'statusLogs' => $statusLogs
+            'statusLogs' => $statusLogs,
+            'application_counts' => $applicationCounts
         ]);
     }
 

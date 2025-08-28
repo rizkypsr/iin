@@ -31,6 +31,7 @@ class IinNasionalApplication extends Model
         'payment_verified_at',
         'field_verification_at',
         'issued_at',
+        'viewed_at',
 
         'admin_id',
     ];
@@ -43,6 +44,7 @@ class IinNasionalApplication extends Model
         'payment_verified_at' => 'datetime',
         'field_verification_at' => 'datetime',
         'issued_at' => 'datetime',
+        'viewed_at' => 'datetime',
         'payment_proof_uploaded_at' => 'datetime',
         'payment_documents_uploaded_at' => 'datetime',
         'field_verification_documents_uploaded_at' => 'datetime',

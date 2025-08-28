@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\IinNasionalApplication;
 use App\Models\IinStatusLog;
+use App\Services\ApplicationCountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -18,8 +19,12 @@ class IinNasionalAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        $applicationCountService = new ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+
         return Inertia::render('admin/IinNasional/Index', [
-            'applications' => $applications
+            'applications' => $applications,
+            'application_counts' => $applicationCounts
         ]);
     }
 
@@ -34,13 +39,17 @@ class IinNasionalAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $applicationCountService = new ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+
         return Inertia::render('admin/IinNasional/Show', [
             'application' => array_merge($iinNasional->toArray(), [
                 'can_upload_payment_proof' => false, // Admin doesn't upload payment proof
                 'can_download_certificate' => $iinNasional->certificate_path && Storage::disk('public')->exists($iinNasional->certificate_path),
                 'can_upload_certificate' => in_array($iinNasional->status, ['verifikasi-lapangan', 'terbit']),
             ]),
-            'statusLogs' => $statusLogs
+            'statusLogs' => $statusLogs,
+            'application_counts' => $applicationCounts
         ]);
     }
 

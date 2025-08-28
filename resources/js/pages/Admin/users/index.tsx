@@ -42,9 +42,13 @@ interface UsersIndexProps {
         success?: string;
         error?: string;
     };
+    application_counts: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
-export default function UsersIndex({ users, filters, flash }: UsersIndexProps) {
+export default function UsersIndex({ users, filters, flash, application_counts }: UsersIndexProps) {
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [deleteConfirmation, setDeleteConfirmation] = useState<{
@@ -146,7 +150,7 @@ export default function UsersIndex({ users, filters, flash }: UsersIndexProps) {
     };
 
     return (
-        <DashboardLayout title="User Management" user={user}>
+        <DashboardLayout title="User Management" user={user} applicationCounts={application_counts}>
             <Head title="User Management" />
 
             {/* Flash Messages */}
@@ -156,14 +160,14 @@ export default function UsersIndex({ users, filters, flash }: UsersIndexProps) {
                 {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-3xl font-bold text-transparent">
+                        <h1 className="bg-gradient-to-r from-blue-700 to-blue-900 bg-clip-text text-3xl font-bold text-transparent">
                             User Management
                         </h1>
                         <p className="mt-1 text-gray-600">Manage user accounts and roles</p>
                     </div>
 
                     <Link href={route('admin.users.create')}>
-                        <Button className="bg-gradient-to-r from-purple-700 to-purple-900 text-white hover:from-purple-800 hover:to-purple-950">
+                        <Button className="bg-gradient-to-r from-blue-600 to-blue-800 text-white hover:from-blue-700 hover:to-blue-900">
                             <Plus className="mr-2 h-4 w-4" />
                             Create User
                         </Button>

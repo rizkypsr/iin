@@ -95,10 +95,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'pending_applications' => $pendingApplications,
             ];
             
+            // Get application counts for sidebar badges
+            $applicationCountService = new App\Services\ApplicationCountService();
+            $applicationCounts = $applicationCountService->getNewApplicationCounts();
+            
             return Inertia::render('dashboard', [
                 'stats' => $stats,
                 'recent_applications' => $recentApplications,
-                'recent_activities' => $recentActivities
+                'recent_activities' => $recentActivities,
+                'application_counts' => $applicationCounts
             ]);
         }
     })->name('dashboard');

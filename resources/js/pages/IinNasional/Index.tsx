@@ -265,9 +265,9 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                                 ? '25%'
                                                                 : application.status === 'perbaikan'
                                                                     ? '25%'
-                                                                    : application.status === 'verifikasi-lapangan'
+                                                                    : application.status === 'pembayaran'
                                                                         ? '50%'
-                                                                        : application.status === 'pembayaran'
+                                                                        : application.status === 'verifikasi-lapangan'
                                                                             ? '75%'
                                                                             : application.status === 'menunggu-terbit'
                                                                                 ? '75%'
@@ -279,8 +279,8 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                             </div>
                                             <div className="flex justify-between text-xs text-gray-500">
                                                 <span>Pengajuan</span>
-                                                <span>Verifikasi</span>
                                                 <span>Pembayaran</span>
+                                                <span>Verifikasi Lapangan</span>
                                                 <span>Terbit</span>
                                             </div>
                                         </div>
@@ -437,7 +437,7 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                         key={index}
                                         href={link.url || '#'}
                                         className={`rounded px-3 py-1 ${link.active
-                                            ? 'bg-purple-100 text-purple-700'
+                                            ? 'bg-blue-100 text-blue-700'
                                             : link.url
                                                 ? 'text-gray-600 hover:bg-gray-100'
                                                 : 'cursor-not-allowed text-gray-300'

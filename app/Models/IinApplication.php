@@ -24,7 +24,7 @@ class IinApplication extends Model
         'payment_verified_at',
         'field_verification_at',
         'issued_at',
-
+        'viewed_at',
         'admin_id',
     ];
 
@@ -33,6 +33,7 @@ class IinApplication extends Model
         'payment_verified_at' => 'datetime',
         'field_verification_at' => 'datetime',
         'issued_at' => 'datetime',
+        'viewed_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

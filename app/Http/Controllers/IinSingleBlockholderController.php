@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DocumentRequirement;
 use App\Models\IinSingleBlockholderApplication;
 use App\Models\IinStatusLog;
 use Illuminate\Http\Request;
@@ -30,7 +31,11 @@ class IinSingleBlockholderController extends Controller
 
     public function create()
     {
-        return Inertia::render('IinSingleBlockholder/Create');
+        $documentRequirements = DocumentRequirement::getIinSingleBlockholderRequirements();
+        
+        return Inertia::render('IinSingleBlockholder/Create', [
+            'documentRequirements' => $documentRequirements,
+        ]);
     }
 
     public function store(Request $request)

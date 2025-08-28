@@ -1,12 +1,16 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { User } from '@/types';
+import { User, PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ChevronRight, FileText, LayoutDashboard, LogOut, User as UserIcon, Users, CreditCard } from 'lucide-react';
+import { ChevronRight, FileText, LayoutDashboard, LogOut, User as UserIcon, Users, CreditCard, Settings } from 'lucide-react';
 
 interface DashboardSidebarProps {
     user?: User;
+    applicationCounts?: {
+        iin_nasional: number;
+        iin_single_blockholder: number;
+    };
 }
 
 const menuItems = {
@@ -21,15 +25,17 @@ const menuItems = {
         { name: 'IIN Nasional', href: '/admin/iin-nasional', icon: FileText },
         { name: 'Single IIN/Blockholder', href: '/admin/iin-single-blockholder', icon: CreditCard },
         { name: 'User Management', href: '/admin/users', icon: Users },
+        { name: 'Settings', href: '/admin/settings', icon: Settings },
     ],
 
 };
 
-export default function DashboardSidebar() {
-    const { user }: DashboardSidebarProps = usePage().props.auth as any;
+export default function DashboardSidebar({ user, applicationCounts }: DashboardSidebarProps) {
+    const { auth } = usePage<PageProps>().props;
+    const currentUser = user || auth.user;
 
     // Determine the user's role - using the direct role property that is now guaranteed to exist
-    const userRole = user?.role || 'user'; // Default to 'user' if somehow undefined
+    const userRole = currentUser?.role || 'user'; // Default to 'user' if somehow undefined
 
     // Make sure we select the correct menu items based on role
     let currentMenuItems;
@@ -44,20 +50,20 @@ export default function DashboardSidebar() {
     return (
         <div className="flex h-full flex-col overflow-hidden">
             {/* Modern User Info */}
-            {user && (
+            {currentUser && (
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
                     className="border-b border-purple-200/50 bg-white/70 p-6 backdrop-blur-sm"
                 >
-                    <div className="flex items-center space-x-3 rounded-xl border border-purple-200/30 bg-gradient-to-r from-purple-50/80 to-purple-100/60 p-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-800 shadow-md">
+                    <div className="flex items-center space-x-3 rounded-xl border border-[#01AEEC]-200/30 bg-gradient-to-r from-purple-50/80 to-purple-100/60 p-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[#01AEEC] to-[#01AEEC] shadow-md">
                             <UserIcon className="h-5 w-5 text-white" />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-gray-900">{user.name}</p>
-                            <p className="truncate text-xs text-gray-500 mb-1">{user.email}</p>
+                            <p className="truncate text-sm font-semibold text-gray-900">{currentUser.name}</p>
+                            <p className="truncate text-xs text-gray-500 mb-1">{currentUser.email}</p>
                             <Badge
                                 variant={userRole === 'admin' ? 'destructive' : 'default'}
                                 className="h-4 py-0 text-xs inline-flex"
@@ -87,17 +93,29 @@ export default function DashboardSidebar() {
                                     className={cn(
                                         'group flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
                                         'text-gray-700 hover:text-gray-900',
-                                        'hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50',
-                                        'hover:shadow-md hover:shadow-purple-100/50',
-                                        'border border-transparent hover:border-purple-200/50',
+                                        'hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-50',
+                                        'hover:shadow-md hover:shadow-blue-100/50',
+                                        'border border-transparent hover:border-blue-200/50',
                                         'backdrop-blur-sm',
                                     )}
                                 >
-                                    <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-gray-100 to-gray-200 transition-all duration-200 group-hover:from-purple-100 group-hover:to-blue-100">
-                                        <Icon className="h-5 w-5 text-gray-600 group-hover:text-purple-700" />
+                                    <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-gray-100 to-gray-200 transition-all duration-200 group-hover:from-blue-100 group-hover:to-blue-100">
+                                        <Icon className="h-5 w-5 text-gray-600 group-hover:text-blue-700" />
                                     </div>
                                     <span className="flex-1 group-hover:text-gray-900">{item.name}</span>
-                                    <ChevronRight className="h-4 w-4 transform text-gray-400 transition-all duration-200 group-hover:translate-x-1 group-hover:text-purple-600" />
+                                    {/* Show badge for new applications - only visible for admin */}
+                                    {userRole === 'admin' && applicationCounts && (
+                                        (item.name === 'IIN Nasional' && applicationCounts.iin_nasional > 0) ||
+                                        (item.name === 'Single IIN/Blockholder' && applicationCounts.iin_single_blockholder > 0)
+                                    ) && (
+                                        <Badge 
+                                            variant="destructive" 
+                                            className="mr-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                                        >
+                                            {item.name === 'IIN Nasional' ? applicationCounts.iin_nasional : applicationCounts.iin_single_blockholder}
+                                        </Badge>
+                                    )}
+                                    <ChevronRight className="h-4 w-4 transform text-gray-400 transition-all duration-200 group-hover:translate-x-1 group-hover:text-[#01AEEC]" />
                                 </Link>
                             </motion.div>
                         );
@@ -110,7 +128,7 @@ export default function DashboardSidebar() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="border-t border-purple-500/20 bg-gradient-to-r from-purple-600 to-purple-900 p-4 backdrop-blur-lg"
+                className="border-t border-[#01AEEC]/20 bg-gradient-to-r from-[#01AEEC] to-[#058ec0] p-4 backdrop-blur-lg"
             >
                 <Link
                     href={route('logout')}
@@ -118,7 +136,7 @@ export default function DashboardSidebar() {
                     as="button"
                     onBefore={() => confirm('Apakah Anda yakin ingin keluar dari sistem?')}
                     className={cn(
-                        'group flex w-full items-center rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
+                        'group flex w-full items-center rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 cursor-pointer',
                         'text-white hover:text-red-100',
                         'hover:bg-white/10 hover:backdrop-blur-sm',
                         'hover:shadow-lg hover:shadow-black/20',
