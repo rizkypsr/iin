@@ -633,6 +633,7 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                 </DialogContent>
                             </Dialog>
                         )}
+
                         {canChangeToPayment && (
                             <>
                                 <Dialog>
@@ -807,6 +808,112 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                     </DialogContent>
                                 </Dialog>
                             </>
+                        )}
+
+                        {/* Status Pembayaran - Tombol Proses ke Verifikasi Lapangan */}
+                        {canChangeToFieldVerification && (
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="sm" disabled={loading}>
+                                        <Shield className="mr-1 h-4 w-4" />
+                                        Proses ke Verifikasi Lapangan
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                    <DialogHeader>
+                                        <DialogTitle>Proses ke Verifikasi Lapangan</DialogTitle>
+                                        <DialogDescription>
+                                            Upload dokumen verifikasi lapangan dan ubah status aplikasi ke <strong>verifikasi lapangan</strong>.
+                                            Dokumen ini akan tersedia untuk diunduh oleh pemohon.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-6 py-4">
+                                        {/* Upload Dokumen Verifikasi Lapangan */}
+                                        <div className="space-y-4">
+                                            <div>
+                                                <Label htmlFor="field_verification_documents_modal" className="text-sm font-medium text-gray-700">
+                                                    Dokumen Verifikasi Lapangan <span className="text-red-500">*</span>
+                                                </Label>
+                                                <Input
+                                                    id="field_verification_documents_modal"
+                                                    type="file"
+                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    multiple
+                                                    onChange={(e) => {
+                                                        const files = Array.from(e.target.files || []);
+                                                        setFieldVerificationDocuments(files);
+                                                        e.target.value = ''; // Reset input
+                                                    }}
+                                                    className="mt-1"
+                                                />
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                </p>
+                                            </div>
+
+                                            {/* Selected Files */}
+                                            {fieldVerificationDocuments.length > 0 && (
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium text-gray-700">File yang Dipilih:</Label>
+                                                    {fieldVerificationDocuments.map((file, index) => (
+                                                        <div key={index} className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                            <div className="flex items-center gap-2">
+                                                                <FileText className="h-4 w-4 text-gray-600" />
+                                                                <div>
+                                                                    <span className="text-sm font-medium text-gray-800">{file.name}</span>
+                                                                    <span className="ml-2 text-xs text-gray-500">
+                                                                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    const newFiles = fieldVerificationDocuments.filter((_, i) => i !== index);
+                                                                    setFieldVerificationDocuments(newFiles);
+                                                                }}
+                                                                className="text-red-600 hover:text-red-700"
+                                                            >
+                                                                Hapus
+                                                            </Button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Catatan */}
+                                        <div>
+                                            <Label htmlFor="field_verification_notes" className="text-sm font-medium text-gray-700">
+                                                Catatan (Opsional)
+                                            </Label>
+                                            <Textarea
+                                                id="field_verification_notes"
+                                                value={notes}
+                                                onChange={(e) => setNotes(e.target.value)}
+                                                placeholder="Catatan untuk verifikasi lapangan..."
+                                                rows={3}
+                                                className="mt-1"
+                                            />
+                                        </div>
+                                    </div>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button variant="outline">Batal</Button>
+                                        </DialogClose>
+                                        <DialogClose asChild>
+                                            <Button
+                                                onClick={() => handleStatusChangeToFieldVerification()}
+                                                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                disabled={loading || fieldVerificationDocuments.length === 0}
+                                            >
+                                                {loading ? 'Memproses...' : 'Proses ke Verifikasi Lapangan'}
+                                            </Button>
+                                        </DialogClose>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                         )}
                     </div>
                 </div>
@@ -1198,26 +1305,26 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                                 <div className="flex items-start gap-4">
                                                     <div
                                                         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${log.status_to === 'perbaikan'
-                                                                ? 'bg-amber-100'
-                                                                : log.status_to === 'pembayaran'
-                                                                    ? 'bg-blue-100'
-                                                                    : log.status_to === 'verifikasi-lapangan'
-                                                                        ? 'bg-purple-100'
-                                                                        : log.status_to === 'terbit'
-                                                                            ? 'bg-green-100'
-                                                                            : 'bg-gray-100'
+                                                            ? 'bg-amber-100'
+                                                            : log.status_to === 'pembayaran'
+                                                                ? 'bg-blue-100'
+                                                                : log.status_to === 'verifikasi-lapangan'
+                                                                    ? 'bg-purple-100'
+                                                                    : log.status_to === 'terbit'
+                                                                        ? 'bg-green-100'
+                                                                        : 'bg-gray-100'
                                                             }`}
                                                     >
                                                         <span
                                                             className={`${log.status_to === 'perbaikan'
-                                                                    ? 'text-amber-600'
-                                                                    : log.status_to === 'pembayaran'
-                                                                        ? 'text-blue-600'
-                                                                        : log.status_to === 'verifikasi-lapangan'
-                                                                            ? 'text-purple-600'
-                                                                            : log.status_to === 'terbit'
-                                                                                ? 'text-green-600'
-                                                                                : 'text-gray-600'
+                                                                ? 'text-amber-600'
+                                                                : log.status_to === 'pembayaran'
+                                                                    ? 'text-blue-600'
+                                                                    : log.status_to === 'verifikasi-lapangan'
+                                                                        ? 'text-purple-600'
+                                                                        : log.status_to === 'terbit'
+                                                                            ? 'text-green-600'
+                                                                            : 'text-gray-600'
                                                                 }`}
                                                         >
                                                             {log.status_to === 'pengajuan' ? (
