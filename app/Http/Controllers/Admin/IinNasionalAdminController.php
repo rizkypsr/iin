@@ -58,7 +58,7 @@ class IinNasionalAdminController extends Controller
         $request->validate([
             'status' => 'required|in:pengajuan,perbaikan,pembayaran,verifikasi-lapangan,pembayaran-tahap-2,menunggu-terbit,terbit',
             'notes' => 'nullable|string',
-            'iin_number' => 'nullable|string|max:20',
+            'iin_number' => 'required_if:status,terbit|nullable|string|max:20',
             'iin_block_range' => 'nullable|array',
             'field_verification_completed' => 'nullable|boolean',
         ]);
@@ -102,14 +102,17 @@ class IinNasionalAdminController extends Controller
         return back()->with('success', 'Status aplikasi berhasil diperbarui');
     }
 
-    public function uploadCertificate(Request $request, IinNasionalApplication $iinNasional)
+    public function uploadCertificate(Request $request, IinNasionalApplication $iinNasional): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'certificate' => 'required|file|mimes:pdf|max:10240',
+            'additional_documents.*' => 'nullable|file|mimes:pdf|max:5120',
+            'iin_number' => 'required|string|max:255',
             'notes' => 'nullable|string'
         ]);
 
         $oldStatus = $iinNasional->status;
+        $updateData = [];
 
         if ($request->hasFile('certificate')) {
             // Delete old certificate if exists
@@ -120,29 +123,56 @@ class IinNasionalAdminController extends Controller
             $file = $request->file('certificate');
             $filename = $iinNasional->application_number . '_' . time() . '_certificate.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('iin-nasional/certificates', $filename, 'public');
-            
-            // Update application with certificate and change status to 'terbit'
-            $iinNasional->update([
+
+            $updateData = array_merge($updateData, [
                 'certificate_path' => $path,
                 'certificate_uploaded_at' => now(),
                 'status' => 'terbit',
                 'field_verification_at' => $iinNasional->field_verification_at ?: now(),
                 'issued_at' => now(),
-                'admin_id' => Auth::id()
-            ]);
-
-            // Log status change
-            IinStatusLog::create([
-                'application_type' => 'nasional',
-                'application_id' => $iinNasional->id,
-                'user_id' => Auth::id(),
-                'status_from' => $oldStatus,
-                'status_to' => 'terbit',
-                'notes' => $request->notes ?: 'IIN diterbitkan dengan upload sertifikat'
+                'admin_id' => Auth::id(),
+                'iin_number' => $request->iin_number
             ]);
         }
 
-        return back()->with('success', 'IIN berhasil diterbitkan dan sertifikat diupload');
+        // Handle additional documents upload
+        if ($request->hasFile('additional_documents')) {
+            $uploadedAdditionalFiles = [];
+
+            foreach ($request->file('additional_documents') as $file) {
+                $filename = $iinNasional->application_number . '_' . time() . '_additional_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('iin-nasional/additional-documents', $filename, 'public');
+
+                $uploadedAdditionalFiles[] = [
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'uploaded_at' => now()->toISOString()
+                ];
+            }
+
+            $updateData['additional_documents'] = $uploadedAdditionalFiles;
+        }
+
+        // Update application
+        $iinNasional->update($updateData);
+
+        // Log status change
+        IinStatusLog::create([
+            'application_type' => 'nasional',
+            'application_id' => $iinNasional->id,
+            'user_id' => Auth::id(),
+            'status_from' => $oldStatus,
+            'status_to' => 'terbit',
+            'notes' => $request->notes ?: 'IIN diterbitkan dengan upload sertifikat'
+        ]);
+
+        $message = 'IIN berhasil diterbitkan dan sertifikat diupload';
+        if ($request->hasFile('additional_documents')) {
+            $additionalCount = count($request->file('additional_documents'));
+            $message .= ' beserta ' . $additionalCount . ' dokumen tambahan';
+        }
+
+        return back()->with('success', $message);
     }
 
     public function uploadPaymentDocuments(Request $request, IinNasionalApplication $iinNasional)
@@ -158,7 +188,7 @@ class IinNasionalAdminController extends Controller
             foreach ($request->file('payment_documents') as $file) {
                 $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_payment_doc.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional/payment-documents', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -169,7 +199,7 @@ class IinNasionalAdminController extends Controller
 
         // Merge with existing documents
         $allDocuments = array_merge($existingDocuments, $uploadedFiles);
-        
+
         $iinNasional->update([
             'payment_documents' => $allDocuments
         ]);
@@ -193,7 +223,8 @@ class IinNasionalAdminController extends Controller
             'field_verification_documents.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'certificate' => 'nullable|file|mimes:pdf|max:10240',
             'notes' => 'nullable|string',
-            'complete_verification' => 'nullable|boolean'
+            'complete_verification' => 'nullable|boolean',
+            'iin_number' => 'required_if:complete_verification,true|nullable|string|max:255'
         ]);
 
         $uploadedFiles = [];
@@ -204,7 +235,7 @@ class IinNasionalAdminController extends Controller
             foreach ($request->file('field_verification_documents') as $file) {
                 $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_field_verification.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional/field-verification', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -215,7 +246,7 @@ class IinNasionalAdminController extends Controller
 
         // Merge with existing documents
         $allDocuments = array_merge($existingDocuments, $uploadedFiles);
-        
+
         $updateData = [
             'field_verification_documents' => $allDocuments
         ];
@@ -230,17 +261,18 @@ class IinNasionalAdminController extends Controller
             $certificateFile = $request->file('certificate');
             $certificateFilename = $iinNasional->application_number . '_' . time() . '_certificate.' . $certificateFile->getClientOriginalExtension();
             $certificatePath = $certificateFile->storeAs('iin-nasional/certificates', $certificateFilename, 'public');
-            
+
             $updateData = array_merge($updateData, [
                 'certificate_path' => $certificatePath,
                 'certificate_uploaded_at' => now(),
                 'status' => 'terbit',
                 'field_verification_at' => now(),
                 'issued_at' => now(),
-                'admin_id' => Auth::id()
+                'admin_id' => Auth::id(),
+                'iin_number' => $request->iin_number
             ]);
         }
-        
+
         $iinNasional->update($updateData);
 
         // Log field verification documents upload
@@ -294,7 +326,7 @@ class IinNasionalAdminController extends Controller
     public function downloadPaymentDocument(IinNasionalApplication $iinNasional, int $index)
     {
         $documents = $iinNasional->payment_documents ?? [];
-        
+
         if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
@@ -308,7 +340,7 @@ class IinNasionalAdminController extends Controller
     public function downloadPaymentProof(IinNasionalApplication $iinNasional, int $index)
     {
         $proofs = $iinNasional->payment_proof_documents ?? [];
-        
+
         if (!isset($proofs[$index]) || !Storage::disk('public')->exists($proofs[$index]['path'])) {
             abort(404, 'Bukti pembayaran tidak ditemukan');
         }
@@ -322,7 +354,7 @@ class IinNasionalAdminController extends Controller
     public function downloadFieldVerificationDocument(IinNasionalApplication $iinNasional, int $index)
     {
         $documents = $iinNasional->field_verification_documents ?? [];
-        
+
         if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen verifikasi lapangan tidak ditemukan');
         }
@@ -330,6 +362,89 @@ class IinNasionalAdminController extends Controller
         return Storage::disk('public')->download(
             $documents[$index]['path'],
             $documents[$index]['original_name'] ?? 'field_verification_document.pdf'
+        );
+    }
+
+    public function uploadAdditionalDocuments(Request $request, IinNasionalApplication $iinNasional)
+    {
+        // Debug logging
+        \Log::info('Upload Additional Documents - Request Data:', [
+            'has_files' => $request->hasFile('additional_documents'),
+            'files_count' => $request->hasFile('additional_documents') ? count($request->file('additional_documents')) : 0,
+            'all_files' => $request->allFiles(),
+            'application_id' => $iinNasional->id,
+            'existing_documents' => $iinNasional->additional_documents
+        ]);
+
+        $request->validate([
+            'additional_documents.*' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $uploadedFiles = [];
+        $existingDocuments = $iinNasional->additional_documents ?? [];
+
+        if ($request->hasFile('additional_documents')) {
+            foreach ($request->file('additional_documents') as $file) {
+                $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_additional.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('iin-nasional/additional-documents', $filename, 'public');
+
+                $uploadedFiles[] = [
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'uploaded_at' => now()->toISOString()
+                ];
+
+                \Log::info('File uploaded:', [
+                    'filename' => $filename,
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName()
+                ]);
+            }
+        }
+
+        // Merge with existing documents
+        $allDocuments = array_merge($existingDocuments, $uploadedFiles);
+
+        \Log::info('Before update:', [
+            'existing_documents' => $existingDocuments,
+            'uploaded_files' => $uploadedFiles,
+            'all_documents' => $allDocuments
+        ]);
+
+        $updateResult = $iinNasional->update([
+            'additional_documents' => $allDocuments,
+            'additional_documents_uploaded_at' => now()
+        ]);
+
+        \Log::info('After update:', [
+            'update_result' => $updateResult,
+            'fresh_additional_documents' => $iinNasional->fresh()->additional_documents
+        ]);
+
+        // Log activity
+        IinStatusLog::create([
+            'application_type' => 'nasional',
+            'application_id' => $iinNasional->id,
+            'user_id' => Auth::id(),
+            'status_from' => null,
+            'status_to' => null,
+            'notes' => 'Admin mengupload dokumen tambahan (' . count($uploadedFiles) . ' file)'
+        ]);
+
+        return back()->with('success', count($uploadedFiles) . ' dokumen tambahan berhasil diupload');
+    }
+
+    public function downloadAdditionalDocument(IinNasionalApplication $iinNasional, int $index)
+    {
+        $documents = $iinNasional->additional_documents ?? [];
+
+        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+            abort(404, 'Dokumen tambahan tidak ditemukan');
+        }
+
+        return Storage::disk('public')->download(
+            $documents[$index]['path'],
+            $documents[$index]['original_name'] ?? 'additional_document.pdf'
         );
     }
 }

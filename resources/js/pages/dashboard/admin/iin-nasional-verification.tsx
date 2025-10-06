@@ -48,6 +48,7 @@ interface IinNasionalApplication {
     payment_proof_documents?: PaymentDocument[];
     payment_proof_uploaded_at?: string;
     certificate_path?: string;
+    additional_documents?: PaymentDocument[];
     payment_verified_at?: string;
     field_verification_at?: string;
     issued_at?: string;
@@ -90,6 +91,7 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
     const [loading, setLoading] = useState(false);
     const [certificateFile, setCertificateFile] = useState<File | null>(null);
     const [uploadingCertificate, setUploadingCertificate] = useState(false);
+    const [additionalDocuments, setAdditionalDocuments] = useState<File[]>([]);
     const [paymentDocuments, setPaymentDocuments] = useState<File[]>([]);
     const [uploadingPaymentDocuments, setUploadingPaymentDocuments] = useState(false);
     const [fieldVerificationDocuments, setFieldVerificationDocuments] = useState<File[]>([]);
@@ -342,12 +344,22 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
 
         const formData = new FormData();
         formData.append('certificate', certificateFile);
+        
+        // Add additional documents if any
+        additionalDocuments.forEach((file, index) => {
+            formData.append(`additional_documents[${index}]`, file);
+        });
 
         try {
             router.post(route('iin-nasional.upload-certificate', application.id), formData, {
                 onSuccess: () => {
-                    showSuccessToast('Sertifikat berhasil diupload');
+                    let message = 'Sertifikat berhasil diupload';
+                    if (additionalDocuments.length > 0) {
+                        message += ` beserta ${additionalDocuments.length} dokumen tambahan`;
+                    }
+                    showSuccessToast(message);
                     setCertificateFile(null);
+                    setAdditionalDocuments([]);
                 },
                 onError: (errors) => {
                     console.error('Error uploading certificate:', errors);
@@ -1435,6 +1447,58 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                                     <span className="text-xs text-gray-500">
                                                         ({(certificateFile.size / 1024 / 1024).toFixed(2)} MB)
                                                     </span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div>
+                                            <Label htmlFor="additional_documents" className="text-sm font-medium text-gray-700">
+                                                Dokumen Tambahan (Opsional)
+                                            </Label>
+                                            <Input
+                                                id="additional_documents"
+                                                type="file"
+                                                accept=".pdf"
+                                                multiple
+                                                onChange={(e) => {
+                                                    const files = Array.from(e.target.files || []);
+                                                    setAdditionalDocuments(files);
+                                                }}
+                                                className="mt-1"
+                                            />
+                                            <p className="mt-1 text-xs text-gray-500">Format yang didukung: PDF. Maksimal 5MB per file. Dapat memilih multiple files.</p>
+                                        </div>
+
+                                        {additionalDocuments.length > 0 && (
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-gray-700">
+                                                    Dokumen Tambahan Terpilih ({additionalDocuments.length} file)
+                                                </Label>
+                                                <div className="space-y-2">
+                                                    {additionalDocuments.map((file, index) => (
+                                                        <div key={index} className="rounded-lg bg-blue-50 p-3">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-2">
+                                                                    <FileText className="h-4 w-4 text-blue-600" />
+                                                                    <span className="text-sm font-medium text-gray-800">{file.name}</span>
+                                                                    <span className="text-xs text-gray-500">
+                                                                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                                                    </span>
+                                                                </div>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() => {
+                                                                        const newFiles = additionalDocuments.filter((_, i) => i !== index);
+                                                                        setAdditionalDocuments(newFiles);
+                                                                    }}
+                                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                >
+                                                                    Hapus
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </div>
                                         )}

@@ -51,6 +51,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
+    Route::get('change-password', function () {
+        return \Inertia\Inertia::render('auth/change-password');
+    })->name('password.change');
+
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });

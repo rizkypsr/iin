@@ -75,7 +75,7 @@ class IinSingleBlockholderController extends Controller
             'application_type' => 'single_blockholder',
             'application_id' => $application->id,
             'user_id' => Auth::id(),
-            'status_from' => 'draft',
+            'status_from' => null,
             'status_to' => 'pengajuan',
             'notes' => 'Aplikasi Single IIN/Blockholder diajukan'
         ]);
@@ -577,6 +577,29 @@ class IinSingleBlockholderController extends Controller
         }
 
         $document = $paymentProofs[$index];
+        $path = $document['path'];
+
+        if (!Storage::disk('public')->exists($path)) {
+            abort(404, 'File tidak ditemukan di storage');
+        }
+
+        $fullPath = Storage::disk('public')->path($path);
+        $originalName = $document['original_name'] ?? basename($path);
+        
+        return response()->download($fullPath, $originalName);
+    }
+
+    public function downloadAdditionalDocument(IinSingleBlockholderApplication $iinSingleBlockholder, int $index)
+    {
+        $this->authorize('downloadFile', $iinSingleBlockholder);
+
+        $additionalDocuments = $iinSingleBlockholder->additional_documents ?? [];
+        
+        if (!isset($additionalDocuments[$index])) {
+            abort(404, 'Dokumen tambahan tidak ditemukan');
+        }
+
+        $document = $additionalDocuments[$index];
         $path = $document['path'];
 
         if (!Storage::disk('public')->exists($path)) {

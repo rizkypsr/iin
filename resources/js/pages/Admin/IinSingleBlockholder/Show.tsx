@@ -68,6 +68,8 @@ interface IinSingleBlockholderApplication {
     payment_documents_uploaded_at_stage_2?: string;
     field_verification_documents?: string[];
     field_verification_documents_uploaded_at?: string;
+    additional_documents?: PaymentDocument[];
+    additional_documents_uploaded_at?: string;
     can_download_certificate?: boolean;
     user: {
         id: number;
@@ -111,12 +113,14 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
     const [loading, setLoading] = useState(false);
     const [paymentDocuments, setPaymentDocuments] = useState<File[]>([]);
     const [fieldVerificationDocuments, setFieldVerificationDocuments] = useState<File[]>([]);
+    const [additionalDocuments, setAdditionalDocuments] = useState<File[]>([]);
     const [uploadingPaymentDocuments, setUploadingPaymentDocuments] = useState(false);
     const [statusNotes, setStatusNotes] = useState('');
 
     // Form untuk terbitkan IIN menggunakan useForm
     const { data, setData, post, processing, progress } = useForm({
         certificate: null as File | null,
+        iin_number: '',
         notes: ''
     });
 
@@ -207,6 +211,7 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                 showSuccessToast('IIN berhasil diterbitkan');
                 setData({
                     certificate: null,
+                    iin_number: '',
                     notes: ''
                 });
             },
@@ -239,6 +244,57 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
             index: index
         });
         window.open(url, '_blank');
+    };
+
+    const removeAdditionalDocument = (index: number) => {
+        setAdditionalDocuments(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleUploadAdditionalDocuments = async () => {
+        if (additionalDocuments.length === 0) {
+            showErrorToast('Pilih dokumen tambahan terlebih dahulu');
+            return;
+        }
+
+        const formData = new FormData();
+        additionalDocuments.forEach((file, index) => {
+            formData.append(`additional_documents[${index}]`, file);
+        });
+
+        try {
+            await router.post(route('admin.iin-single-blockholder.upload-additional-documents', application.id), formData, {
+                onSuccess: () => {
+                    showSuccessToast('Dokumen tambahan berhasil diunggah');
+                    setAdditionalDocuments([]);
+                },
+                onError: (errors) => {
+                    console.error('Upload error:', errors);
+                    showErrorToast('Gagal mengunggah dokumen tambahan');
+                }
+            });
+        } catch (error) {
+            console.error('Upload error:', error);
+            showErrorToast('Gagal mengunggah dokumen tambahan');
+        }
+    };
+
+    const deleteAdditionalDocument = async (documentId: number) => {
+        try {
+            await router.delete(route('admin.iin-single-blockholder.delete-additional-document', {
+                iinSingleBlockholder: application.id,
+                document: documentId
+            }), {
+                onSuccess: () => {
+                    showSuccessToast('Dokumen tambahan berhasil dihapus');
+                },
+                onError: () => {
+                    showErrorToast('Gagal menghapus dokumen tambahan');
+                }
+            });
+        } catch (error) {
+            console.error('Delete error:', error);
+            showErrorToast('Gagal menghapus dokumen tambahan');
+        }
     };
 
     return (
@@ -776,6 +832,21 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                                     <form onSubmit={handleIssueIIN}>
                                         <div className="space-y-4 py-4">
                                             <div>
+                                                <Label htmlFor="iin_number" className="text-sm font-medium text-gray-700">
+                                                    Nomor IIN <span className="text-red-500">*</span>
+                                                </Label>
+                                                <Input
+                                                    id="iin_number"
+                                                    type="number"
+                                                    value={data.iin_number}
+                                                    onChange={(e) => setData('iin_number', e.target.value)}
+                                                    placeholder="Masukkan nomor IIN..."
+                                                    className="mt-1"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div>
                                                 <Label htmlFor="certificate" className="text-sm font-medium text-gray-700">
                                                     Sertifikat IIN <span className="text-red-500">*</span>
                                                 </Label>
@@ -788,6 +859,37 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                                                     required
                                                 />
                                             </div>
+
+                                            {/* Additional Documents */}
+                                            <div>
+                                                <Label className="text-sm font-medium text-gray-700">
+                                                    Dokumen Tambahan (Opsional)
+                                                </Label>
+                                                <Input
+                                                    type="file"
+                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    multiple
+                                                    onChange={(e) => {
+                                                        const files = Array.from(e.target.files || []);
+                                                        setAdditionalDocuments(files);
+                                                    }}
+                                                    className="mt-2"
+                                                />
+                                                {additionalDocuments.length > 0 && (
+                                                    <div className="mt-2 space-y-1">
+                                                        <p className="text-sm text-gray-600">
+                                                            {additionalDocuments.length} file dipilih:
+                                                        </p>
+                                                        {additionalDocuments.map((file, index) => (
+                                                            <div key={index} className="flex items-center space-x-2 text-sm text-gray-700">
+                                                                <FileText className="h-4 w-4 text-blue-500" />
+                                                                <span>{file.name}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+
                                             <div>
                                                 <Label htmlFor="issuance_notes" className="text-sm font-medium text-gray-700">
                                                     Catatan (Opsional)
@@ -822,7 +924,7 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                                             <Button
                                                 onClick={handleIssueIIN}
                                                 className="bg-green-600 hover:bg-green-700 text-white"
-                                                disabled={processing || !data.certificate}
+                                                disabled={processing || !data.certificate || !data.iin_number}
                                             >
                                                 {processing ? 'Memproses...' : 'Terbitkan IIN'}
                                             </Button>

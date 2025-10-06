@@ -469,6 +469,29 @@ class IinNasionalController extends Controller
         return response()->download($fullPath, $originalName);
     }
 
+    public function downloadAdditionalDocument(IinNasionalApplication $iinNasional, int $index)
+    {
+        $this->authorize('downloadFile', $iinNasional);
+
+        $additionalDocuments = $iinNasional->additional_documents ?? [];
+        
+        if (!isset($additionalDocuments[$index])) {
+            abort(404, 'Dokumen tambahan tidak ditemukan');
+        }
+
+        $document = $additionalDocuments[$index];
+        $path = $document['path'];
+
+        if (!Storage::disk('public')->exists($path)) {
+            abort(404, 'File tidak ditemukan di storage');
+        }
+
+        $fullPath = Storage::disk('public')->path($path);
+        $originalName = $document['original_name'] ?? basename($path);
+        
+        return response()->download($fullPath, $originalName);
+    }
+
     public function downloadPaymentProof(IinNasionalApplication $iinNasional, int $index)
     {
         $this->authorize('downloadFile', $iinNasional);

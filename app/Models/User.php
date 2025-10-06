@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -25,6 +26,7 @@ class User extends Authenticatable
         'company_name',
         'company_phone',
         'company_email',
+        'password_changed_at',
     ];
 
     /**
@@ -47,6 +49,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'password_changed_at' => 'datetime',
         ];
     }
     
@@ -86,5 +89,21 @@ class User extends Authenticatable
     protected function hasSpatieTrait(): bool
     {
         return method_exists($this, 'roles') && $this->roles !== null;
+    }
+
+    /**
+     * Get the user's IIN Nasional profile.
+     */
+    public function iinNasionalProfile(): HasOne
+    {
+        return $this->hasOne(IinNasionalProfile::class);
+    }
+
+    /**
+     * Get the user's Single IIN profile.
+     */
+    public function singleIinProfile(): HasOne
+    {
+        return $this->hasOne(SingleIinProfile::class);
     }
 }

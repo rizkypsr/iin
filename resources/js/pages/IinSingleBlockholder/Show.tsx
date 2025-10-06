@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Upload, User } from 'lucide-react';
 import { useState } from 'react';
+import SurveyModal from '@/components/SurveyModal';
 
 interface PaymentDocument {
     path: string;
@@ -39,6 +40,8 @@ interface IinSingleBlockholderApplication {
     payment_documents?: PaymentDocument[];
     payment_documents_stage_2?: PaymentDocument[];
     payment_documents_uploaded_at_stage_2?: string;
+    additional_documents?: PaymentDocument[];
+    additional_documents_uploaded_at?: string;
     payment_verified_at?: string;
     payment_verified_at_stage_2?: string;
     field_verification_at?: string;
@@ -75,6 +78,7 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
     const [activeTab, setActiveTab] = useState('detail');
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         payment_proof: [] as File[],
     });
@@ -455,9 +459,7 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() =>
-                                                    window.open(route('iin-single-blockholder.download-file', [application.id, 'certificate']), '_blank')
-                                                }
+                                                onClick={() => setIsSurveyModalOpen(true)}
                                                 className="border-green-200 bg-white text-green-700 hover:bg-green-50 hover:text-green-800"
                                             >
                                                 <Download className="mr-2 h-4 w-4" />
@@ -541,10 +543,43 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                                         </div>
                                     )}
 
+                                    {application.additional_documents && application.additional_documents.length > 0 && (
+                                        <div className="space-y-3">
+                                            <h4 className="font-medium text-gray-800">Dokumen Tambahan dari Admin</h4>
+                                            {application.additional_documents.map((document: PaymentDocument, index: number) => (
+                                                <div key={index} className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="rounded-full bg-blue-100 p-2">
+                                                            <FileText className="h-7 w-7 text-blue-600" />
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="font-medium text-gray-800">{document.original_name}</h3>
+                                                            <p className="text-sm text-gray-500">
+                                                                Diunggah pada {format(new Date(document.uploaded_at), 'dd MMMM yyyy HH:mm', { locale: id })}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            window.open(route('iin-single-blockholder.download-additional-document', [application.id, index]), '_blank')
+                                                        }
+                                                        className="bg-white"
+                                                    >
+                                                        <Download className="mr-2 h-4 w-4" />
+                                                        Download
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
                                     {!application.application_form_path &&
                                         !application.certificate_path &&
                                         !application.payment_proof_path &&
-                                        !application.requirements_archive_path && (
+                                        !application.requirements_archive_path &&
+                                        (!application.additional_documents || application.additional_documents.length === 0) && (
                                             <div className="p-8 text-center">
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -1091,6 +1126,15 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                     </TabsContent>
                 </Tabs>
             </div>
+            
+            <SurveyModal
+                isOpen={isSurveyModalOpen}
+                onClose={() => setIsSurveyModalOpen(false)}
+                onDownload={() => {
+                    window.open(route('iin-single-blockholder.download-file', [application.id, 'certificate']), '_blank');
+                }}
+                certificateType="Sertifikat Single IIN/Blockholder"
+            />
         </DashboardLayout>
     );
 }

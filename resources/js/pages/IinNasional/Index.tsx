@@ -7,7 +7,8 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, Upload, User } from 'lucide-react';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import SurveyModal from '@/components/SurveyModal';
 
 interface IinNasionalApplication {
     id: number;
@@ -122,6 +123,8 @@ const containerAnimation = {
 
 export default function IinNasionalIndex({ applications, auth }: Props) {
     const { flash } = usePage().props as any;
+    const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+    const [selectedApplication, setSelectedApplication] = useState<IinNasionalApplication | null>(null);
 
     useEffect(() => {
         if (flash.success) {
@@ -262,15 +265,15 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                     style={{
                                                         width:
                                                             application.status === 'pengajuan'
-                                                                ? '25%'
+                                                                ? '40%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                 : application.status === 'perbaikan'
-                                                                    ? '25%'
+                                                                    ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
                                                                     : application.status === 'pembayaran'
-                                                                        ? '50%'
+                                                                        ? '60%'
                                                                         : application.status === 'verifikasi-lapangan'
-                                                                            ? '75%'
+                                                                            ? '80%'
                                                                             : application.status === 'menunggu-terbit'
-                                                                                ? '75%'
+                                                                                ? '80%'
                                                                                 : application.status === 'terbit'
                                                                                     ? '100%'
                                                                                     : '0%',
@@ -279,6 +282,7 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                             </div>
                                             <div className="flex justify-between text-xs text-gray-500">
                                                 <span>Pengajuan</span>
+                                                <span>Verifikasi Dokumen</span>
                                                 <span>Pembayaran</span>
                                                 <span>Verifikasi Lapangan</span>
                                                 <span>Terbit</span>
@@ -383,43 +387,14 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                             variant="outline"
                                                             size="sm"
                                                             className="border-green-200 text-green-600 hover:bg-green-50"
-                                                            onClick={() =>
-                                                                window.open(
-                                                                    route('iin-nasional.download-file', [application.id, 'certificate']),
-                                                                    '_blank',
-                                                                )
-                                                            }
+                                                            onClick={() => {
+                                                                setSelectedApplication(application);
+                                                                setIsSurveyModalOpen(true);
+                                                            }}
                                                         >
                                                             <Download className="mr-2 h-4 w-4" />
                                                             Download Sertifikat
                                                         </Button>
-                                                    )}
-                                                </div>
-
-                                                <div className="flex items-center text-sm text-gray-500">
-                                                    {application.status === 'pembayaran' && (
-                                                        <div className="flex items-center text-blue-500">
-                                                            <CreditCard className="mr-1 h-4 w-4" />
-                                                            <span>Menunggu pembayaran</span>
-                                                        </div>
-                                                    )}
-                                                    {application.status === 'verifikasi-lapangan' && (
-                                                        <div className="flex items-center text-purple-500">
-                                                            <MapPin className="mr-1 h-4 w-4" />
-                                                            <span>Sedang verifikasi lapangan</span>
-                                                        </div>
-                                                    )}
-                                                    {application.status === 'terbit' && (
-                                                        <div className="flex items-center text-green-500">
-                                                            <CheckCircle className="mr-1 h-4 w-4" />
-                                                            <span>Telah terbit</span>
-                                                        </div>
-                                                    )}
-                                                    {application.status === 'pengajuan' && (
-                                                        <div className="flex items-center text-gray-500">
-                                                            <Clock className="mr-1 h-4 w-4" />
-                                                            <span>Sedang diproses</span>
-                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
@@ -452,6 +427,20 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                     </CardContent>
                 </Card>
             </div>
+
+            <SurveyModal
+                isOpen={isSurveyModalOpen}
+                onClose={() => setIsSurveyModalOpen(false)}
+                onDownload={() => {
+                    if (selectedApplication) {
+                        window.open(
+                            route('iin-nasional.download-file', [selectedApplication.id, 'certificate']),
+                            '_blank'
+                        );
+                    }
+                }}
+                certificateType="IIN Nasional"
+            />
         </DashboardLayout>
     );
 }

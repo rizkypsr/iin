@@ -47,6 +47,7 @@ class RegisteredUserController extends Controller
             'company_name' => $request->company_name,
             'company_phone' => $request->company_phone,
             'company_email' => $request->company_email,
+            'password_changed_at' => now(), // Public registration always sets password_changed_at
         ]);
 
         // Assign 'user' role to all public registrations

@@ -6,6 +6,8 @@ import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, Upload, User } from 'lucide-react';
+import { useState } from 'react';
+import SurveyModal from '@/components/SurveyModal';
 
 interface IinSingleBlockholderApplication {
     id: number;
@@ -46,8 +48,8 @@ const getStatusIcon = (status: string) => {
             return <CreditCard className="h-4 w-4" />;
         case 'verifikasi-lapangan':
             return <MapPin className="h-4 w-4" />;
-        case 'menunggu-terbit':
-            return <Clock className="h-4 w-4" />;
+        case 'pembayaran-tahap-2':
+            return <CreditCard className="h-4 w-4" />;
         case 'terbit':
             return <Award className="h-4 w-4" />;
         default:
@@ -68,11 +70,11 @@ const getStatusBadgeClass = (status: string) => {
             return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
         case 'verifikasi-lapangan':
             return 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200';
-        case 'menunggu-terbit':
-            return 'bg-cyan-100 text-cyan-800 hover:bg-cyan-200';
+        case 'pembayaran-tahap-2':
+            return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
         case 'terbit':
             return 'bg-green-100 text-green-800 hover:bg-green-200';
-        case 'ditolak':
+        case 'perbaikan':
             return 'bg-red-100 text-red-800 hover:bg-red-200';
         default:
             return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
@@ -89,15 +91,15 @@ const getStatusLabel = (status: string) => {
         case 'perbaikan':
             return 'Perlu Perbaikan';
         case 'pembayaran':
-            return 'Menunggu Pembayaran';
+            return 'Pembayaran Tahap 1';
         case 'verifikasi-lapangan':
             return 'Verifikasi Lapangan';
-        case 'menunggu-terbit':
-            return 'Menunggu Terbit';
+        case 'pembayaran-tahap-2':
+            return 'Pembayaran Tahap 2';
         case 'terbit':
             return 'Sudah Terbit';
-        case 'ditolak':
-            return 'Ditolak';
+        case 'perbaikan':
+            return 'Perbaikan';
         default:
             return 'Tidak Diketahui';
     }
@@ -119,6 +121,8 @@ const containerAnimation = {
 };
 
 export default function IinSingleBlockholderIndex({ applications, auth }: Props) {
+    const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+    const [selectedApplication, setSelectedApplication] = useState<IinSingleBlockholderApplication | null>(null);
     return (
         <DashboardLayout user={auth.user}>
             <Head title="Pengajuan Single IIN/Blockholder" />
@@ -203,9 +207,9 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                             <li>Download dan isi formulir aplikasi dengan lengkap</li>
                                             <li>Upload formulir yang telah diisi</li>
                                             <li>Tunggu verifikasi dari admin</li>
-                                            <li>Lakukan pembayaran Tahap 1 jika aplikasi disetujui</li>
-                                            <li>Tunggu proses verifikasi lapangan</li>
-                                            <li>Lakukan pembayaran Tahap 2 jika aplikasi disetujui</li>
+                                            <li>Lakukan Pembayaran jika aplikasi disetujui</li>
+                                            <li>Tunggu proses Verifikasi Lapangan</li>
+                                            <li>Lakukan Pembayaran Tahap 2 jika Verifikasi Lapangan selesai</li>
                                             <li>Single IIN akan diterbitkan jika semua tahapan selesai</li>
                                         </ul>
                                     </div>
@@ -251,15 +255,15 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                                     style={{
                                                         width:
                                                             application.status === 'pengajuan'
-                                                                ? '25%'
+                                                                ? '33%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                 : application.status === 'perbaikan'
-                                                                  ? '25%'
-                                                                  : application.status === 'verifikasi-lapangan'
+                                                                  ? '33%' // Perbaikan also means user is in Verifikasi Dokumen phase
+                                                                  : application.status === 'pembayaran'
                                                                     ? '50%'
-                                                                    : application.status === 'pembayaran'
-                                                                      ? '75%'
-                                                                      : application.status === 'menunggu-terbit'
-                                                                        ? '75%'
+                                                                    : application.status === 'verifikasi-lapangan'
+                                                                      ? '67%'
+                                                                      : application.status === 'pembayaran-tahap-2'
+                                                                        ? '83%'
                                                                         : application.status === 'terbit'
                                                                           ? '100%'
                                                                           : '0%',
@@ -268,8 +272,10 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                             </div>
                                             <div className="flex justify-between text-xs text-gray-500">
                                                 <span>Pengajuan</span>
-                                                <span>Verifikasi</span>
-                                                <span>Pembayaran</span>
+                                                <span>Verifikasi Dokumen</span>
+                                                <span>Pembayaran 1</span>
+                                                <span>Verifikasi Lapangan</span>
+                                                <span>Pembayaran 2</span>
                                                 <span>Terbit</span>
                                             </div>
                                         </div>
@@ -327,7 +333,7 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                                             </Link>
                                                         )}
 
-                                                    {application.status === 'pembayaran' && auth.user.role === 'user' && (
+                                                    {(application.status === 'pembayaran' || application.status === 'pembayaran-tahap-2') && auth.user.role === 'user' && (
                                                         <Link href={route('iin-single-blockholder.show', application.id) + '#payment'}>
                                                             <Button
                                                                 variant="outline"
@@ -345,12 +351,10 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                                             variant="outline"
                                                             size="sm"
                                                             className="border-green-200 text-green-600 hover:bg-green-50"
-                                                            onClick={() =>
-                                                                window.open(
-                                                                    route('iin-single-blockholder.download-file', [application.id, 'certificate']),
-                                                                    '_blank',
-                                                                )
-                                                            }
+                                                            onClick={() => {
+                                                                setSelectedApplication(application);
+                                                                setIsSurveyModalOpen(true);
+                                                            }}
                                                         >
                                                             <Download className="mr-2 h-4 w-4" />
                                                             Download Sertifikat
@@ -360,15 +364,21 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
 
                                                 <div className="flex items-center text-sm text-gray-500">
                                                     {application.status === 'pembayaran' && (
-                                                        <div className="flex items-center text-blue-500">
+                                                        <div className="flex items-center text-purple-500">
                                                             <CreditCard className="mr-1 h-4 w-4" />
-                                                            <span>Menunggu pembayaran</span>
+                                                            <span>Menunggu Pembayaran Tahap 1</span>
+                                                        </div>
+                                                    )}
+                                                    {application.status === 'pembayaran-tahap-2' && (
+                                                        <div className="flex items-center text-orange-500">
+                                                            <CreditCard className="mr-1 h-4 w-4" />
+                                                            <span>Menunggu Pembayaran Tahap 2</span>
                                                         </div>
                                                     )}
                                                     {application.status === 'verifikasi-lapangan' && (
-                                                        <div className="flex items-center text-purple-500">
+                                                        <div className="flex items-center text-indigo-500">
                                                             <MapPin className="mr-1 h-4 w-4" />
-                                                            <span>Sedang verifikasi lapangan</span>
+                                                            <span>Sedang Verifikasi Lapangan</span>
                                                         </div>
                                                     )}
                                                     {application.status === 'terbit' && (
@@ -415,6 +425,20 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                     </CardContent>
                 </Card>
             </div>
+
+            <SurveyModal
+                isOpen={isSurveyModalOpen}
+                onClose={() => setIsSurveyModalOpen(false)}
+                onDownload={() => {
+                    if (selectedApplication) {
+                        window.open(
+                            route('iin-single-blockholder.download-file', [selectedApplication.id, 'certificate']),
+                            '_blank'
+                        );
+                    }
+                }}
+                certificateType="IIN Single Blockholder"
+            />
         </DashboardLayout>
     );
 }

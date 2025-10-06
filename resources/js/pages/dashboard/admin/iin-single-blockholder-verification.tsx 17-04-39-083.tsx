@@ -47,6 +47,7 @@ interface IinSingleBlockholderApplication {
     payment_proof_path?: string;
     payment_proof_documents?: PaymentDocument[];
     certificate_path?: string;
+    additional_documents?: PaymentDocument[];
     payment_verified_at?: string;
     payment_verified_at_stage_2?: string;
     field_verification_at?: string;
@@ -98,6 +99,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
     const [statusNotes, setStatusNotes] = useState('');
     const [updatingStatus, setUpdatingStatus] = useState(false);
     const [fieldVerificationDocuments, setFieldVerificationDocuments] = useState<File[]>([]);
+    const [additionalDocuments, setAdditionalDocuments] = useState<File[]>([]);
 
     // Admin can only issue IIN when status is "menunggu-terbit"
     // This ensures payment stage 2 documents have been uploaded
@@ -220,6 +222,11 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
         formData.append('iin_number', iinNumber.trim());
         formData.append('certificate', certificateFile);
 
+        // Add additional documents if any
+        additionalDocuments.forEach((file, index) => {
+            formData.append(`additional_documents[${index}]`, file);
+        });
+
         try {
             router.post(
                 route('iin-single-blockholder.issue-iin-with-certificate', application.id),
@@ -228,6 +235,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                     onSuccess: () => {
                         showSuccessToast('IIN berhasil diterbitkan dan sertifikat diupload');
                         setCertificateFile(null);
+                        setAdditionalDocuments([]);
                     },
                     onError: (errors) => {
                         console.error('Error issuing IIN:', errors);
@@ -1729,6 +1737,53 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                         ({(certificateFile.size / 1024 / 1024).toFixed(2)} MB)
                                                     </span>
                                                 </div>
+                                            </div>
+                                        )}
+
+                                        <div>
+                                            <Label htmlFor="additional_documents" className="text-sm font-medium text-gray-700">
+                                                Dokumen Tambahan (Opsional)
+                                            </Label>
+                                            <Input
+                                                id="additional_documents"
+                                                type="file"
+                                                accept=".pdf"
+                                                multiple
+                                                onChange={(e) => {
+                                                    const files = Array.from(e.target.files || []);
+                                                    setAdditionalDocuments(files);
+                                                }}
+                                                className="mt-1"
+                                            />
+                                            <p className="mt-1 text-xs text-gray-500">Format yang didukung: PDF. Maksimal 5MB per file.</p>
+                                        </div>
+
+                                        {additionalDocuments.length > 0 && (
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-gray-700">File Dokumen Tambahan:</Label>
+                                                {additionalDocuments.map((file, index) => (
+                                                    <div key={index} className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <FileText className="h-4 w-4 text-gray-600" />
+                                                            <span className="text-sm font-medium text-gray-800">{file.name}</span>
+                                                            <span className="text-xs text-gray-500">
+                                                                ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                                            </span>
+                                                        </div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                const newFiles = additionalDocuments.filter((_, i) => i !== index);
+                                                                setAdditionalDocuments(newFiles);
+                                                            }}
+                                                            className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
                                             </div>
                                         )}
 

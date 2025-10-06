@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Upload, User, X } from 'lucide-react';
 import { useState } from 'react';
+import SurveyModal from '@/components/SurveyModal';
 
 interface PaymentDocument {
     path: string;
@@ -42,6 +43,8 @@ interface IinNasionalApplication {
     payment_proof_documents?: PaymentDocument[];
     field_verification_documents?: PaymentDocument[];
     field_verification_documents_uploaded_at?: string;
+    additional_documents?: PaymentDocument[];
+    additional_documents_uploaded_at?: string;
     payment_verified_at?: string;
     field_verification_at?: string;
     issued_at?: string;
@@ -86,9 +89,13 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
     const [activeTab, setActiveTab] = useState('detail');
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         payment_proof: [] as File[],
     });
+
+    console.log(application);
+    
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -442,9 +449,7 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() =>
-                                                    window.open(route('iin-nasional.download-file', [application.id, 'certificate']), '_blank')
-                                                }
+                                                onClick={() => setIsSurveyModalOpen(true)}
                                                 className="border-green-200 bg-white text-green-700 hover:bg-green-50 hover:text-green-800"
                                             >
                                                 <Download className="mr-2 h-4 w-4" />
@@ -470,54 +475,6 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                 onClick={() =>
                                                     window.open(route('iin-nasional.download-file', [application.id, 'application_form']), '_blank')
                                                 }
-                                                className="bg-white"
-                                            >
-                                                <Download className="mr-2 h-4 w-4" />
-                                                Download
-                                            </Button>
-                                        </div>
-                                    )}
-
-                                    {application.business_license_path && (
-                                        <div className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50">
-                                            <div className="flex items-center gap-4">
-                                                <div className="rounded-full bg-blue-100 p-2">
-                                                    <FileText className="h-7 w-7 text-blue-600" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-medium text-gray-800">Izin Usaha</h3>
-                                                    <p className="text-sm text-gray-500">Dokumen izin usaha</p>
-                                                </div>
-                                            </div>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() =>
-                                                    window.open(route('iin-nasional.download-file', [application.id, 'business_license']), '_blank')
-                                                }
-                                                className="bg-white"
-                                            >
-                                                <Download className="mr-2 h-4 w-4" />
-                                                Download
-                                            </Button>
-                                        </div>
-                                    )}
-
-                                    {application.npwp_path && (
-                                        <div className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50">
-                                            <div className="flex items-center gap-4">
-                                                <div className="rounded-full bg-amber-100 p-2">
-                                                    <FileText className="h-7 w-7 text-amber-600" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-medium text-gray-800">NPWP</h3>
-                                                    <p className="text-sm text-gray-500">Dokumen NPWP</p>
-                                                </div>
-                                            </div>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => window.open(route('iin-nasional.download-file', [application.id, 'npwp']), '_blank')}
                                                 className="bg-white"
                                             >
                                                 <Download className="mr-2 h-4 w-4" />
@@ -580,9 +537,6 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                     {application.field_verification_documents && application.field_verification_documents.length > 0 && (
                                         <div className="space-y-4">
                                             <h3 className="text-lg font-semibold text-gray-800">Dokumen Verifikasi Lapangan</h3>
-                                            <p className="text-sm text-gray-600">
-                                                Admin telah mengunggah {application.field_verification_documents.length} dokumen verifikasi lapangan pada {application.field_verification_documents_uploaded_at ? new Date(application.field_verification_documents_uploaded_at).toLocaleDateString('id-ID') : 'tanggal tidak tersedia'}.
-                                            </p>
                                             {application.field_verification_documents.map((document: PaymentDocument, index: number) => (
                                                 <div key={index} className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50">
                                                     <div className="flex items-center gap-4">
@@ -614,13 +568,49 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                         </div>
                                     )}
 
+                                    {/* Additional Documents */}
+                                    {application.additional_documents && application.additional_documents.length > 0 && (
+                                        <div className="space-y-4">
+                                            <h3 className="text-lg font-semibold text-gray-800">Dokumen Tambahan</h3>
+                                            {application.additional_documents.map((document: PaymentDocument, index: number) => (
+                                                <div key={index} className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="rounded-full bg-teal-100 p-2">
+                                                            <FileText className="h-7 w-7 text-teal-600" />
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="font-medium text-gray-800">{document.original_name || `Dokumen Tambahan ${index + 1}`}</h3>
+                                                            <p className="text-sm text-gray-500">Dokumen tambahan dari admin</p>
+                                                        </div>
+                                                    </div>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => window.open(
+                                                            route('iin-nasional.download-additional-document', {
+                                                                iinNasional: application.id,
+                                                                index: index,
+                                                            }),
+                                                            '_blank',
+                                                        )}
+                                                        className="bg-white"
+                                                    >
+                                                        <Download className="mr-2 h-4 w-4" />
+                                                        Download
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
                                     {!application.application_form_path &&
                                         !application.business_license_path &&
                                         !application.npwp_path &&
                                         !application.certificate_path &&
                                         !application.payment_proof_path &&
                                         !application.requirements_archive_path &&
-                                        (!application.field_verification_documents || application.field_verification_documents.length === 0) && (
+                                        (!application.field_verification_documents || application.field_verification_documents.length === 0) &&
+                                        (!application.additional_documents || application.additional_documents.length === 0) && (
                                             <div className="p-8 text-center">
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -825,10 +815,6 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                         </div>
                                     )
                                 )}
-
-
-
-
 
                                 {application.can_upload_payment_proof && auth.user.role === 'user' && application.payment_documents && application.payment_documents.length > 0 && (application.payment_proof_path || (application.payment_proof_documents && application.payment_proof_documents.length > 0)) && (
                                     <div className="mt-6 rounded-lg border p-4">
@@ -1148,6 +1134,15 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                     </TabsContent>
                 </Tabs>
             </div>
+
+            <SurveyModal
+                isOpen={isSurveyModalOpen}
+                onClose={() => setIsSurveyModalOpen(false)}
+                onDownload={() => {
+                    window.open(route('iin-nasional.download-file', [application.id, 'certificate']), '_blank');
+                }}
+                certificateType="IIN Nasional"
+            />
         </DashboardLayout >
     );
 }

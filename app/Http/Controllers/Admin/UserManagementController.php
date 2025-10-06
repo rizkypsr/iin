@@ -41,6 +41,40 @@ class UserManagementController extends Controller
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|in:user,admin',
+            // IIN Nasional Profile validation
+            'iin_nasional_profile.institution_name' => 'nullable|string|max:255',
+            'iin_nasional_profile.brand' => 'nullable|string|max:255',
+            'iin_nasional_profile.iin_national_assignment' => 'nullable|string|max:255',
+            'iin_nasional_profile.assignment_year' => 'nullable|integer|min:1900|max:' . date('Y'),
+            'iin_nasional_profile.regional' => 'nullable|string|max:255',
+            'iin_nasional_profile.aspi_recommendation_letter' => 'nullable|string|max:255',
+            'iin_nasional_profile.phone_fax' => 'nullable|string|max:255',
+            'iin_nasional_profile.email_office' => 'nullable|email|max:255',
+            'iin_nasional_profile.contact_person' => 'nullable|string|max:255',
+            'iin_nasional_profile.contact_person_phone' => 'nullable|string|max:255',
+            'iin_nasional_profile.contact_person_email' => 'nullable|email|max:255',
+            'iin_nasional_profile.remarks_status' => 'nullable|string|max:255',
+            'iin_nasional_profile.details' => 'nullable|string',
+            'iin_nasional_profile.usage_purpose' => 'nullable|string',
+            'iin_nasional_profile.address' => 'nullable|string',
+            'iin_nasional_profile.card_issued' => 'nullable|boolean',
+            // Single IIN Profile validation
+            'single_iin_profile.institution_name' => 'nullable|string|max:255',
+            'single_iin_profile.type' => 'nullable|string|max:255',
+            'single_iin_profile.year' => 'nullable|integer|min:1900|max:' . date('Y'),
+            'single_iin_profile.iin_assignment' => 'nullable|string|max:255',
+            'single_iin_profile.assignment_date' => 'nullable|date',
+            'single_iin_profile.regional' => 'nullable|string|max:255',
+            'single_iin_profile.usage_purpose' => 'nullable|string',
+            'single_iin_profile.address' => 'nullable|string',
+            'single_iin_profile.updated_address' => 'nullable|string',
+            'single_iin_profile.phone_fax' => 'nullable|string|max:255',
+            'single_iin_profile.updated_phone_fax' => 'nullable|string|max:255',
+            'single_iin_profile.email' => 'nullable|email|max:255',
+            'single_iin_profile.contact_person' => 'nullable|string|max:255',
+            'single_iin_profile.remarks_status' => 'nullable|string|max:255',
+            'single_iin_profile.card_specimen' => 'nullable|string|max:255',
+            'single_iin_profile.previous_name' => 'nullable|string|max:255',
         ]);
 
         // Only allow admin to create admin accounts
@@ -52,10 +86,21 @@ class UserManagementController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'password_changed_at' => $request->password === env('DEFAULT_PASSWORD', 'password123') ? null : now(),
         ]);
 
         // Assign the specified role
         $user->assignRole($request->role);
+
+        // Create IIN Nasional Profile if data is provided
+        if ($request->has('iin_nasional_profile') && !empty(array_filter($request->iin_nasional_profile))) {
+            $user->iinNasionalProfile()->create($request->iin_nasional_profile);
+        }
+
+        // Create Single IIN Profile if data is provided
+        if ($request->has('single_iin_profile') && !empty(array_filter($request->single_iin_profile))) {
+            $user->singleIinProfile()->create($request->single_iin_profile);
+        }
 
         return to_route('admin.users.index')
             ->with('success', ucfirst($request->role) . ' account created successfully.');
@@ -101,7 +146,7 @@ class UserManagementController extends Controller
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/users/edit', [
-            'user' => $user->load('roles'),
+            'user' => $user->load(['roles', 'iinNasionalProfile', 'singleIinProfile']),
             'application_counts' => $applicationCounts
         ]);
     }
@@ -115,6 +160,40 @@ class UserManagementController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|in:user,admin',
+            // IIN Nasional Profile validation
+            'iin_nasional_profile.institution_name' => 'nullable|string|max:255',
+            'iin_nasional_profile.brand' => 'nullable|string|max:255',
+            'iin_nasional_profile.iin_national_assignment' => 'nullable|string|max:255',
+            'iin_nasional_profile.assignment_year' => 'nullable|integer|min:1900|max:' . date('Y'),
+            'iin_nasional_profile.regional' => 'nullable|string|max:255',
+            'iin_nasional_profile.aspi_recommendation_letter' => 'nullable|string|max:255',
+            'iin_nasional_profile.phone_fax' => 'nullable|string|max:255',
+            'iin_nasional_profile.email_office' => 'nullable|email|max:255',
+            'iin_nasional_profile.contact_person' => 'nullable|string|max:255',
+            'iin_nasional_profile.contact_person_phone' => 'nullable|string|max:255',
+            'iin_nasional_profile.contact_person_email' => 'nullable|email|max:255',
+            'iin_nasional_profile.remarks_status' => 'nullable|string|max:255',
+            'iin_nasional_profile.details' => 'nullable|string',
+            'iin_nasional_profile.usage_purpose' => 'nullable|string',
+            'iin_nasional_profile.address' => 'nullable|string',
+            'iin_nasional_profile.card_issued' => 'nullable|boolean',
+            // Single IIN Profile validation
+            'single_iin_profile.institution_name' => 'nullable|string|max:255',
+            'single_iin_profile.type' => 'nullable|string|max:255',
+            'single_iin_profile.year' => 'nullable|integer|min:1900|max:' . date('Y'),
+            'single_iin_profile.iin_assignment' => 'nullable|string|max:255',
+            'single_iin_profile.assignment_date' => 'nullable|date',
+            'single_iin_profile.regional' => 'nullable|string|max:255',
+            'single_iin_profile.usage_purpose' => 'nullable|string',
+            'single_iin_profile.address' => 'nullable|string',
+            'single_iin_profile.updated_address' => 'nullable|string',
+            'single_iin_profile.phone_fax' => 'nullable|string|max:255',
+            'single_iin_profile.updated_phone_fax' => 'nullable|string|max:255',
+            'single_iin_profile.email' => 'nullable|email|max:255',
+            'single_iin_profile.contact_person' => 'nullable|string|max:255',
+            'single_iin_profile.remarks_status' => 'nullable|string|max:255',
+            'single_iin_profile.card_specimen' => 'nullable|string|max:255',
+            'single_iin_profile.previous_name' => 'nullable|string|max:255',
         ]);
 
         // Only allow admin to change roles to admin
@@ -129,6 +208,34 @@ class UserManagementController extends Controller
 
         // Update role
         $user->syncRoles([$request->role]);
+
+        // Update or create IIN Nasional Profile
+        if ($request->has('iin_nasional_profile')) {
+            $iinNasionalData = array_filter($request->iin_nasional_profile);
+            if (!empty($iinNasionalData)) {
+                $user->iinNasionalProfile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $iinNasionalData
+                );
+            } else {
+                // Delete if all fields are empty
+                $user->iinNasionalProfile()->delete();
+            }
+        }
+
+        // Update or create Single IIN Profile
+        if ($request->has('single_iin_profile')) {
+            $singleIinData = array_filter($request->single_iin_profile);
+            if (!empty($singleIinData)) {
+                $user->singleIinProfile()->updateOrCreate(
+                    ['user_id' => $user->id],
+                    $singleIinData
+                );
+            } else {
+                // Delete if all fields are empty
+                $user->singleIinProfile()->delete();
+            }
+        }
 
         return to_route('admin.users.index')
             ->with('success', 'User updated successfully.');

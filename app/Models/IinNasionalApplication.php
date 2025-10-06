@@ -25,6 +25,8 @@ class IinNasionalApplication extends Model
         'field_verification_documents',
         'field_verification_documents_uploaded_at',
         'certificate_path',
+        'additional_documents',
+        'additional_documents_uploaded_at',
         'iin_number',
         'notes',
         'submitted_at',
@@ -40,6 +42,7 @@ class IinNasionalApplication extends Model
         'payment_proof_documents' => 'array',
         'payment_documents' => 'array',
         'field_verification_documents' => 'array',
+        'additional_documents' => 'array',
         'submitted_at' => 'datetime',
         'payment_verified_at' => 'datetime',
         'field_verification_at' => 'datetime',
@@ -48,6 +51,7 @@ class IinNasionalApplication extends Model
         'payment_proof_uploaded_at' => 'datetime',
         'payment_documents_uploaded_at' => 'datetime',
         'field_verification_documents_uploaded_at' => 'datetime',
+        'additional_documents_uploaded_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

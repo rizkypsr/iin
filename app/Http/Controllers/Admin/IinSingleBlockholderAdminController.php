@@ -59,7 +59,7 @@ class IinSingleBlockholderAdminController extends Controller
         $request->validate([
             'status' => 'required|in:pengajuan,perbaikan,pembayaran,verifikasi-lapangan,pembayaran-tahap-2,menunggu-terbit,terbit',
             'notes' => 'nullable|string',
-            'iin_number' => 'nullable|string|max:20',
+            'iin_number' => 'required_if:status,terbit|string|max:20',
             'iin_block_range' => 'nullable|array',
             'field_verification_completed' => 'nullable|boolean',
         ]);
@@ -109,10 +109,19 @@ class IinSingleBlockholderAdminController extends Controller
     {
         $request->validate([
             'certificate' => 'required|file|mimes:pdf,doc,docx|max:10240',
+            'additional_documents.*' => 'nullable|file|mimes:pdf|max:5120',
+            'iin_number' => 'required|string|max:20',
             'notes' => 'nullable|string|max:1000',
         ]);
 
         return DB::transaction(function () use ($request, $iinSingleBlockholder) {
+            $updateData = [
+                'iin_number' => $request->iin_number,
+                'status' => 'terbit',
+                'issued_at' => now(),
+                'notes' => $request->notes
+            ];
+
             if ($request->hasFile('certificate')) {
                 // Delete old certificate if exists
                 if ($iinSingleBlockholder->certificate_path && Storage::disk('public')->exists($iinSingleBlockholder->certificate_path)) {
@@ -123,27 +132,48 @@ class IinSingleBlockholderAdminController extends Controller
                 $filename = $iinSingleBlockholder->application_number . '_' . time() . '_certificate.' . $file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-single-blockholder/certificates', $filename, 'public');
                 
-                // Update application with IIN number, certificate, and status
-                $iinSingleBlockholder->update([
-                    'certificate_path' => $path,
-                    'certificate_uploaded_at' => now(),
-                    'status' => 'terbit',
-                    'issued_at' => now(),
-                    'notes' => $request->notes
-                ]);
-
-                // Log status change
-                IinStatusLog::create([
-                    'application_type' => 'single_blockholder',
-                    'application_id' => $iinSingleBlockholder->id,
-                    'user_id' => Auth::id(),
-                    'status_from' => 'pembayaran-tahap-2',
-                    'status_to' => 'terbit',
-                    'notes' => $request->notes ?: 'IIN berhasil diterbitkan dengan nomor: ' . $request->iin_number
-                ]);
+                $updateData['certificate_path'] = $path;
+                $updateData['certificate_uploaded_at'] = now();
             }
 
-            return back()->with('success', 'IIN berhasil diterbitkan');
+            // Handle additional documents upload
+            if ($request->hasFile('additional_documents')) {
+                $uploadedAdditionalFiles = [];
+                
+                foreach ($request->file('additional_documents') as $file) {
+                    $filename = $iinSingleBlockholder->application_number . '_' . time() . '_additional_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $path = $file->storeAs('iin-single-blockholder/additional-documents', $filename, 'public');
+                    
+                    $uploadedAdditionalFiles[] = [
+                        'path' => $path,
+                        'original_name' => $file->getClientOriginalName(),
+                        'uploaded_at' => now()->toISOString()
+                    ];
+                }
+                
+                $updateData['additional_documents'] = $uploadedAdditionalFiles;
+            }
+
+            // Update application
+            $iinSingleBlockholder->update($updateData);
+
+            // Log status change
+            IinStatusLog::create([
+                'application_type' => 'single_blockholder',
+                'application_id' => $iinSingleBlockholder->id,
+                'user_id' => Auth::id(),
+                'status_from' => 'pembayaran-tahap-2',
+                'status_to' => 'terbit',
+                'notes' => $request->notes ?: 'IIN berhasil diterbitkan dengan nomor: ' . $request->iin_number
+            ]);
+
+            $message = 'IIN berhasil diterbitkan';
+            if ($request->hasFile('additional_documents')) {
+                $additionalCount = count($request->file('additional_documents'));
+                $message .= ' beserta ' . $additionalCount . ' dokumen tambahan';
+            }
+
+            return back()->with('success', $message);
         });
     }
 
@@ -348,6 +378,20 @@ class IinSingleBlockholderAdminController extends Controller
         return Storage::disk('public')->download(
             $documents[$index]['path'],
             $documents[$index]['original_name'] ?? 'field_verification_document.pdf'
+        );
+    }
+
+    public function downloadAdditionalDocument(IinSingleBlockholderApplication $iinSingleBlockholder, int $index)
+    {
+        $documents = $iinSingleBlockholder->additional_documents ?? [];
+        
+        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+            abort(404, 'Dokumen tambahan tidak ditemukan');
+        }
+
+        return Storage::disk('public')->download(
+            $documents[$index]['path'],
+            $documents[$index]['original_name'] ?? 'additional_document.pdf'
         );
     }
 }

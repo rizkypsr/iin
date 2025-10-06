@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { User, PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ChevronRight, FileText, LayoutDashboard, LogOut, User as UserIcon, Users, CreditCard, Settings } from 'lucide-react';
+import { ChevronRight, FileText, LayoutDashboard, LogOut, User as UserIcon, Users, CreditCard, Settings, Shield, BarChart3 } from 'lucide-react';
 
 interface DashboardSidebarProps {
     user?: User;
@@ -18,13 +18,18 @@ const menuItems = {
         { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { name: 'IIN Nasional', href: '/iin-nasional', icon: FileText },
         { name: 'Single IIN/Blockholder', href: '/iin-single-blockholder', icon: CreditCard },
-        // { name: 'Profil', href: '/dashboard/profil', icon: UserIcon },
+        { name: 'Pengawasan IIN Nasional', href: '/pengawasan-iin-nasional', icon: Shield },
+        { name: 'Pengawasan Single IIN', href: '/pengawasan-single-iin', icon: Shield },
+        { name: 'Profil', href: '/dashboard/profil', icon: UserIcon },
     ],
     admin: [
         { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { name: 'IIN Nasional', href: '/admin/iin-nasional', icon: FileText },
         { name: 'Single IIN/Blockholder', href: '/admin/iin-single-blockholder', icon: CreditCard },
+        { name: 'Pengawasan IIN Nasional', href: '/admin/pengawasan-iin-nasional', icon: Shield },
+        { name: 'Pengawasan Single IIN', href: '/admin/pengawasan-single-iin', icon: Shield },
         { name: 'User Management', href: '/admin/users', icon: Users },
+        { name: 'Laporan', href: '/admin/reports', icon: BarChart3 },
         { name: 'Settings', href: '/admin/settings', icon: Settings },
     ],
 
@@ -57,8 +62,8 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                     transition={{ duration: 0.5, delay: 0.1 }}
                     className="border-b border-purple-200/50 bg-white/70 p-6 backdrop-blur-sm"
                 >
-                    <div className="flex items-center space-x-3 rounded-xl border border-[#01AEEC]-200/30 bg-gradient-to-r from-purple-50/80 to-purple-100/60 p-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[#01AEEC] to-[#01AEEC] shadow-md">
+                    <div className="flex items-center space-x-3 rounded-xl border border-purple-200/30 bg-gradient-to-r from-purple-50/80 to-purple-100/60 p-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-800 shadow-md">
                             <UserIcon className="h-5 w-5 text-white" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -80,7 +85,7 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                 <div className="space-y-2">
                     {currentMenuItems.map((item, index) => {
                         const Icon = item.icon;
-                        
+
                         return (
                             <motion.div
                                 key={item.name}
@@ -108,14 +113,14 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                                         (item.name === 'IIN Nasional' && applicationCounts.iin_nasional > 0) ||
                                         (item.name === 'Single IIN/Blockholder' && applicationCounts.iin_single_blockholder > 0)
                                     ) && (
-                                        <Badge 
-                                            variant="destructive" 
-                                            className="mr-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-                                        >
-                                            {item.name === 'IIN Nasional' ? applicationCounts.iin_nasional : applicationCounts.iin_single_blockholder}
-                                        </Badge>
-                                    )}
-                                    <ChevronRight className="h-4 w-4 transform text-gray-400 transition-all duration-200 group-hover:translate-x-1 group-hover:text-[#01AEEC]" />
+                                            <Badge
+                                                variant="destructive"
+                                                className="mr-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                                            >
+                                                {item.name === 'IIN Nasional' ? applicationCounts.iin_nasional : applicationCounts.iin_single_blockholder}
+                                            </Badge>
+                                        )}
+                                    <ChevronRight className="h-4 w-4 transform text-gray-400 transition-all duration-200 group-hover:translate-x-1 group-hover:text-purple-600" />
                                 </Link>
                             </motion.div>
                         );
@@ -128,7 +133,7 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="border-t border-[#01AEEC]/20 bg-gradient-to-r from-[#01AEEC] to-[#058ec0] p-4 backdrop-blur-lg"
+                className="border-t border-purple-500/20 bg-gradient-to-r from-purple-600 to-purple-900 p-4 backdrop-blur-lg"
             >
                 <Link
                     href={route('logout')}
@@ -136,7 +141,7 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                     as="button"
                     onBefore={() => confirm('Apakah Anda yakin ingin keluar dari sistem?')}
                     className={cn(
-                        'group flex w-full items-center rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 cursor-pointer',
+                        'group flex w-full items-center rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200',
                         'text-white hover:text-red-100',
                         'hover:bg-white/10 hover:backdrop-blur-sm',
                         'hover:shadow-lg hover:shadow-black/20',
