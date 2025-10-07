@@ -165,6 +165,7 @@ class PengawasanIinNasionalController extends Controller
 
         $path = match ($type) {
             'agreement' => $pengawasanIinNasional->agreement_path,
+            'qris' => $pengawasanIinNasional->additional_documents['path'],
             default => null
         };
 
@@ -180,7 +181,7 @@ class PengawasanIinNasionalController extends Controller
         
         // Get original filename with proper extension
         $originalFilename = match ($type) {
-            'agreement' => $pengawasanIinNasional->application_number . '_perjanjian.' . pathinfo($path, PATHINFO_EXTENSION),
+            'agreement' => $pengawasanIinNasional->application_number . '_iin_nasional.' . pathinfo($path, PATHINFO_EXTENSION),
             default => basename($path)
         };
 
@@ -254,6 +255,39 @@ class PengawasanIinNasionalController extends Controller
         $originalName = $document['original_name'] ?? basename($path);
         
         return response()->download($fullPath, $originalName);
+    }
+
+    public function uploadAdditionalDocument(Request $request, PengawasanIinNasional $pengawasanIinNasional)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240|mimes:pdf,doc,docx',
+        ]);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = $pengawasanIinNasional->application_number . '_' . time() . '_' . uniqid() . '_additional.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('pengawasan-iin-nasional/additional-document', $filename, 'public');
+
+            $existingDocuments = [
+                'path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'uploaded_at' => now()->toISOString()
+            ];
+            
+            $pengawasanIinNasional->update([
+                'additional_documents' => $existingDocuments,
+            ]);
+
+            PengawasanIinNasionalStatusLog::create([
+                'pengawasan_iin_nasional_id' => $pengawasanIinNasional->id,
+                'status_from' => $pengawasanIinNasional->status,
+                'status_to' => $pengawasanIinNasional->status,
+                'notes' => 'Dokumen tambahan diupload (' . $file->getClientOriginalName() . ')',
+                'changed_by' => Auth::id(),
+            ]);
+        }
+
+        return back()->with('success', 'Dokumen tambahan berhasil diupload');
     }
 
     /**

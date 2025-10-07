@@ -39,6 +39,7 @@ class PengawasanSingleIin extends Model
         'field_verification_at',
         'issued_at',
         'admin_id',
+        'additional_documents',
     ];
 
     protected $casts = [
@@ -59,6 +60,7 @@ class PengawasanSingleIin extends Model
         'payment_documents_uploaded_at_stage_2' => 'datetime',
         'field_verification_documents_uploaded_at' => 'datetime',
         'issuance_documents_uploaded_at' => 'datetime',
+        'additional_documents' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -84,6 +86,11 @@ class PengawasanSingleIin extends Model
     public function pengawasanStatusLogs(): HasMany
     {
         return $this->hasMany(PengawasanSingleIinStatusLog::class);
+    }
+
+    public function expenseReimbursement(): BelongsTo
+    {
+        return $this->belongsTo(ExpenseReimbursements::class, 'expense_reim_id');
     }
 
     public function getStatusLabelAttribute(): string

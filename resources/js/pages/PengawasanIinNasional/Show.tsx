@@ -1,3 +1,4 @@
+import QrisModal from '@/components/QrisModal';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,6 +32,7 @@ interface PengawasanIinNasionalApplication {
     issuance_documents?: PaymentDocument[];
     supervision_issued_documents?: PaymentDocument[];
     field_verification_documents_uploaded_at?: string;
+    additional_documents?: string;
     payment_verified_at?: string;
     field_verification_at?: string;
     issued_at?: string;
@@ -67,9 +69,32 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
     const [activeTab, setActiveTab] = useState('detail');
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
+    const [selectedApplication, setSelectedApplication] = useState<PengawasanIinNasionalApplication | null>(null);
     const [formData, setFormData] = useState({
         payment_proof: [] as File[],
     });
+
+    const handleQrisFileUpload = (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        router.post(
+            route('pengawasan-iin-nasional.upload-additional-documents', selectedApplication?.id),
+            formData,
+            {
+                onBefore: () => console.log('Uploading...', file),
+                onSuccess: () => {
+                    showSuccessToast('File QRIS berhasil diupload!');
+                    setIsQrisModalOpen(false);
+                },
+                onError: (errors) => {
+                    console.error(errors);
+                    showErrorToast('Gagal mengupload file QRIS');
+                },
+            }
+        );
+    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -316,7 +341,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {/* Issuance Documents */}
-                                {application.issuance_documents && application.issuance_documents.length > 0 && (
+                                {application.issuance_documents && application.issuance_documents.length > 0 && application.additional_documents && (
                                     <div className="space-y-2">
                                         <h4 className="font-medium text-green-800 flex items-center gap-2">
                                             <Award className="h-5 w-5" />
@@ -327,7 +352,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                                                 <div className="flex items-center gap-3">
                                                     <FileText className="h-8 w-8 text-green-600" />
                                                     <div>
-                                                        <p className="font-medium text-green-900">{doc.original_name}</p>
+                                                        <p className="">Dokumen Pengawasan Terbit</p>
                                                         <p className="text-sm text-green-700">
                                                             Diupload: {format(new Date(doc.uploaded_at), 'dd MMM yyyy HH:mm', { locale: id })}
                                                         </p>
@@ -347,6 +372,32 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                                     </div>
                                 )}
 
+                                {application.issuance_documents && !application.additional_documents && (
+                                    <div className="flex items-center justify-between rounded-lg border border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 shadow-sm">
+                                        <div className="flex items-center gap-4">
+                                            <div className="rounded-full bg-white p-2">
+                                                <Award className="h-8 w-8 text-yellow-500" />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-semibold text-yellow-800">Surat Pernyataan Penggunaan QRIS</h3>
+                                                <p className="text-sm text-yellow-700">Sebelum dapat mendownload sertifikat, harap mengisi surat pernyataan ini.</p>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                setSelectedApplication(application)
+                                                setIsQrisModalOpen(true)
+                                            }}
+                                            className="border-yellow-200 bg-white text-yellow-700 hover:bg-yellow-50 hover:text-yellow-800"
+                                        >
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Isi Surat Pernyataan
+                                        </Button>
+                                    </div>
+                                )}
+
                                 {/* Field Verification Documents */}
                                 {application.field_verification_documents && application.field_verification_documents.length > 0 && (
                                     <div className="space-y-2">
@@ -356,7 +407,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                                                 <div className="flex items-center gap-3">
                                                     <FileText className="h-8 w-8 text-yellow-600" />
                                                     <div>
-                                                        <p className="font-medium text-gray-900">{doc.original_name}</p>
+                                                        <p className="font-medium text-gray-900">Dokumen Verifikasi Lapangan</p>
                                                         <p className="text-sm text-gray-500">
                                                             Diupload: {format(new Date(doc.uploaded_at), 'dd MMM yyyy HH:mm', { locale: id })}
                                                         </p>
@@ -775,6 +826,15 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                     </TabsContent>
                 </Tabs>
             </div>
+
+            <QrisModal
+                isOpen={isQrisModalOpen}
+                onClose={() => setIsQrisModalOpen(false)}
+                onTemplateDownload={() => {
+                    // Any additional actions on template download can be handled here
+                }}
+                onFileUpload={(file: File) => handleQrisFileUpload(file)}
+            />
         </DashboardLayout>
     );
 }

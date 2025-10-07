@@ -3,12 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { PageProps } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, Upload, User } from 'lucide-react';
+import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, TriangleAlert, Upload, User } from 'lucide-react';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { useEffect, useState } from 'react';
 import SurveyModal from '@/components/SurveyModal';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import QrisModal from '@/components/QrisModal';
 
 interface IinNasionalApplication {
     id: number;
@@ -19,6 +24,7 @@ interface IinNasionalApplication {
     created_at: string;
     submitted_at: string;
     iin_number?: string;
+    additional_documents?: string
     can_upload_payment_proof: boolean;
     can_download_certificate: boolean;
     user: {
@@ -122,9 +128,32 @@ const containerAnimation = {
 };
 
 export default function IinNasionalIndex({ applications, auth }: Props) {
+    console.log(applications);
+
     const { flash } = usePage().props as any;
     const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+    const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [selectedApplication, setSelectedApplication] = useState<IinNasionalApplication | null>(null);
+
+    const { data, setData, post, processing, errors } = useForm<{
+        company_name: string;
+        pic_name: string;
+        pic_contact: string;
+        verification_date: string;
+        is_acknowledged: boolean;
+        chief_verificator_amount: number;
+        member_verificator_amount: number;
+        payment_proof_path: File | string;
+    }>({
+        company_name: '',
+        pic_name: '',
+        pic_contact: '',
+        verification_date: '',
+        is_acknowledged: false,
+        chief_verificator_amount: 0,
+        member_verificator_amount: 0,
+        payment_proof_path: '',
+    });
 
     useEffect(() => {
         if (flash.success) {
@@ -134,6 +163,33 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
             showErrorToast(flash.error);
         }
     }, [flash]);
+
+    const expenseReimSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        console.log(data);
+    }
+
+    const handleQrisFileUpload = (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        router.post(
+            route('iin-nasional.upload-additional-documents', selectedApplication?.id),
+            formData,
+            {
+                onBefore: () => console.log('Uploading...', file),
+                onSuccess: () => {
+                    showSuccessToast('File QRIS berhasil diupload!');
+                    setIsQrisModalOpen(false);
+                },
+                onError: (errors) => {
+                    console.error(errors);
+                    showErrorToast('Gagal mengupload file QRIS');
+                },
+            }
+        );
+    };
 
     return (
         <DashboardLayout user={auth.user}>
@@ -319,7 +375,7 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
 
                                         <div className="mt-2 border-t pt-3">
                                             <div className="flex flex-wrap items-center justify-between gap-2">
-                                                <div className="flex flex-wrap items-center gap-2">
+                                                <div className="flex items-center gap-2 w-full">
                                                     <Link href={route('iin-nasional.show', application.id)}>
                                                         <Button variant="outline" size="sm">
                                                             <Eye className="mr-2 h-4 w-4" />
@@ -382,7 +438,110 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                         </Link>
                                                     )}
 
-                                                    {application.status === 'terbit' && application.iin_number && (
+                                                    {application.status === 'verifikasi-lapangan' && (
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button variant="outline" size="sm" className='border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:text-red-500'>
+                                                                    <TriangleAlert className="mr-2 h-4 w-4 text-red-500" />
+                                                                    Silahkan isi Form Bukti Penggantian Transport dan Uang Harian
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent>
+                                                                <DialogHeader>
+                                                                    <DialogTitle>Form Bukti Penggantian Transport dan Uang Harian</DialogTitle>
+                                                                    <DialogDescription>
+                                                                        Silahkan isi form berikut untuk mengajukan penggantian transport dan uang harian.
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+                                                                <form id="expense-reim-form" className='flex flex-col gap-4' onSubmit={expenseReimSubmit}>
+                                                                    <div>
+                                                                        <Label htmlFor="company_name" className="text-sm font-medium text-gray-700 mb-1">
+                                                                            Nama Perusahaan
+                                                                        </Label>
+                                                                        <Input required type='text' placeholder='Nama Perusahaan' value={data.company_name} onChange={e => setData('company_name', e.target.value)} />
+                                                                        {errors.company_name && <p className="mt-1 text-xs text-red-600">{errors.company_name}</p>}
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <Label htmlFor="pic_name" className="text-sm font-medium text-gray-700 mb-1">
+                                                                            Nama PIC
+                                                                        </Label>
+                                                                        <Input required type='text' placeholder='Nama PIC' value={data.pic_name} onChange={e => setData('pic_name', e.target.value)} />
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <Label htmlFor="pic_contact" className="text-sm font-medium text-gray-700 mb-1">
+                                                                            Kontak PIC
+                                                                        </Label>
+                                                                        <Input required type='text' placeholder='Kontak PIC' value={data.pic_contact} onChange={e => setData('pic_contact', e.target.value)} />
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <Label htmlFor="verification_date" className="text-sm font-medium text-gray-700 mb-1">
+                                                                            Tanggal Verifikasi
+                                                                        </Label>
+                                                                        <Input required type='date' placeholder='Tanggal Verifikasi' value={data.verification_date} onChange={e => setData('verification_date', e.target.value)} />
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <Label htmlFor="is_acknowledged" className="text-sm font-medium text-gray-700 mb-1">
+                                                                            Dengan ini saya menyatakan bahwa penggantian transport dan uang harian yang diberikan kepada tim verifikator sudah sesuai dengan ketentuan surat informasi pembebanan biaya dari sekretariat Layanan Otoritas Sponsor
+                                                                        </Label>
+                                                                        <Checkbox checked={data.is_acknowledged} onCheckedChange={(checked) => setData('is_acknowledged', Boolean(checked))} />
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <Label htmlFor="chief_verificator_amount" className="text-sm font-medium text-gray-700 mb-1">
+                                                                            Nominal yang di berikan kepada Verifikator Kepala
+                                                                        </Label>
+                                                                        <Input required type='number' placeholder='Nominal yang di berikan kepada Verifikator Kepala' value={data.chief_verificator_amount} onChange={e => setData('chief_verificator_amount', parseInt(e.target.value))} />
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <Label htmlFor="member_verificator_amount" className="text-sm font-medium text-gray-700 mb-1">
+                                                                            Nominal yang diberikan kepada Verifikator Anggota
+                                                                        </Label>
+                                                                        <Input required type='number' placeholder='Nominal yang diberikan kepada Verifikator Anggota' value={data.member_verificator_amount} onChange={e => setData('member_verificator_amount', parseInt(e.target.value))} />
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <Label htmlFor="payment_proof_path" className="text-sm font-medium text-gray-700 mb-1">
+                                                                            Upload bukti transfer penggantian transport dan uang harian tim verifikator
+
+                                                                        </Label>
+                                                                        <Input required type='file' accept=".jpg,.jpeg,.png,.pdf" onChange={e => {
+                                                                            if (e.target.files && e.target.files.length > 0) {
+                                                                                setData('payment_proof_path', e.target.files[0]);
+                                                                            }
+                                                                        }} />
+                                                                    </div>
+                                                                </form>
+                                                                <DialogFooter>
+                                                                    <Button variant="outline" onClick={() => setIsSurveyModalOpen(false)}>
+                                                                        Batal
+                                                                    </Button>
+                                                                    <Button form="expense-reim-form" type="submit">Kirim</Button>
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    )}
+
+                                                    {application.status === 'terbit' && !application.additional_documents && (
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="border-yellow-200 text-yellow-600 hover:bg-yellow-50"
+                                                            onClick={() => {
+                                                                setSelectedApplication(application);
+                                                                setIsQrisModalOpen(true);
+                                                            }}
+                                                        >
+                                                            <Download className="mr-2 h-4 w-4" />
+                                                            Upload Dokumen Pendukung
+                                                        </Button>
+                                                    )}
+
+                                                    {application.status === 'terbit' && application.iin_number && application.additional_documents && (
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
@@ -440,6 +599,15 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                     }
                 }}
                 certificateType="IIN Nasional"
+            />
+
+            <QrisModal
+                isOpen={isQrisModalOpen}
+                onClose={() => setIsQrisModalOpen(false)}
+                onTemplateDownload={() => {
+                    // Any additional actions on template download can be handled here
+                }}
+                onFileUpload={(file: File) => handleQrisFileUpload(file)}
             />
         </DashboardLayout>
     );

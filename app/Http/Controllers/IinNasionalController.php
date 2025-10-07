@@ -410,6 +410,40 @@ class IinNasionalController extends Controller
         return back()->with('success', $message);
     }
 
+    public function uploadAdditionalDocument(Request $request, IinNasionalApplication $iinNasional)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240|mimes:pdf,doc,docx',
+        ]);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_additional.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('iin-nasional/additional-document', $filename, 'public');
+
+            $existingDocuments = [
+                'path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'uploaded_at' => now()->toISOString()
+            ];
+            
+            $iinNasional->update([
+                'additional_documents' => $existingDocuments,
+            ]);
+
+            IinStatusLog::create([
+                'application_type' => 'nasional',
+                'application_id' => $iinNasional->id,
+                'user_id' => Auth::id(),
+                'status_from' => $iinNasional->status,
+                'status_to' => $iinNasional->status,
+                'notes' => 'Dokumen tambahan diupload (' . $file->getClientOriginalName() . ')'
+            ]);
+        }
+
+        return back()->with('success', 'Dokumen tambahan berhasil diupload');
+    }
+
     public function downloadFile(IinNasionalApplication $iinNasional, string $type)
     {
         $this->authorize('downloadFile', $iinNasional);
@@ -419,6 +453,7 @@ class IinNasionalController extends Controller
             'requirements_archive' => $iinNasional->requirements_archive_path,
             'payment_proof' => $iinNasional->payment_proof_path,
             'certificate' => $iinNasional->certificate_path,
+            'qris' => $iinNasional->additional_documents['path'],
             default => null
         };
 

@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { PageProps } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, Shield, Upload, User } from 'lucide-react';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { useEffect, useState } from 'react';
+import QrisModal from '@/components/QrisModal';
 
 interface PengawasanIinNasionalApplication {
     id: number;
@@ -18,6 +19,7 @@ interface PengawasanIinNasionalApplication {
     created_at: string;
     submitted_at: string;
     iin_number?: string;
+    additional_documents?: string;
     can_upload_payment_proof: boolean;
     can_download_certificate: boolean;
     user: {
@@ -109,7 +111,30 @@ const containerAnimation = {
 
 export default function PengawasanIinNasionalIndex({ applications, auth, errors }: Props) {
     const [showSurvey, setShowSurvey] = useState(false);
+    const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
+    const [selectedApplication, setSelectedApplication] = useState<PengawasanIinNasionalApplication | null>(null);
     const { flash } = usePage<PageProps>().props;
+
+    const handleQrisFileUpload = (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        router.post(
+            route('pengawasan-iin-nasional.upload-additional-documents', selectedApplication?.id),
+            formData,
+            {
+                onBefore: () => console.log('Uploading...', file),
+                onSuccess: () => {
+                    showSuccessToast('File QRIS berhasil diupload!');
+                    setIsQrisModalOpen(false);
+                },
+                onError: (errors) => {
+                    console.error(errors);
+                    showErrorToast('Gagal mengupload file QRIS');
+                },
+            }
+        );
+    };
 
     useEffect(() => {
         if (flash && typeof flash === 'object' && 'success' in flash && flash.success) {
@@ -118,7 +143,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
         if (flash && typeof flash === 'object' && 'error' in flash && flash.error) {
             showErrorToast(flash.error as string);
         }
-        
+
         // Handle validation errors
         if (errors?.profile) {
             showErrorToast(errors.profile);
@@ -284,21 +309,24 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                                         style={{
                                                             width:
                                                                 application.status === 'pengajuan'
-                                                                    ? '25%'
+                                                                    ? '40%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                     : application.status === 'perbaikan'
-                                                                        ? '25%'
+                                                                        ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
                                                                         : application.status === 'pembayaran'
-                                                                            ? '50%'
+                                                                            ? '60%'
                                                                             : application.status === 'verifikasi-lapangan'
-                                                                                ? '75%'
-                                                                                : application.status === 'terbit'
-                                                                                    ? '100%'
-                                                                                    : '0%',
+                                                                                ? '80%'
+                                                                                : application.status === 'menunggu-terbit'
+                                                                                    ? '80%'
+                                                                                    : application.status === 'terbit'
+                                                                                        ? '100%'
+                                                                                        : '0%',
                                                         }}
                                                     ></div>
                                                 </div>
                                                 <div className="flex justify-between text-xs text-gray-500">
                                                     <span>Pengajuan</span>
+                                                    <span>Verifikasi Dokumen</span>
                                                     <span>Pembayaran</span>
                                                     <span>Verifikasi Lapangan</span>
                                                     <span>Terbit</span>
@@ -370,7 +398,22 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                                             </Link>
                                                         )}
 
-                                                        {application.can_download_certificate && (
+                                                        {application.can_download_certificate && !application.additional_documents && (
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                                                                onClick={() => {
+                                                                    setSelectedApplication(application);
+                                                                    setIsQrisModalOpen(true);
+                                                                }}
+                                                            >
+                                                                <Upload className="mr-2 h-4 w-4" />
+                                                                Upload QRIS
+                                                            </Button>
+                                                        )}
+
+                                                        {application.can_download_certificate && application.additional_documents && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
@@ -400,11 +443,10 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    className={`px-3 py-2 text-sm rounded-md ${
-                                        link.active
+                                    className={`px-3 py-2 text-sm rounded-md ${link.active
                                             ? 'bg-blue-600 text-white'
                                             : 'bg-white text-gray-700 border hover:bg-gray-50'
-                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}
@@ -412,6 +454,15 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                     </motion.div>
                 )}
             </motion.div>
+
+            <QrisModal
+                isOpen={isQrisModalOpen}
+                onClose={() => setIsQrisModalOpen(false)}
+                onTemplateDownload={() => {
+                    // Any additional actions on template download can be handled here
+                }}
+                onFileUpload={(file: File) => handleQrisFileUpload(file)}
+            />
         </DashboardLayout>
     );
 }

@@ -12,6 +12,7 @@ import { id } from 'date-fns/locale';
 import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Upload, User } from 'lucide-react';
 import { useState } from 'react';
 import SurveyModal from '@/components/SurveyModal';
+import QrisModal from '@/components/QrisModal';
 
 interface PaymentDocument {
     path: string;
@@ -78,7 +79,9 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
     const [activeTab, setActiveTab] = useState('detail');
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [selectedApplication, setSelectedApplication] = useState<IinSingleBlockholderApplication | null>(null);
     const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+    const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         payment_proof: [] as File[],
     });
@@ -100,6 +103,30 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
             payment_proof: updatedFiles,
         });
     };
+
+    const handleQrisFileUpload = (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        console.log(selectedApplication);
+
+        router.post(
+            route('iin-single-blockholder.upload-additional-documents', selectedApplication?.id),
+            formData,
+            {
+                onBefore: () => console.log('Uploading...', file),
+                onSuccess: () => {
+                    showSuccessToast('File QRIS berhasil diupload!');
+                    setIsQrisModalOpen(false);
+                },
+                onError: (errors) => {
+                    console.error(errors);
+                    showErrorToast('Gagal mengupload file QRIS');
+                },
+            }
+        );
+    };
+
 
     const uploadPaymentProof = (e: React.FormEvent) => {
         e.preventDefault();
@@ -445,7 +472,7 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                             </CardHeader>
                             <CardContent className="p-6">
                                 <div className="space-y-4">
-                                    {application.certificate_path && (
+                                    {application.certificate_path && application.additional_documents && (
                                         <div className="flex items-center justify-between rounded-lg border border-green-200 bg-gradient-to-r from-green-50 to-green-100 p-4 shadow-sm">
                                             <div className="flex items-center gap-4">
                                                 <div className="rounded-full bg-white p-2">
@@ -467,6 +494,33 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                                             </Button>
                                         </div>
                                     )}
+
+                                    {application.certificate_path && !application.additional_documents && (
+                                        <div className="flex items-center justify-between rounded-lg border border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 shadow-sm">
+                                            <div className="flex items-center gap-4">
+                                                <div className="rounded-full bg-white p-2">
+                                                    <Award className="h-8 w-8 text-yellow-500" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-semibold text-yellow-800">Surat Pernyataan Penggunaan QRIS</h3>
+                                                    <p className="text-sm text-yellow-700">Sebelum dapat mendownload sertifikat, harap mengisi surat pernyataan ini.</p>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setSelectedApplication(application)
+                                                    setIsQrisModalOpen(true)
+                                                }}
+                                                className="border-yellow-200 bg-white text-yellow-700 hover:bg-yellow-50 hover:text-yellow-800"
+                                            >
+                                                <Download className="mr-2 h-4 w-4" />
+                                                Isi Surat Pernyataan
+                                            </Button>
+                                        </div>
+                                    )}
+
 
                                     {application.application_form_path && (
                                         <div className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50">
@@ -1126,7 +1180,7 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                     </TabsContent>
                 </Tabs>
             </div>
-            
+
             <SurveyModal
                 isOpen={isSurveyModalOpen}
                 onClose={() => setIsSurveyModalOpen(false)}
@@ -1134,6 +1188,15 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                     window.open(route('iin-single-blockholder.download-file', [application.id, 'certificate']), '_blank');
                 }}
                 certificateType="Sertifikat Single IIN/Blockholder"
+            />
+
+            <QrisModal
+                isOpen={isQrisModalOpen}
+                onClose={() => setIsQrisModalOpen(false)}
+                onTemplateDownload={() => {
+                    // Any additional actions on template download can be handled here
+                }}
+                onFileUpload={(file: File) => handleQrisFileUpload(file)}
             />
         </DashboardLayout>
     );

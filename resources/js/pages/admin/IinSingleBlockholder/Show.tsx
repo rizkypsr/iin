@@ -246,10 +246,6 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
         window.open(url, '_blank');
     };
 
-    const removeAdditionalDocument = (index: number) => {
-        setAdditionalDocuments(prev => prev.filter((_, i) => i !== index));
-    };
-
     const handleUploadAdditionalDocuments = async () => {
         if (additionalDocuments.length === 0) {
             showErrorToast('Pilih dokumen tambahan terlebih dahulu');
@@ -275,25 +271,6 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
         } catch (error) {
             console.error('Upload error:', error);
             showErrorToast('Gagal mengunggah dokumen tambahan');
-        }
-    };
-
-    const deleteAdditionalDocument = async (documentId: number) => {
-        try {
-            await router.delete(route('admin.iin-single-blockholder.delete-additional-document', {
-                iinSingleBlockholder: application.id,
-                document: documentId
-            }), {
-                onSuccess: () => {
-                    showSuccessToast('Dokumen tambahan berhasil dihapus');
-                },
-                onError: () => {
-                    showErrorToast('Gagal menghapus dokumen tambahan');
-                }
-            });
-        } catch (error) {
-            console.error('Delete error:', error);
-            showErrorToast('Gagal menghapus dokumen tambahan');
         }
     };
 
@@ -860,36 +837,6 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                                                 />
                                             </div>
 
-                                            {/* Additional Documents */}
-                                            <div>
-                                                <Label className="text-sm font-medium text-gray-700">
-                                                    Dokumen Tambahan (Opsional)
-                                                </Label>
-                                                <Input
-                                                    type="file"
-                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                    multiple
-                                                    onChange={(e) => {
-                                                        const files = Array.from(e.target.files || []);
-                                                        setAdditionalDocuments(files);
-                                                    }}
-                                                    className="mt-2"
-                                                />
-                                                {additionalDocuments.length > 0 && (
-                                                    <div className="mt-2 space-y-1">
-                                                        <p className="text-sm text-gray-600">
-                                                            {additionalDocuments.length} file dipilih:
-                                                        </p>
-                                                        {additionalDocuments.map((file, index) => (
-                                                            <div key={index} className="flex items-center space-x-2 text-sm text-gray-700">
-                                                                <FileText className="h-4 w-4 text-blue-500" />
-                                                                <span>{file.name}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-
                                             <div>
                                                 <Label htmlFor="issuance_notes" className="text-sm font-medium text-gray-700">
                                                     Catatan (Opsional)
@@ -1012,6 +959,43 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                                 <CardDescription>Daftar dokumen yang terkait dengan aplikasi</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
+                                {/* Certificate */}
+                                {application.status === 'terbit' && application.can_download_certificate && (
+                                    <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="rounded-lg bg-green-100 p-2">
+                                                <Award className="h-5 w-5 text-green-600" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-800">Sertifikat IIN</p>
+                                                <p className="text-sm text-gray-500">Sertifikat IIN Single Blockholder</p>
+                                            </div>
+                                        </div>
+                                        <Button variant="outline" size="sm" onClick={() => downloadFile('certificate')}>
+                                            <Download className="mr-1 h-4 w-4" />
+                                            Download
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Additional Documents */}
+                                {application.additional_documents && (
+                                    <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="rounded-lg bg-blue-100 p-2">
+                                                <FileText className="h-5 w-5 text-blue-600" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-800">Surat Pernyataan Penggunaan QRIS</p>
+                                            </div>
+                                        </div>
+                                        <Button variant="outline" size="sm" onClick={() => downloadFile('qris')}>
+                                            <Download className="mr-1 h-4 w-4" />
+                                            Download
+                                        </Button>
+                                    </div>
+                                )}
+
                                 {/* Application Form */}
                                 <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
                                     <div className="flex items-center gap-3">
@@ -1243,25 +1227,6 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                                                 </Button>
                                             </div>
                                         ))}
-                                    </div>
-                                )}
-
-                                {/* Certificate */}
-                                {application.status === 'terbit' && application.can_download_certificate && (
-                                    <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="rounded-lg bg-green-100 p-2">
-                                                <Award className="h-5 w-5 text-green-600" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium text-gray-800">Sertifikat IIN</p>
-                                                <p className="text-sm text-gray-500">Sertifikat IIN Single Blockholder</p>
-                                            </div>
-                                        </div>
-                                        <Button variant="outline" size="sm" onClick={() => downloadFile('certificate')}>
-                                            <Download className="mr-1 h-4 w-4" />
-                                            Download
-                                        </Button>
                                     </div>
                                 )}
                             </CardContent>

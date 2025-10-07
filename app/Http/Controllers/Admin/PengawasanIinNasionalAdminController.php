@@ -241,6 +241,7 @@ class PengawasanIinNasionalAdminController extends Controller
     {
         $path = match ($type) {
             'agreement' => $pengawasanIinNasional->agreement_path,
+            'qris' => $pengawasanIinNasional->additional_documents,
             default => null
         };
 

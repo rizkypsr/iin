@@ -61,14 +61,13 @@ class IinSingleBlockholderApplication extends Model
         'field_verification_documents_uploaded_at' => 'datetime',
         'iin_block_range' => 'array',
         'viewed_at' => 'datetime',
+        'additional_documents' => 'array',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-
-
 
     public function admin(): BelongsTo
     {
@@ -78,6 +77,11 @@ class IinSingleBlockholderApplication extends Model
     public function statusLogs(): MorphMany
     {
         return $this->morphMany(IinStatusLog::class, 'application');
+    }
+
+    public function expenseReimbursement(): BelongsTo
+    {
+        return $this->belongsTo(ExpenseReimbursements::class, 'expense_reim_id');
     }
 
     public function getStatusLabelAttribute(): string

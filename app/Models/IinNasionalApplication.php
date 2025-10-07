@@ -34,7 +34,6 @@ class IinNasionalApplication extends Model
         'field_verification_at',
         'issued_at',
         'viewed_at',
-
         'admin_id',
     ];
 
@@ -42,7 +41,6 @@ class IinNasionalApplication extends Model
         'payment_proof_documents' => 'array',
         'payment_documents' => 'array',
         'field_verification_documents' => 'array',
-        'additional_documents' => 'array',
         'submitted_at' => 'datetime',
         'payment_verified_at' => 'datetime',
         'field_verification_at' => 'datetime',
@@ -51,7 +49,7 @@ class IinNasionalApplication extends Model
         'payment_proof_uploaded_at' => 'datetime',
         'payment_documents_uploaded_at' => 'datetime',
         'field_verification_documents_uploaded_at' => 'datetime',
-        'additional_documents_uploaded_at' => 'datetime',
+        'additional_documents' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -69,6 +67,11 @@ class IinNasionalApplication extends Model
     public function statusLogs(): MorphMany
     {
         return $this->morphMany(IinStatusLog::class, 'application');
+    }
+
+    public function expenseReimbursement(): BelongsTo
+    {
+        return $this->belongsTo(ExpenseReimbursements::class, 'expense_reim_id');
     }
 
     public function getStatusLabelAttribute(): string

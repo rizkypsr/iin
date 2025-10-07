@@ -48,7 +48,7 @@ interface IinNasionalApplication {
     payment_documents_uploaded_at?: string;
     field_verification_documents?: PaymentDocument[];
     field_verification_documents_uploaded_at?: string;
-    additional_documents?: PaymentDocument[];
+    additional_documents?: PaymentDocument;
     additional_documents_uploaded_at?: string;
     can_download_certificate?: boolean;
     user: {
@@ -1054,6 +1054,45 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                 <CardDescription>Daftar dokumen yang terkait dengan aplikasi</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
+                                {/* Certificate */}
+                                {application.status === 'terbit' && (
+                                    <div className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="rounded-lg bg-green-100 p-2">
+                                                <Award className="h-5 w-5 text-green-600" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-800">Sertifikat IIN</p>
+                                                <p className="text-sm text-gray-500">Sertifikat IIN Nasional</p>
+                                            </div>
+                                        </div>
+                                        {application.can_download_certificate && (
+                                            <Button variant="outline" size="sm" onClick={() => downloadFile('certificate')}>
+                                                <Download className="mr-1 h-4 w-4" />
+                                                Download
+                                            </Button>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Additional Documents */}
+                                {application.additional_documents && (
+                                    <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="rounded-lg bg-blue-100 p-2">
+                                                <FileText className="h-5 w-5 text-blue-600" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-800">Surat Pernyataan Penggunaan QRIS</p>
+                                            </div>
+                                        </div>
+                                        <Button variant="outline" size="sm" onClick={() => downloadFile('qris')}>
+                                            <Download className="mr-1 h-4 w-4" />
+                                            Download
+                                        </Button>
+                                    </div>
+                                )}
+
                                 {/* Application Form */}
                                 <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
                                     <div className="flex items-center gap-3">
@@ -1233,56 +1272,6 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                                 </Button>
                                             </div>
                                         ))}
-                                    </div>
-                                )}
-
-                                {/* Additional Documents */}
-                                {application.additional_documents && application.additional_documents.length > 0 && (
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <div className="rounded-lg bg-yellow-100 p-2">
-                                                <FileText className="h-5 w-5 text-yellow-600" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium text-gray-800">Dokumen Tambahan</p>
-                                            </div>
-                                        </div>
-                                        {application.additional_documents.map((document: PaymentDocument, index: number) => (
-                                            <div
-                                                key={index}
-                                                className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2"
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <FileText className="h-4 w-4 text-gray-600" />
-                                                    <span className="text-sm text-gray-700">{document.original_name}</span>
-                                                </div>
-                                                <Button variant="outline" size="sm" onClick={() => downloadAdditionalDocument(index)}>
-                                                    <Download className="mr-1 h-3 w-3" />
-                                                    Download
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Certificate */}
-                                {application.status === 'terbit' && (
-                                    <div className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="rounded-lg bg-green-100 p-2">
-                                                <Award className="h-5 w-5 text-green-600" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium text-gray-800">Sertifikat IIN</p>
-                                                <p className="text-sm text-gray-500">Sertifikat IIN Nasional</p>
-                                            </div>
-                                        </div>
-                                        {application.can_download_certificate && (
-                                            <Button variant="outline" size="sm" onClick={() => downloadFile('certificate')}>
-                                                <Download className="mr-1 h-4 w-4" />
-                                                Download
-                                            </Button>
-                                        )}
                                     </div>
                                 )}
                             </CardContent>

@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { PageProps } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, File, FileText, MapPin, Plus, Shield, Upload, User } from 'lucide-react';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { useEffect, useState } from 'react';
+import QrisModal from '@/components/QrisModal';
 
 interface PengawasanSingleIinApplication {
     id: number;
@@ -222,23 +223,24 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors }:
                                                         style={{
                                                             width:
                                                                 application.status === 'pengajuan'
-                                                                    ? '20%'
+                                                                    ? '33%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                     : application.status === 'perbaikan'
-                                                                      ? '20%'
-                                                                      : application.status === 'pembayaran'
-                                                                        ? '40%'
-                                                                        : application.status === 'verifikasi-lapangan'
-                                                                          ? '60%'
-                                                                          : application.status === 'pembayaran-tahap-2'
-                                                                            ? '80%'
-                                                                            : application.status === 'terbit'
-                                                                              ? '100%'
-                                                                              : '0%',
+                                                                        ? '33%' // Perbaikan also means user is in Verifikasi Dokumen phase
+                                                                        : application.status === 'pembayaran'
+                                                                            ? '50%'
+                                                                            : application.status === 'verifikasi-lapangan'
+                                                                                ? '67%'
+                                                                                : application.status === 'pembayaran-tahap-2'
+                                                                                    ? '83%'
+                                                                                    : application.status === 'terbit'
+                                                                                        ? '100%'
+                                                                                        : '0%',
                                                         }}
                                                     ></div>
                                                 </div>
                                                 <div className="flex justify-between text-xs text-gray-500">
                                                     <span>Pengajuan</span>
+                                                    <span>Verifikasi Dokumen</span>
                                                     <span>Pembayaran 1</span>
                                                     <span>Verifikasi Lapangan</span>
                                                     <span>Pembayaran 2</span>

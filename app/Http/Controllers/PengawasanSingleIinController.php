@@ -262,6 +262,35 @@ class PengawasanSingleIinController extends Controller
         return response()->download($fullPath, $originalName);
     }
 
+    public function downloadFile(PengawasanSingleIin $pengawasanSingleIin, string $type)
+    {
+        $this->authorize('downloadFile', $pengawasanSingleIin);
+
+        $path = match ($type) {
+            'agreement' => $pengawasanSingleIin->agreement_path,
+            'qris' => $pengawasanSingleIin->additional_documents['path'],
+            default => null
+        };
+
+        if (!$path) {
+            abort(404, 'File path tidak ditemukan untuk tipe: ' . $type);
+        }
+
+        if (!Storage::disk('public')->exists($path)) {
+            abort(404, 'File tidak ditemukan di storage: ' . $path);
+        }
+
+        $fullPath = Storage::disk('public')->path($path);
+        
+        // Get original filename with proper extension
+        $originalFilename = match ($type) {
+            'agreement' => $pengawasanSingleIin->application_number . '_single_iin.' . pathinfo($path, PATHINFO_EXTENSION),
+            default => basename($path)
+        };
+
+        return response()->download($fullPath, $originalFilename);
+    }
+
     public function downloadFieldVerificationDocument(PengawasanSingleIin $pengawasanSingleIin, int $index)
     {
         $this->authorize('downloadFile', $pengawasanSingleIin);
@@ -283,6 +312,33 @@ class PengawasanSingleIinController extends Controller
         $originalName = $document['original_name'] ?? basename($path);
         
         return response()->download($fullPath, $originalName);
+    }
+
+    public function uploadAdditionalDocument(Request $request, PengawasanSingleIin $pengawasanSingleIin)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240|mimes:pdf,doc,docx',
+        ]);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = $pengawasanSingleIin->application_number . '_' . time() . '_' . uniqid() . '_additional.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('pengawasan-single-iin/additional-document', $filename, 'public');
+
+            $existingDocuments = [
+                'path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'uploaded_at' => now()->toISOString()
+            ];
+            
+            $pengawasanSingleIin->update([
+                'additional_documents' => $existingDocuments,
+            ]);
+
+            $this->logStatusChange($pengawasanSingleIin, null, $pengawasanSingleIin->status, 'Dokumen tambahan diupload (' . $file->getClientOriginalName() . ')');
+        }
+
+        return back()->with('success', 'Dokumen tambahan berhasil diupload');
     }
 
     /**

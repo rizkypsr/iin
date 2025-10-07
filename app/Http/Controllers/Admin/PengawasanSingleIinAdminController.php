@@ -391,6 +391,7 @@ class PengawasanSingleIinAdminController extends Controller
     {
         $path = match ($type) {
             'agreement' => $pengawasanSingleIin->agreement_path,
+            'qris' => $pengawasanSingleIin->additional_documents,
             default => null
         };
 

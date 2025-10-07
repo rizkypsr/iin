@@ -109,7 +109,6 @@ class IinSingleBlockholderAdminController extends Controller
     {
         $request->validate([
             'certificate' => 'required|file|mimes:pdf,doc,docx|max:10240',
-            'additional_documents.*' => 'nullable|file|mimes:pdf|max:5120',
             'iin_number' => 'required|string|max:20',
             'notes' => 'nullable|string|max:1000',
         ]);
@@ -134,24 +133,6 @@ class IinSingleBlockholderAdminController extends Controller
                 
                 $updateData['certificate_path'] = $path;
                 $updateData['certificate_uploaded_at'] = now();
-            }
-
-            // Handle additional documents upload
-            if ($request->hasFile('additional_documents')) {
-                $uploadedAdditionalFiles = [];
-                
-                foreach ($request->file('additional_documents') as $file) {
-                    $filename = $iinSingleBlockholder->application_number . '_' . time() . '_additional_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                    $path = $file->storeAs('iin-single-blockholder/additional-documents', $filename, 'public');
-                    
-                    $uploadedAdditionalFiles[] = [
-                        'path' => $path,
-                        'original_name' => $file->getClientOriginalName(),
-                        'uploaded_at' => now()->toISOString()
-                    ];
-                }
-                
-                $updateData['additional_documents'] = $uploadedAdditionalFiles;
             }
 
             // Update application
@@ -329,6 +310,7 @@ class IinSingleBlockholderAdminController extends Controller
             'application_form' => $iinSingleBlockholder->application_form_path,
             'requirements_archive' => $iinSingleBlockholder->requirements_archive_path,
             'certificate' => $iinSingleBlockholder->certificate_path,
+            'qris' => $iinSingleBlockholder->additional_documents,
             default => null
         };
 

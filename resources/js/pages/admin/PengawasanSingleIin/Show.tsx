@@ -125,6 +125,15 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
     const [verificationNotes, setVerificationNotes] = useState('');
     const [verificationCompletionFiles, setVerificationCompletionFiles] = useState<File[]>([]);
 
+    const downloadFile = (type: string, stage?: string) => {
+        const url = route('pengawasan-single-iin.download-file', {
+            pengawasanSingleIin: application.id,
+            type: type,
+            ...(stage && { stage })
+        });
+        window.open(url, '_blank');
+    };
+
     const handleStatusChangeToPayment = async () => {
         setLoading(true);
 
@@ -1085,6 +1094,31 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                         </p>
                                     </div>
                                 )}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {application.issuance_documents && application.issuance_documents.length > 0 && application.additional_documents && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <CheckCircle className="h-5 w-5" />
+                                    Dokumen Tambahan
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <FileText className="h-4 w-4 text-gray-500" />
+                                            <span className="text-sm">Surat Pernyataan Penggunaan QRIS</span>
+                                        </div>
+                                        <Button onClick={() => downloadFile('qris')}>
+                                            <Download className="h-4 w-4 mr-2" />
+                                            Unduh
+                                        </Button>
+                                    </div>
+                                </div>
                             </CardContent>
                         </Card>
                     )}

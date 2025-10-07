@@ -34,6 +34,7 @@ class PengawasanIinNasional extends Model
         'field_verification_at',
         'issued_at',
         'admin_id',
+        'additional_documents',
     ];
 
     protected $casts = [
@@ -49,6 +50,7 @@ class PengawasanIinNasional extends Model
         'payment_proof_uploaded_at' => 'datetime',
         'field_verification_documents_uploaded_at' => 'datetime',
         'issuance_documents_uploaded_at' => 'datetime',
+        'additional_documents' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -74,6 +76,11 @@ class PengawasanIinNasional extends Model
     public function pengawasanStatusLogs(): HasMany
     {
         return $this->hasMany(PengawasanIinNasionalStatusLog::class);
+    }
+
+    public function expenseReimbursement(): BelongsTo
+    {
+        return $this->belongsTo(ExpenseReimbursements::class, 'expense_reim_id');
     }
 
     public function getStatusLabelAttribute(): string

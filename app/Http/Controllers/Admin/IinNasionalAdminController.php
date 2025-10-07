@@ -106,7 +106,7 @@ class IinNasionalAdminController extends Controller
     {
         $request->validate([
             'certificate' => 'required|file|mimes:pdf|max:10240',
-            'additional_documents.*' => 'nullable|file|mimes:pdf|max:5120',
+            'additional_documents.*' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
             'iin_number' => 'required|string|max:255',
             'notes' => 'nullable|string'
         ]);
@@ -313,6 +313,7 @@ class IinNasionalAdminController extends Controller
             'application_form' => $iinNasional->application_form_path,
             'requirements_archive' => $iinNasional->requirements_archive_path,
             'certificate' => $iinNasional->certificate_path,
+            'qris' => $iinNasional->additional_documents,
             default => null
         };
 

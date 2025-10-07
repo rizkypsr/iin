@@ -7,11 +7,12 @@ import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Upload, User, X } from 'lucide-react';
 import { useState } from 'react';
 import SurveyModal from '@/components/SurveyModal';
+import QrisModal from '@/components/QrisModal';
 
 interface PaymentDocument {
     path: string;
@@ -43,8 +44,7 @@ interface IinNasionalApplication {
     payment_proof_documents?: PaymentDocument[];
     field_verification_documents?: PaymentDocument[];
     field_verification_documents_uploaded_at?: string;
-    additional_documents?: PaymentDocument[];
-    additional_documents_uploaded_at?: string;
+    additional_documents?: PaymentDocument;
     payment_verified_at?: string;
     field_verification_at?: string;
     issued_at?: string;
@@ -90,12 +90,11 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
+    const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         payment_proof: [] as File[],
     });
-
-    console.log(application);
-    
+    const [selectedApplication, setSelectedApplication] = useState<IinNasionalApplication | null>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -145,6 +144,27 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                 showErrorToast(errorMessage);
             },
         });
+    };
+
+    const handleQrisFileUpload = (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        router.post(
+            route('iin-nasional.upload-additional-documents', selectedApplication?.id),
+            formData,
+            {
+                onBefore: () => console.log('Uploading...', file),
+                onSuccess: () => {
+                    showSuccessToast('File QRIS berhasil diupload!');
+                    setIsQrisModalOpen(false);
+                },
+                onError: (errors) => {
+                    console.error(errors);
+                    showErrorToast('Gagal mengupload file QRIS');
+                },
+            }
+        );
     };
 
     const getStatusLabel = (status: string) => {
@@ -435,7 +455,7 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                             </CardHeader>
                             <CardContent className="p-6">
                                 <div className="space-y-4">
-                                    {application.certificate_path && (
+                                    {application.certificate_path && application.additional_documents && (
                                         <div className="flex items-center justify-between rounded-lg border border-green-200 bg-gradient-to-r from-green-50 to-green-100 p-4 shadow-sm">
                                             <div className="flex items-center gap-4">
                                                 <div className="rounded-full bg-white p-2">
@@ -454,6 +474,32 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                             >
                                                 <Download className="mr-2 h-4 w-4" />
                                                 Download
+                                            </Button>
+                                        </div>
+                                    )}
+
+                                    {application.certificate_path && !application.additional_documents && (
+                                        <div className="flex items-center justify-between rounded-lg border border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 shadow-sm">
+                                            <div className="flex items-center gap-4">
+                                                <div className="rounded-full bg-white p-2">
+                                                    <Award className="h-8 w-8 text-yellow-500" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-semibold text-yellow-800">Surat Pernyataan Penggunaan QRIS</h3>
+                                                    <p className="text-sm text-yellow-700">Sebelum dapat mendownload sertifikat, harap mengisi surat pernyataan ini.</p>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setSelectedApplication(application)
+                                                    setIsQrisModalOpen(true)
+                                                }}
+                                                className="border-yellow-200 bg-white text-yellow-700 hover:bg-yellow-50 hover:text-yellow-800"
+                                            >
+                                                <Download className="mr-2 h-4 w-4" />
+                                                Isi Surat Pernyataan
                                             </Button>
                                         </div>
                                     )}
@@ -1142,6 +1188,15 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                     window.open(route('iin-nasional.download-file', [application.id, 'certificate']), '_blank');
                 }}
                 certificateType="IIN Nasional"
+            />
+
+            <QrisModal
+                isOpen={isQrisModalOpen}
+                onClose={() => setIsQrisModalOpen(false)}
+                onTemplateDownload={() => {
+                    // Any additional actions on template download can be handled here
+                }}
+                onFileUpload={(file: File) => handleQrisFileUpload(file)}
             />
         </DashboardLayout >
     );

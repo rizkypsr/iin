@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\DocumentRequirement;
 use App\Models\IinSingleBlockholderApplication;
 use App\Models\IinStatusLog;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class IinSingleBlockholderController extends Controller
@@ -25,14 +25,14 @@ class IinSingleBlockholderController extends Controller
             ->paginate(10);
 
         return Inertia::render('IinSingleBlockholder/Index', [
-            'applications' => $applications
+            'applications' => $applications,
         ]);
     }
 
     public function create()
     {
         $documentRequirements = DocumentRequirement::getIinSingleBlockholderRequirements();
-        
+
         return Inertia::render('IinSingleBlockholder/Create', [
             'documentRequirements' => $documentRequirements,
         ]);
@@ -45,7 +45,7 @@ class IinSingleBlockholderController extends Controller
             'requirements_archive' => 'nullable|file|mimes:zip,rar|max:51200', // 50MB max for ZIP/RAR
         ]);
 
-        $application = new IinSingleBlockholderApplication();
+        $application = new IinSingleBlockholderApplication;
         $application->user_id = Auth::id();
         $application->submitted_at = now();
 
@@ -55,7 +55,7 @@ class IinSingleBlockholderController extends Controller
         // Handle file upload
         if ($request->hasFile('application_form')) {
             $file = $request->file('application_form');
-            $filename = $application->application_number . '_' . time() . '_form.' . $file->getClientOriginalExtension();
+            $filename = $application->application_number.'_'.time().'_form.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-single-blockholder', $filename, 'public');
             $application->application_form_path = $path;
         }
@@ -63,7 +63,7 @@ class IinSingleBlockholderController extends Controller
         // Handle requirements archive upload
         if ($request->hasFile('requirements_archive')) {
             $file = $request->file('requirements_archive');
-            $filename = $application->application_number . '_' . time() . '_requirements.' . $file->getClientOriginalExtension();
+            $filename = $application->application_number.'_'.time().'_requirements.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-single-blockholder', $filename, 'public');
             $application->requirements_archive_path = $path;
         }
@@ -77,7 +77,7 @@ class IinSingleBlockholderController extends Controller
             'user_id' => Auth::id(),
             'status_from' => null,
             'status_to' => 'pengajuan',
-            'notes' => 'Aplikasi Single IIN/Blockholder diajukan'
+            'notes' => 'Aplikasi Single IIN/Blockholder diajukan',
         ]);
 
         return to_route('iin-single-blockholder.index')
@@ -103,7 +103,7 @@ class IinSingleBlockholderController extends Controller
                 'can_download_certificate' => $iinSingleBlockholder->certificate_path && Storage::disk('public')->exists($iinSingleBlockholder->certificate_path),
                 'can_upload_certificate' => Auth::user()->hasRole('admin') && in_array($iinSingleBlockholder->status, ['menunggu-terbit', 'terbit']),
             ]),
-            'statusLogs' => $statusLogs
+            'statusLogs' => $statusLogs,
         ]);
     }
 
@@ -119,7 +119,7 @@ class IinSingleBlockholderController extends Controller
         $iinSingleBlockholder->load(['user', 'admin']);
 
         return Inertia::render('IinSingleBlockholder/Edit', [
-            'application' => $iinSingleBlockholder
+            'application' => $iinSingleBlockholder,
         ]);
     }
 
@@ -147,7 +147,7 @@ class IinSingleBlockholderController extends Controller
             }
 
             $file = $request->file('application_form');
-            $filename = $iinSingleBlockholder->application_number . '_' . time() . '_form.' . $file->getClientOriginalExtension();
+            $filename = $iinSingleBlockholder->application_number.'_'.time().'_form.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-single-blockholder', $filename, 'public');
             $updateData['application_form_path'] = $path;
         }
@@ -160,19 +160,19 @@ class IinSingleBlockholderController extends Controller
             }
 
             $file = $request->file('requirements_archive');
-            $filename = $iinSingleBlockholder->application_number . '_' . time() . '_requirements.' . $file->getClientOriginalExtension();
+            $filename = $iinSingleBlockholder->application_number.'_'.time().'_requirements.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-single-blockholder', $filename, 'public');
             $updateData['requirements_archive_path'] = $path;
         }
 
         // Update application if there are changes
-        if (!empty($updateData)) {
+        if (! empty($updateData)) {
             return DB::transaction(function () use ($updateData, $iinSingleBlockholder) {
                 // Change status back to 'pengajuan' when user updates the application
                 $updateData['status'] = 'pengajuan';
                 $updateData['notes'] = null; // Clear admin notes
                 $updateData['admin_id'] = null; // Clear admin assignment
-                
+
                 $iinSingleBlockholder->update($updateData);
 
                 // Log status change
@@ -182,7 +182,7 @@ class IinSingleBlockholderController extends Controller
                     'user_id' => Auth::id(),
                     'status_from' => 'perbaikan',
                     'status_to' => 'pengajuan',
-                    'notes' => 'User memperbarui aplikasi dan mengirim ulang untuk review'
+                    'notes' => 'User memperbarui aplikasi dan mengirim ulang untuk review',
                 ]);
 
                 return redirect()->route('iin-single-blockholder.show', $iinSingleBlockholder)
@@ -239,7 +239,7 @@ class IinSingleBlockholderController extends Controller
             'user_id' => Auth::id(),
             'status_from' => $oldStatus,
             'status_to' => $newStatus,
-            'notes' => $request->notes
+            'notes' => $request->notes,
         ]);
 
         return back()->with('success', 'Status aplikasi berhasil diperbarui');
@@ -255,7 +255,7 @@ class IinSingleBlockholderController extends Controller
 
         $uploadedFiles = [];
         $isStage2 = $iinSingleBlockholder->status === 'pembayaran-tahap-2';
-        
+
         if ($isStage2) {
             $existingProofs = $iinSingleBlockholder->payment_proof_documents_stage_2 ?? [];
         } else {
@@ -265,30 +265,30 @@ class IinSingleBlockholderController extends Controller
         if ($request->hasFile('payment_proof')) {
             foreach ($request->file('payment_proof') as $file) {
                 $stage = $isStage2 ? 'stage2' : 'stage1';
-                $filename = $iinSingleBlockholder->application_number . '_' . time() . '_' . uniqid() . '_payment_proof_' . $stage . '.' . $file->getClientOriginalExtension();
+                $filename = $iinSingleBlockholder->application_number.'_'.time().'_'.uniqid().'_payment_proof_'.$stage.'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-single-blockholder/payment-proofs', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
         }
 
         // Merge with existing proofs
         $allProofs = array_merge($existingProofs, $uploadedFiles);
-        
+
         return DB::transaction(function () use ($isStage2, $allProofs, $iinSingleBlockholder, $uploadedFiles) {
             if ($isStage2) {
                 $iinSingleBlockholder->update([
                     'payment_proof_documents_stage_2' => $allProofs,
-                    'payment_proof_uploaded_at_stage_2' => now()
+                    'payment_proof_uploaded_at_stage_2' => now(),
                 ]);
             } else {
                 $iinSingleBlockholder->update([
                     'payment_proof_documents' => $allProofs,
-                    'payment_proof_uploaded_at' => now()
+                    'payment_proof_uploaded_at' => now(),
                 ]);
             }
 
@@ -299,10 +299,10 @@ class IinSingleBlockholderController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $iinSingleBlockholder->status,
                 'status_to' => $iinSingleBlockholder->status,
-                'notes' => 'User mengupload bukti pembayaran ' . ($isStage2 ? 'tahap 2' : 'tahap 1') . ' (' . count($uploadedFiles) . ' file)'
+                'notes' => 'User mengupload bukti pembayaran '.($isStage2 ? 'tahap 2' : 'tahap 1').' ('.count($uploadedFiles).' file)',
             ]);
 
-            return back()->with('success', count($uploadedFiles) . ' bukti pembayaran berhasil diupload');
+            return back()->with('success', count($uploadedFiles).' bukti pembayaran berhasil diupload');
         });
     }
 
@@ -326,9 +326,9 @@ class IinSingleBlockholderController extends Controller
         $uploadedFiles = [];
         $completeFieldVerification = $request->boolean('complete_field_verification');
         // Determine if this is stage 2 based on status or field verification completion
-        $isStage2 = $iinSingleBlockholder->status === 'pembayaran-tahap-2' || 
+        $isStage2 = $iinSingleBlockholder->status === 'pembayaran-tahap-2' ||
                    ($iinSingleBlockholder->status === 'verifikasi-lapangan' && $completeFieldVerification);
-        
+
         if ($isStage2) {
             $existingDocuments = $iinSingleBlockholder->payment_documents_stage_2 ?? [];
         } else {
@@ -338,24 +338,24 @@ class IinSingleBlockholderController extends Controller
         if ($request->hasFile('payment_documents')) {
             foreach ($request->file('payment_documents') as $file) {
                 $stage = $isStage2 ? 'stage2' : 'stage1';
-                $filename = $iinSingleBlockholder->application_number . '_' . time() . '_' . uniqid() . '_payment_doc_' . $stage . '.' . $file->getClientOriginalExtension();
+                $filename = $iinSingleBlockholder->application_number.'_'.time().'_'.uniqid().'_payment_doc_'.$stage.'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-single-blockholder/payment-documents', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
                     'uploaded_at' => now()->toISOString(),
-                    'stage' => $stage
+                    'stage' => $stage,
                 ];
             }
         }
 
         // Merge with existing documents
         $allDocuments = array_merge($existingDocuments, $uploadedFiles);
-        
+
         return DB::transaction(function () use ($isStage2, $allDocuments, $iinSingleBlockholder, $completeFieldVerification, $request, $uploadedFiles) {
             $oldStatus = $iinSingleBlockholder->status;
-            
+
             if ($isStage2) {
                 // If completing field verification, change status to pembayaran-tahap-2 first
                 if ($completeFieldVerification && $iinSingleBlockholder->status === 'verifikasi-lapangan') {
@@ -363,23 +363,23 @@ class IinSingleBlockholderController extends Controller
                         'payment_documents_stage_2' => $allDocuments,
                         'payment_documents_uploaded_at_stage_2' => now(),
                         'status' => 'pembayaran-tahap-2', // Change to pembayaran-tahap-2 after field verification
-                        'field_verification_at' => now()
+                        'field_verification_at' => now(),
                     ];
                 } else {
                     // If already in pembayaran-tahap-2 status, change to menunggu-terbit
                     $updateData = [
                         'payment_documents_stage_2' => $allDocuments,
                         'payment_documents_uploaded_at_stage_2' => now(),
-                        'status' => 'menunggu-terbit' // Auto change status to menunggu-terbit after stage 2 payment documents upload
+                        'status' => 'menunggu-terbit', // Auto change status to menunggu-terbit after stage 2 payment documents upload
                     ];
                     // Note: payment_verified_at_stage_2 will be set when admin manually changes status from pembayaran-tahap-2 to menunggu-terbit
                 }
-                
+
                 $iinSingleBlockholder->update($updateData);
             } else {
                 $iinSingleBlockholder->update([
                     'payment_documents' => $allDocuments,
-                    'payment_documents_uploaded_at' => now()
+                    'payment_documents_uploaded_at' => now(),
                 ]);
             }
 
@@ -418,17 +418,17 @@ class IinSingleBlockholderController extends Controller
             ]);
 
             if ($statusChanged) {
-                $message = count($uploadedFiles) . ' dokumen pembayaran berhasil diupload dan status diubah ke pembayaran';
+                $message = count($uploadedFiles).' dokumen pembayaran berhasil diupload dan status diubah ke pembayaran';
             } elseif ($isStage2) {
                 if ($completeFieldVerification && $oldStatus === 'verifikasi-lapangan') {
-                    $message = 'Verifikasi lapangan berhasil diselesaikan dan ' . count($uploadedFiles) . ' dokumen pembayaran tahap 2 diupload. Status aplikasi otomatis berubah ke pembayaran tahap 2.';
+                    $message = 'Verifikasi lapangan berhasil diselesaikan dan '.count($uploadedFiles).' dokumen pembayaran tahap 2 diupload. Status aplikasi otomatis berubah ke pembayaran tahap 2.';
                 } else {
-                    $message = count($uploadedFiles) . ' dokumen pembayaran tahap 2 berhasil diupload dan status diubah ke menunggu terbit';
+                    $message = count($uploadedFiles).' dokumen pembayaran tahap 2 berhasil diupload dan status diubah ke menunggu terbit';
                 }
             } else {
-                $message = count($uploadedFiles) . ' dokumen pembayaran tahap 1 berhasil diupload';
+                $message = count($uploadedFiles).' dokumen pembayaran tahap 1 berhasil diupload';
             }
-                
+
             return back()->with('success', $message);
         });
     }
@@ -449,24 +449,24 @@ class IinSingleBlockholderController extends Controller
 
         if ($request->hasFile('field_verification_documents')) {
             foreach ($request->file('field_verification_documents') as $file) {
-                $filename = $iinSingleBlockholder->application_number . '_' . time() . '_' . uniqid() . '_field_verification.' . $file->getClientOriginalExtension();
+                $filename = $iinSingleBlockholder->application_number.'_'.time().'_'.uniqid().'_field_verification.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-single-blockholder/field-verification-documents', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
         }
 
         // Merge with existing documents
         $allDocuments = array_merge($existingDocuments, $uploadedFiles);
-        
+
         // Update data aplikasi
         $updateData = [
             'field_verification_documents' => $allDocuments,
-            'field_verification_documents_uploaded_at' => now()
+            'field_verification_documents_uploaded_at' => now(),
         ];
 
         // Handle status change if requested
@@ -490,9 +490,9 @@ class IinSingleBlockholderController extends Controller
                     'user_id' => Auth::id(),
                     'status_from' => $oldStatus,
                     'status_to' => 'verifikasi-lapangan',
-                    'notes' => $request->notes ?: 'Status diubah ke verifikasi lapangan oleh admin'
+                    'notes' => $request->notes ?: 'Status diubah ke verifikasi lapangan oleh admin',
                 ]);
-                
+
                 // Log document upload
                 if (count($uploadedFiles) > 0) {
                     IinStatusLog::create([
@@ -501,7 +501,7 @@ class IinSingleBlockholderController extends Controller
                         'user_id' => Auth::id(),
                         'status_from' => $iinSingleBlockholder->status,
                         'status_to' => $iinSingleBlockholder->status,
-                        'notes' => 'Dokumen verifikasi lapangan diupload oleh admin (' . count($uploadedFiles) . ' file)'
+                        'notes' => 'Dokumen verifikasi lapangan diupload oleh admin ('.count($uploadedFiles).' file)',
                     ]);
                 }
             } else {
@@ -511,14 +511,14 @@ class IinSingleBlockholderController extends Controller
                     'user_id' => Auth::id(),
                     'status_from' => $oldStatus,
                     'status_to' => $iinSingleBlockholder->status,
-                    'notes' => 'Dokumen verifikasi lapangan diupload oleh admin (' . count($uploadedFiles) . ' file)'
+                    'notes' => 'Dokumen verifikasi lapangan diupload oleh admin ('.count($uploadedFiles).' file)',
                 ]);
             }
 
-            $message = $statusChanged 
-                ? count($uploadedFiles) . ' dokumen verifikasi lapangan berhasil diupload dan status diubah ke verifikasi lapangan'
-                : count($uploadedFiles) . ' dokumen verifikasi lapangan berhasil diupload';
-                
+            $message = $statusChanged
+                ? count($uploadedFiles).' dokumen verifikasi lapangan berhasil diupload dan status diubah ke verifikasi lapangan'
+                : count($uploadedFiles).' dokumen verifikasi lapangan berhasil diupload';
+
             return back()->with('success', $message);
         });
     }
@@ -528,15 +528,15 @@ class IinSingleBlockholderController extends Controller
         $this->authorize('view', $iinSingleBlockholder);
 
         $documents = $iinSingleBlockholder->field_verification_documents ?? [];
-        
-        if (!isset($documents[$index])) {
+
+        if (! isset($documents[$index])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
         $document = $documents[$index];
-        $filePath = storage_path('app/public/' . $document['path']);
-        
-        if (!file_exists($filePath)) {
+        $filePath = storage_path('app/public/'.$document['path']);
+
+        if (! file_exists($filePath)) {
             abort(404, 'File tidak ditemukan');
         }
 
@@ -552,10 +552,11 @@ class IinSingleBlockholderController extends Controller
             'requirements_archive' => $iinSingleBlockholder->requirements_archive_path,
             'payment_proof' => $iinSingleBlockholder->payment_proof_path, // Keep for backward compatibility
             'certificate' => $iinSingleBlockholder->certificate_path,
+            'qris' => $iinSingleBlockholder->additional_documents['path'],
             default => null
         };
 
-        if (!$path || !Storage::disk('public')->exists($path)) {
+        if (! $path || ! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan');
         }
 
@@ -571,21 +572,21 @@ class IinSingleBlockholderController extends Controller
         } else {
             $paymentProofs = $iinSingleBlockholder->payment_proof_documents ?? [];
         }
-        
-        if (!isset($paymentProofs[$index])) {
+
+        if (! isset($paymentProofs[$index])) {
             abort(404, 'Bukti pembayaran tidak ditemukan');
         }
 
         $document = $paymentProofs[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -594,21 +595,21 @@ class IinSingleBlockholderController extends Controller
         $this->authorize('downloadFile', $iinSingleBlockholder);
 
         $additionalDocuments = $iinSingleBlockholder->additional_documents ?? [];
-        
-        if (!isset($additionalDocuments[$index])) {
+
+        if (! isset($additionalDocuments[$index])) {
             abort(404, 'Dokumen tambahan tidak ditemukan');
         }
 
         $document = $additionalDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -621,21 +622,21 @@ class IinSingleBlockholderController extends Controller
         } else {
             $paymentDocuments = $iinSingleBlockholder->payment_documents ?? [];
         }
-        
-        if (!isset($paymentDocuments[$index])) {
+
+        if (! isset($paymentDocuments[$index])) {
             abort(404, 'Dokumen pembayaran tidak ditemukan');
         }
 
         $document = $paymentDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -654,11 +655,11 @@ class IinSingleBlockholderController extends Controller
             }
 
             $file = $request->file('certificate');
-            $filename = $iinSingleBlockholder->application_number . '_' . time() . '_certificate.' . $file->getClientOriginalExtension();
+            $filename = $iinSingleBlockholder->application_number.'_'.time().'_certificate.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-single-blockholder', $filename, 'public');
-            
+
             $oldStatus = $iinSingleBlockholder->status;
-            
+
             // Update certificate path and optionally change status to 'terbit' if currently 'menunggu-terbit'
             $updateData = ['certificate_path' => $path];
             if ($oldStatus === 'menunggu-terbit') {
@@ -666,7 +667,7 @@ class IinSingleBlockholderController extends Controller
                 $updateData['admin_id'] = Auth::id();
                 $updateData['issued_at'] = now();
             }
-            
+
             $iinSingleBlockholder->update($updateData);
 
             // Log activity
@@ -676,16 +677,50 @@ class IinSingleBlockholderController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $oldStatus,
                 'status_to' => $oldStatus === 'menunggu-terbit' ? 'terbit' : $oldStatus,
-                'notes' => $oldStatus === 'menunggu-terbit' 
+                'notes' => $oldStatus === 'menunggu-terbit'
                     ? 'Sertifikat IIN diupload dan IIN diterbitkan'
-                    : 'Sertifikat IIN diupload'
+                    : 'Sertifikat IIN diupload',
             ]);
         }
 
-        $message = $iinSingleBlockholder->status === 'terbit' 
+        $message = $iinSingleBlockholder->status === 'terbit'
             ? 'Sertifikat berhasil diupload dan IIN telah diterbitkan'
             : 'Sertifikat berhasil diupload';
 
         return back()->with('success', $message);
+    }
+
+    public function uploadAdditionalDocument(Request $request, IinSingleBlockholderApplication $iinSingleBlockholder)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240|mimes:pdf,doc,docx',
+        ]);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = $iinSingleBlockholder->application_number.'_'.time().'_'.uniqid().'_additional.'.$file->getClientOriginalExtension();
+            $path = $file->storeAs('iin-single-blockholder/additional-document', $filename, 'public');
+
+            $existingDocuments = [
+                'path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'uploaded_at' => now()->toISOString(),
+            ];
+
+            $iinSingleBlockholder->update([
+                'additional_documents' => $existingDocuments,
+            ]);
+
+            IinStatusLog::create([
+                'application_type' => 'single_blockholder',
+                'application_id' => $iinSingleBlockholder->id,
+                'user_id' => Auth::id(),
+                'status_from' => $iinSingleBlockholder->status,
+                'status_to' => $iinSingleBlockholder->status,
+                'notes' => 'Dokumen tambahan diupload ('.$file->getClientOriginalName().')',
+            ]);
+        }
+
+        return back()->with('success', 'Dokumen tambahan berhasil diupload');
     }
 }
