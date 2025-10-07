@@ -2,13 +2,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/layouts/dashboard-layout';
-import { PageProps } from '@/types';
-import { Head, Link, usePage, router } from '@inertiajs/react';
-import { motion } from 'framer-motion';
-import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, File, FileText, MapPin, Plus, Shield, Upload, User } from 'lucide-react';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
+import { PageProps } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import { AlertCircle, Award, Calendar, Clock, CreditCard, Download, Eye, File, FileText, MapPin, Plus, Upload, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import QrisModal from '@/components/QrisModal';
 
 interface PengawasanSingleIinApplication {
     id: number;
@@ -142,12 +141,7 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors }:
         <DashboardLayout user={auth.user}>
             <Head title="Pengawasan Single IIN" />
 
-            <motion.div
-                className="space-y-6"
-                initial="hidden"
-                animate="visible"
-                variants={containerAnimation}
-            >
+            <motion.div className="space-y-6" initial="hidden" animate="visible" variants={containerAnimation}>
                 {/* Header */}
                 <motion.div variants={itemAnimation} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -156,7 +150,7 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors }:
                     </div>
                     {auth.user.role === 'user' && (
                         <Link href={route('pengawasan-single-iin.create')}>
-                            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                            <Button className="bg-blue-600 text-white hover:bg-blue-700">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Ajukan Pengawasan
                             </Button>
@@ -191,10 +185,11 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors }:
                                     {applications.data.map((application) => (
                                         <motion.div
                                             key={application.id}
-                                            className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${application.status === 'perbaikan' && auth.user.role === 'user'
-                                                ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
-                                                : ''
-                                                }`}
+                                            className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${
+                                                application.status === 'perbaikan' && auth.user.role === 'user'
+                                                    ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
+                                                    : ''
+                                            }`}
                                             variants={itemAnimation}
                                         >
                                             <div className="mb-3 flex items-start justify-between">
@@ -225,16 +220,16 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors }:
                                                                 application.status === 'pengajuan'
                                                                     ? '33%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                     : application.status === 'perbaikan'
-                                                                        ? '33%' // Perbaikan also means user is in Verifikasi Dokumen phase
-                                                                        : application.status === 'pembayaran'
-                                                                            ? '50%'
-                                                                            : application.status === 'verifikasi-lapangan'
-                                                                                ? '67%'
-                                                                                : application.status === 'pembayaran-tahap-2'
-                                                                                    ? '83%'
-                                                                                    : application.status === 'terbit'
-                                                                                        ? '100%'
-                                                                                        : '0%',
+                                                                      ? '33%' // Perbaikan also means user is in Verifikasi Dokumen phase
+                                                                      : application.status === 'pembayaran'
+                                                                        ? '50%'
+                                                                        : application.status === 'verifikasi-lapangan'
+                                                                          ? '67%'
+                                                                          : application.status === 'pembayaran-tahap-2'
+                                                                            ? '83%'
+                                                                            : application.status === 'terbit'
+                                                                              ? '100%'
+                                                                              : '0%',
                                                         }}
                                                     ></div>
                                                 </div>
@@ -301,25 +296,31 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors }:
                                                                 </Link>
                                                             )}
 
-                                                        {(application.status === 'pembayaran' || application.status === 'pembayaran-tahap-2') && auth.user.role === 'user' && (
-                                                            <Link href={route('pengawasan-single-iin.show', application.id) + '#payment'}>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    className="border-orange-200 text-orange-600 hover:bg-orange-50"
-                                                                >
-                                                                    <Upload className="mr-2 h-4 w-4" />
-                                                                    Upload Bukti Pembayaran
-                                                                </Button>
-                                                            </Link>
-                                                        )}
+                                                        {(application.status === 'pembayaran' || application.status === 'pembayaran-tahap-2') &&
+                                                            auth.user.role === 'user' && (
+                                                                <Link href={route('pengawasan-single-iin.show', application.id) + '#payment'}>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        className="border-orange-200 text-orange-600 hover:bg-orange-50"
+                                                                    >
+                                                                        <Upload className="mr-2 h-4 w-4" />
+                                                                        Upload Bukti Pembayaran
+                                                                    </Button>
+                                                                </Link>
+                                                            )}
 
                                                         {application.can_download_certificate && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
                                                                 className="border-purple-200 text-purple-600 hover:bg-purple-50"
-                                                                onClick={() => window.open(route('pengawasan-single-iin.download-certificate', application.id), '_blank')}
+                                                                onClick={() =>
+                                                                    window.open(
+                                                                        route('pengawasan-single-iin.download-certificate', application.id),
+                                                                        '_blank',
+                                                                    )
+                                                                }
                                                             >
                                                                 <Download className="mr-2 h-4 w-4" />
                                                                 Download Sertifikat
@@ -344,10 +345,9 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors }:
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    className={`px-3 py-2 text-sm rounded-md ${link.active
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-white text-gray-700 border hover:bg-gray-50'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`rounded-md px-3 py-2 text-sm ${
+                                        link.active ? 'bg-blue-600 text-white' : 'border bg-white text-gray-700 hover:bg-gray-50'
+                                    } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

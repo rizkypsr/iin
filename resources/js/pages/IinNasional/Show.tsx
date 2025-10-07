@@ -1,3 +1,5 @@
+import QrisModal from '@/components/QrisModal';
+import SurveyModal from '@/components/SurveyModal';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,12 +9,10 @@ import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { format, set } from 'date-fns';
+import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Upload, User, X } from 'lucide-react';
 import { useState } from 'react';
-import SurveyModal from '@/components/SurveyModal';
-import QrisModal from '@/components/QrisModal';
 
 interface PaymentDocument {
     path: string;
@@ -150,20 +150,16 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
         const formData = new FormData();
         formData.append('file', file);
 
-        router.post(
-            route('iin-nasional.upload-additional-documents', selectedApplication?.id),
-            formData,
-            {
-                onSuccess: () => {
-                    showSuccessToast('File QRIS berhasil diupload!');
-                    setIsQrisModalOpen(false);
-                },
-                onError: (errors) => {
-                    console.error(errors);
-                    showErrorToast('Gagal mengupload file QRIS');
-                },
-            }
-        );
+        router.post(route('iin-nasional.upload-additional-documents', selectedApplication?.id), formData, {
+            onSuccess: () => {
+                showSuccessToast('File QRIS berhasil diupload!');
+                setIsQrisModalOpen(false);
+            },
+            onError: (errors) => {
+                console.error(errors);
+                showErrorToast('Gagal mengupload file QRIS');
+            },
+        });
     };
 
     const getStatusLabel = (status: string) => {
@@ -209,8 +205,6 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
         return format(new Date(dateString), 'dd MMMM yyyy', { locale: id });
     };
 
-
-
     return (
         <DashboardLayout user={auth.user}>
             <Head title={`IIN Nasional - ${application.application_number}`} />
@@ -231,32 +225,34 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                 <p className="text-gray-600">IIN Nasional</p>
                                 <span className="mx-1 text-gray-400">•</span>
                                 <div
-                                    className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-sm font-medium ${application.status === 'perbaikan'
-                                        ? 'border border-amber-200 bg-amber-50 text-amber-700'
-                                        : application.status === 'terbit'
-                                            ? 'border border-green-200 bg-green-50 text-green-700'
-                                            : application.status === 'pembayaran'
+                                    className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-sm font-medium ${
+                                        application.status === 'perbaikan'
+                                            ? 'border border-amber-200 bg-amber-50 text-amber-700'
+                                            : application.status === 'terbit'
+                                              ? 'border border-green-200 bg-green-50 text-green-700'
+                                              : application.status === 'pembayaran'
                                                 ? 'border border-blue-200 bg-blue-50 text-blue-700'
                                                 : application.status === 'verifikasi-lapangan'
-                                                    ? 'border border-purple-200 bg-purple-50 text-purple-700'
-                                                    : application.status === 'menunggu-terbit'
-                                                        ? 'border border-cyan-200 bg-cyan-50 text-cyan-700'
-                                                        : 'border border-gray-200 bg-gray-50 text-gray-700'
-                                        }`}
+                                                  ? 'border border-purple-200 bg-purple-50 text-purple-700'
+                                                  : application.status === 'menunggu-terbit'
+                                                    ? 'border border-cyan-200 bg-cyan-50 text-cyan-700'
+                                                    : 'border border-gray-200 bg-gray-50 text-gray-700'
+                                    }`}
                                 >
                                     <span
-                                        className={`${application.status === 'perbaikan'
-                                            ? 'text-amber-600'
-                                            : application.status === 'terbit'
-                                                ? 'text-green-600'
-                                                : application.status === 'pembayaran'
+                                        className={`${
+                                            application.status === 'perbaikan'
+                                                ? 'text-amber-600'
+                                                : application.status === 'terbit'
+                                                  ? 'text-green-600'
+                                                  : application.status === 'pembayaran'
                                                     ? 'text-blue-600'
                                                     : application.status === 'verifikasi-lapangan'
-                                                        ? 'text-purple-600'
-                                                        : application.status === 'menunggu-terbit'
-                                                            ? 'text-cyan-600'
-                                                            : 'text-gray-600'
-                                            }`}
+                                                      ? 'text-purple-600'
+                                                      : application.status === 'menunggu-terbit'
+                                                        ? 'text-cyan-600'
+                                                        : 'text-gray-600'
+                                        }`}
                                     >
                                         {getStatusIcon(application.status)}
                                     </span>
@@ -318,42 +314,45 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                     <div className="space-y-1">
                                         <Label className="text-xs font-normal text-gray-500">Status</Label>
                                         <div
-                                            className={`flex w-fit items-center gap-1.5 rounded-md px-3 py-1.5 ${application.status === 'perbaikan'
-                                                ? 'border border-amber-200 bg-amber-50'
-                                                : application.status === 'terbit'
-                                                    ? 'border border-green-200 bg-green-50'
-                                                    : application.status === 'pembayaran'
+                                            className={`flex w-fit items-center gap-1.5 rounded-md px-3 py-1.5 ${
+                                                application.status === 'perbaikan'
+                                                    ? 'border border-amber-200 bg-amber-50'
+                                                    : application.status === 'terbit'
+                                                      ? 'border border-green-200 bg-green-50'
+                                                      : application.status === 'pembayaran'
                                                         ? 'border border-blue-200 bg-blue-50'
                                                         : application.status === 'verifikasi-lapangan'
-                                                            ? 'border border-purple-200 bg-purple-50'
-                                                            : 'border border-gray-200 bg-gray-50'
-                                                }`}
+                                                          ? 'border border-purple-200 bg-purple-50'
+                                                          : 'border border-gray-200 bg-gray-50'
+                                            }`}
                                         >
                                             <span
-                                                className={`${application.status === 'perbaikan'
-                                                    ? 'text-amber-600'
-                                                    : application.status === 'terbit'
-                                                        ? 'text-green-600'
-                                                        : application.status === 'pembayaran'
+                                                className={`${
+                                                    application.status === 'perbaikan'
+                                                        ? 'text-amber-600'
+                                                        : application.status === 'terbit'
+                                                          ? 'text-green-600'
+                                                          : application.status === 'pembayaran'
                                                             ? 'text-blue-600'
                                                             : application.status === 'verifikasi-lapangan'
-                                                                ? 'text-purple-600'
-                                                                : 'text-gray-600'
-                                                    }`}
+                                                              ? 'text-purple-600'
+                                                              : 'text-gray-600'
+                                                }`}
                                             >
                                                 {getStatusIcon(application.status)}
                                             </span>
                                             <span
-                                                className={`font-medium${application.status === 'perbaikan'
-                                                    ? 'text-amber-700'
-                                                    : application.status === 'terbit'
-                                                        ? 'text-green-700'
-                                                        : application.status === 'pembayaran'
+                                                className={`font-medium${
+                                                    application.status === 'perbaikan'
+                                                        ? 'text-amber-700'
+                                                        : application.status === 'terbit'
+                                                          ? 'text-green-700'
+                                                          : application.status === 'pembayaran'
                                                             ? 'text-blue-700'
                                                             : application.status === 'verifikasi-lapangan'
-                                                                ? 'text-purple-700'
-                                                                : 'text-gray-700'
-                                                    }`}
+                                                              ? 'text-purple-700'
+                                                              : 'text-gray-700'
+                                                }`}
                                             >
                                                 {getStatusLabel(application.status)}
                                             </span>
@@ -381,7 +380,8 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                 <p className="font-medium text-gray-800">{formatDate(application.issued_at)}</p>
                                             </div>
                                         </div>
-                                    </div>)}
+                                    </div>
+                                )}
 
                                 {application.notes && (
                                     <div className="mt-6 border-t border-dashed pt-5">
@@ -408,7 +408,8 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                 <p className="mt-1 font-medium text-gray-800">{application.notes}</p>
                                             </div>
                                         </div>
-                                    </div>)}
+                                    </div>
+                                )}
 
                                 {/* Show admin info if available */}
                                 {application.admin && (
@@ -485,15 +486,17 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                 </div>
                                                 <div>
                                                     <h3 className="font-semibold text-yellow-800">Surat Pernyataan Penggunaan QRIS</h3>
-                                                    <p className="text-sm text-yellow-700">Sebelum dapat mendownload sertifikat, harap mengisi surat pernyataan ini.</p>
+                                                    <p className="text-sm text-yellow-700">
+                                                        Sebelum dapat mendownload sertifikat, harap mengisi surat pernyataan ini.
+                                                    </p>
                                                 </div>
                                             </div>
                                             <Button
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => {
-                                                    setSelectedApplication(application)
-                                                    setIsQrisModalOpen(true)
+                                                    setSelectedApplication(application);
+                                                    setIsQrisModalOpen(true);
                                                 }}
                                                 className="border-yellow-200 bg-white text-yellow-700 hover:bg-yellow-50 hover:text-yellow-800"
                                             >
@@ -568,7 +571,10 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() =>
-                                                    window.open(route('iin-nasional.download-file', [application.id, 'requirements_archive']), '_blank')
+                                                    window.open(
+                                                        route('iin-nasional.download-file', [application.id, 'requirements_archive']),
+                                                        '_blank',
+                                                    )
                                                 }
                                                 className="bg-white"
                                             >
@@ -583,26 +589,33 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                         <div className="space-y-4">
                                             <h3 className="text-lg font-semibold text-gray-800">Dokumen Verifikasi Lapangan</h3>
                                             {application.field_verification_documents.map((document: PaymentDocument, index: number) => (
-                                                <div key={index} className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50">
+                                                <div
+                                                    key={index}
+                                                    className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50"
+                                                >
                                                     <div className="flex items-center gap-4">
                                                         <div className="rounded-full bg-blue-100 p-2">
                                                             <FileText className="h-7 w-7 text-blue-600" />
                                                         </div>
                                                         <div>
-                                                            <h3 className="font-medium text-gray-800">{document.original_name || `Dokumen Verifikasi Lapangan ${index + 1}`}</h3>
+                                                            <h3 className="font-medium text-gray-800">
+                                                                {document.original_name || `Dokumen Verifikasi Lapangan ${index + 1}`}
+                                                            </h3>
                                                             <p className="text-sm text-gray-500">Dokumen verifikasi lapangan dari admin</p>
                                                         </div>
                                                     </div>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        onClick={() => window.open(
-                                                            route('iin-nasional.download-field-verification-document', {
-                                                                iinNasional: application.id,
-                                                                index: index,
-                                                            }),
-                                                            '_blank',
-                                                        )}
+                                                        onClick={() =>
+                                                            window.open(
+                                                                route('iin-nasional.download-field-verification-document', {
+                                                                    iinNasional: application.id,
+                                                                    index: index,
+                                                                }),
+                                                                '_blank',
+                                                            )
+                                                        }
                                                         className="bg-white"
                                                     >
                                                         <Download className="mr-2 h-4 w-4" />
@@ -618,26 +631,33 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                         <div className="space-y-4">
                                             <h3 className="text-lg font-semibold text-gray-800">Dokumen Tambahan</h3>
                                             {application.additional_documents.map((document: PaymentDocument, index: number) => (
-                                                <div key={index} className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50">
+                                                <div
+                                                    key={index}
+                                                    className="flex items-center justify-between rounded-lg border bg-white p-4 transition-colors hover:bg-gray-50"
+                                                >
                                                     <div className="flex items-center gap-4">
                                                         <div className="rounded-full bg-teal-100 p-2">
                                                             <FileText className="h-7 w-7 text-teal-600" />
                                                         </div>
                                                         <div>
-                                                            <h3 className="font-medium text-gray-800">{document.original_name || `Dokumen Tambahan ${index + 1}`}</h3>
+                                                            <h3 className="font-medium text-gray-800">
+                                                                {document.original_name || `Dokumen Tambahan ${index + 1}`}
+                                                            </h3>
                                                             <p className="text-sm text-gray-500">Dokumen tambahan dari admin</p>
                                                         </div>
                                                     </div>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        onClick={() => window.open(
-                                                            route('iin-nasional.download-additional-document', {
-                                                                iinNasional: application.id,
-                                                                index: index,
-                                                            }),
-                                                            '_blank',
-                                                        )}
+                                                        onClick={() =>
+                                                            window.open(
+                                                                route('iin-nasional.download-additional-document', {
+                                                                    iinNasional: application.id,
+                                                                    index: index,
+                                                                }),
+                                                                '_blank',
+                                                            )
+                                                        }
                                                         className="bg-white"
                                                     >
                                                         <Download className="mr-2 h-4 w-4" />
@@ -702,17 +722,22 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                     <div className="flex-1">
                                                         <h3 className="mb-2 font-semibold text-gray-900">Dokumen Pembayaran dari Admin</h3>
                                                         <p className="mb-4 text-sm text-gray-700">
-                                                            Admin telah mengunggah dokumen pembayaran untuk aplikasi Anda. Silakan unduh dan isi dokumen tersebut sebagai bukti pembayaran.
+                                                            Admin telah mengunggah dokumen pembayaran untuk aplikasi Anda. Silakan unduh dan isi
+                                                            dokumen tersebut sebagai bukti pembayaran.
                                                         </p>
                                                         <div className="space-y-3">
                                                             {application.payment_documents.map((document: PaymentDocument, index: number) => (
-                                                                <div key={index} className="flex items-center justify-between rounded-lg border border-white/40 bg-white/60 p-4 backdrop-blur-sm">
+                                                                <div
+                                                                    key={index}
+                                                                    className="flex items-center justify-between rounded-lg border border-white/40 bg-white/60 p-4 backdrop-blur-sm"
+                                                                >
                                                                     <div className="flex items-center gap-3">
                                                                         <FileText className="h-5 w-5 text-green-600" />
                                                                         <div>
                                                                             <div className="font-medium text-gray-900">{document.original_name}</div>
                                                                             <div className="text-sm text-gray-600">
-                                                                                Diunggah pada {new Date(document.uploaded_at).toLocaleDateString('id-ID')}
+                                                                                Diunggah pada{' '}
+                                                                                {new Date(document.uploaded_at).toLocaleDateString('id-ID')}
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -720,7 +745,13 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                                         variant="outline"
                                                                         size="sm"
                                                                         onClick={() =>
-                                                                            window.open(route('iin-nasional.download-payment-document', [application.id, index]), '_blank')
+                                                                            window.open(
+                                                                                route('iin-nasional.download-payment-document', [
+                                                                                    application.id,
+                                                                                    index,
+                                                                                ]),
+                                                                                '_blank',
+                                                                            )
                                                                         }
                                                                         className="bg-white hover:bg-green-50"
                                                                     >
@@ -756,7 +787,8 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                     <div className="flex-1">
                                                         <h3 className="mb-2 font-semibold text-gray-900">Menunggu Dokumen Pembayaran</h3>
                                                         <p className="mb-4 text-sm text-gray-700">
-                                                            Admin sedang memproses dokumen pembayaran untuk aplikasi Anda. Silakan tunggu hingga dokumen tersedia untuk diunduh.
+                                                            Admin sedang memproses dokumen pembayaran untuk aplikasi Anda. Silakan tunggu hingga
+                                                            dokumen tersedia untuk diunduh.
                                                         </p>
                                                         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
                                                             <div className="flex items-start gap-2">
@@ -776,22 +808,24 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                 </div>
                                             </div>
                                         )}
-
-
                                     </div>
                                 )}
 
-                                {application.status === 'pembayaran' && auth.user.role === 'user' && application.payment_documents && application.payment_documents.length > 0 && (
-                                    <Alert className="border border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800">
-                                        <CreditCard className="h-4 w-4 text-blue-600" />
-                                        <AlertDescription className="text-blue-700">
-                                            Silahkan lakukan pembayaran sesuai informasi di atas dan unggah bukti pembayaran untuk melanjutkan proses
-                                            aplikasi.
-                                        </AlertDescription>
-                                    </Alert>
-                                )}
+                                {application.status === 'pembayaran' &&
+                                    auth.user.role === 'user' &&
+                                    application.payment_documents &&
+                                    application.payment_documents.length > 0 && (
+                                        <Alert className="border border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800">
+                                            <CreditCard className="h-4 w-4 text-blue-600" />
+                                            <AlertDescription className="text-blue-700">
+                                                Silahkan lakukan pembayaran sesuai informasi di atas dan unggah bukti pembayaran untuk melanjutkan
+                                                proses aplikasi.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
 
-                                {(application.payment_proof_path || (application.payment_proof_documents && application.payment_proof_documents.length > 0)) ? (
+                                {application.payment_proof_path ||
+                                (application.payment_proof_documents && application.payment_proof_documents.length > 0) ? (
                                     <div className="space-y-4">
                                         <div className="rounded-lg border bg-gradient-to-r from-gray-50 to-gray-100 p-4">
                                             <h3 className="mb-2 font-medium text-gray-800">Bukti Pembayaran</h3>
@@ -800,7 +834,10 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                             {application.payment_proof_documents && application.payment_proof_documents.length > 0 ? (
                                                 <div className="space-y-3">
                                                     {application.payment_proof_documents.map((document: PaymentDocument, index: number) => (
-                                                        <div key={index} className="flex items-center justify-between rounded-lg border border-white/40 bg-white/60 p-3 backdrop-blur-sm">
+                                                        <div
+                                                            key={index}
+                                                            className="flex items-center justify-between rounded-lg border border-white/40 bg-white/60 p-3 backdrop-blur-sm"
+                                                        >
                                                             <div className="flex items-center gap-3">
                                                                 <FileText className="h-5 w-5 text-purple-500" />
                                                                 <div>
@@ -814,7 +851,10 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                                 variant="outline"
                                                                 size="sm"
                                                                 onClick={() =>
-                                                                    window.open(route('iin-nasional.download-payment-proof', [application.id, index]), '_blank')
+                                                                    window.open(
+                                                                        route('iin-nasional.download-payment-proof', [application.id, index]),
+                                                                        '_blank',
+                                                                    )
                                                                 }
                                                                 className="bg-white hover:bg-purple-50"
                                                             >
@@ -839,7 +879,10 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() =>
-                                                                window.open(route('iin-nasional.download-file', [application.id, 'payment_proof']), '_blank')
+                                                                window.open(
+                                                                    route('iin-nasional.download-file', [application.id, 'payment_proof']),
+                                                                    '_blank',
+                                                                )
                                                             }
                                                             className="bg-white hover:bg-purple-50"
                                                         >
@@ -861,15 +904,143 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                     )
                                 )}
 
-                                {application.can_upload_payment_proof && auth.user.role === 'user' && application.payment_documents && application.payment_documents.length > 0 && (application.payment_proof_path || (application.payment_proof_documents && application.payment_proof_documents.length > 0)) && (
-                                    <div className="mt-6 rounded-lg border p-4">
-                                        <h3 className="mb-2 font-medium text-gray-800">Unggah Bukti Pembayaran Baru</h3>
-                                        <p className="mb-4 text-sm text-gray-600">
-                                            Jika bukti pembayaran sebelumnya tidak valid, Anda dapat mengunggah bukti pembayaran baru di sini.
-                                        </p>
-                                        <form onSubmit={uploadPaymentProof}>
-                                            <div className="space-y-4">
-                                                <div className="relative rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-purple-300">
+                                {application.can_upload_payment_proof &&
+                                    auth.user.role === 'user' &&
+                                    application.payment_documents &&
+                                    application.payment_documents.length > 0 &&
+                                    (application.payment_proof_path ||
+                                        (application.payment_proof_documents && application.payment_proof_documents.length > 0)) && (
+                                        <div className="mt-6 rounded-lg border p-4">
+                                            <h3 className="mb-2 font-medium text-gray-800">Unggah Bukti Pembayaran Baru</h3>
+                                            <p className="mb-4 text-sm text-gray-600">
+                                                Jika bukti pembayaran sebelumnya tidak valid, Anda dapat mengunggah bukti pembayaran baru di sini.
+                                            </p>
+                                            <form onSubmit={uploadPaymentProof}>
+                                                <div className="space-y-4">
+                                                    <div className="relative rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-purple-300">
+                                                        <div className="flex flex-col items-center gap-2">
+                                                            <Upload className="mb-1 h-8 w-8 text-gray-400" />
+                                                            <span className="text-sm font-medium text-gray-900">
+                                                                {formData.payment_proof.length > 0
+                                                                    ? `${formData.payment_proof.length} file dipilih`
+                                                                    : 'Klik untuk memilih file bukti pembayaran'}
+                                                            </span>
+                                                            <span className="text-xs text-gray-500">
+                                                                Format: PDF, JPG, JPEG, PNG (Maks. 5MB per file)
+                                                            </span>
+                                                        </div>
+                                                        <label htmlFor="payment_proof_update" className="absolute inset-0 cursor-pointer">
+                                                            <span className="sr-only">Pilih file</span>
+                                                        </label>
+                                                        <input
+                                                            id="payment_proof_update"
+                                                            type="file"
+                                                            accept=".pdf,.jpg,.jpeg,.png"
+                                                            onChange={handleFileChange}
+                                                            className="hidden"
+                                                            multiple
+                                                        />
+                                                    </div>
+
+                                                    {/* Display selected files */}
+                                                    {formData.payment_proof.length > 0 && (
+                                                        <div className="space-y-2">
+                                                            <p className="text-sm font-medium text-gray-700">File yang dipilih:</p>
+                                                            {formData.payment_proof.map((file: File, index: number) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-2"
+                                                                >
+                                                                    <div className="flex items-center gap-2">
+                                                                        <FileText className="h-4 w-4 text-gray-500" />
+                                                                        <span className="text-sm text-gray-700">{file.name}</span>
+                                                                        <span className="text-xs text-gray-500">
+                                                                            ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                                                        </span>
+                                                                    </div>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => removeFile(index)}
+                                                                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                                                                    >
+                                                                        <X className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+
+                                                    {uploadProgress > 0 && (
+                                                        <div className="space-y-1">
+                                                            <div className="flex justify-between text-xs">
+                                                                <span>Mengunggah...</span>
+                                                                <span>{uploadProgress}%</span>
+                                                            </div>
+                                                            <div className="h-2.5 w-full rounded-full bg-gray-200">
+                                                                <div
+                                                                    className="h-2.5 rounded-full bg-gradient-to-r from-purple-500 to-purple-700 transition-all duration-300"
+                                                                    style={{ width: `${uploadProgress}%` }}
+                                                                ></div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <Button
+                                                        type="submit"
+                                                        disabled={uploading || formData.payment_proof.length === 0}
+                                                        className="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800"
+                                                    >
+                                                        {uploading ? (
+                                                            <span className="flex items-center gap-2">
+                                                                <svg
+                                                                    className="mr-2 -ml-1 h-4 w-4 animate-spin text-white"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    fill="none"
+                                                                    viewBox="0 0 24 24"
+                                                                >
+                                                                    <circle
+                                                                        className="opacity-25"
+                                                                        cx="12"
+                                                                        cy="12"
+                                                                        r="10"
+                                                                        stroke="currentColor"
+                                                                        strokeWidth="4"
+                                                                    ></circle>
+                                                                    <path
+                                                                        className="opacity-75"
+                                                                        fill="currentColor"
+                                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                                    ></path>
+                                                                </svg>
+                                                                Sedang Mengunggah...
+                                                            </span>
+                                                        ) : (
+                                                            <span className="flex items-center gap-2">
+                                                                <Upload className="h-4 w-4" />
+                                                                Unggah Bukti Pembayaran ({formData.payment_proof.length} file)
+                                                            </span>
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    )}
+
+                                {application.can_upload_payment_proof &&
+                                    auth.user.role === 'user' &&
+                                    application.payment_documents &&
+                                    application.payment_documents.length > 0 &&
+                                    !application.payment_proof_path &&
+                                    (!application.payment_proof_documents || application.payment_proof_documents.length === 0) && (
+                                        <form onSubmit={uploadPaymentProof} className="space-y-4">
+                                            <div className="rounded-lg border p-4">
+                                                <h3 className="mb-2 font-medium text-gray-800">Unggah Bukti Pembayaran</h3>
+                                                <p className="mb-4 text-sm text-gray-600">
+                                                    Silakan unggah bukti transfer atau pembayaran dalam format PDF, JPG, atau PNG.
+                                                </p>
+                                                <div className="relative mb-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-purple-300">
                                                     <div className="flex flex-col items-center gap-2">
                                                         <Upload className="mb-1 h-8 w-8 text-gray-400" />
                                                         <span className="text-sm font-medium text-gray-900">
@@ -877,13 +1048,15 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                                 ? `${formData.payment_proof.length} file dipilih`
                                                                 : 'Klik untuk memilih file bukti pembayaran'}
                                                         </span>
-                                                        <span className="text-xs text-gray-500">Format: PDF, JPG, JPEG, PNG (Maks. 5MB per file)</span>
+                                                        <span className="text-xs text-gray-500">
+                                                            Format: PDF, JPG, JPEG, PNG (Maks. 5MB per file)
+                                                        </span>
                                                     </div>
-                                                    <label htmlFor="payment_proof_update" className="absolute inset-0 cursor-pointer">
+                                                    <label htmlFor="payment_proof_new" className="absolute inset-0 cursor-pointer">
                                                         <span className="sr-only">Pilih file</span>
                                                     </label>
                                                     <input
-                                                        id="payment_proof_update"
+                                                        id="payment_proof_new"
                                                         type="file"
                                                         accept=".pdf,.jpg,.jpeg,.png"
                                                         onChange={handleFileChange}
@@ -894,14 +1067,19 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
 
                                                 {/* Display selected files */}
                                                 {formData.payment_proof.length > 0 && (
-                                                    <div className="space-y-2">
+                                                    <div className="mb-4 space-y-2">
                                                         <p className="text-sm font-medium text-gray-700">File yang dipilih:</p>
                                                         {formData.payment_proof.map((file: File, index: number) => (
-                                                            <div key={index} className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-2">
+                                                            <div
+                                                                key={index}
+                                                                className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-2"
+                                                            >
                                                                 <div className="flex items-center gap-2">
                                                                     <FileText className="h-4 w-4 text-gray-500" />
                                                                     <span className="text-sm text-gray-700">{file.name}</span>
-                                                                    <span className="text-xs text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                                                    <span className="text-xs text-gray-500">
+                                                                        ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                                                    </span>
                                                                 </div>
                                                                 <Button
                                                                     type="button"
@@ -931,170 +1109,63 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                                         </div>
                                                     </div>
                                                 )}
-
-                                                <Button
-                                                    type="submit"
-                                                    disabled={uploading || formData.payment_proof.length === 0}
-                                                    className="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800"
-                                                >
-                                                    {uploading ? (
-                                                        <span className="flex items-center gap-2">
-                                                            <svg
-                                                                className="mr-2 -ml-1 h-4 w-4 animate-spin text-white"
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                            >
-                                                                <circle
-                                                                    className="opacity-25"
-                                                                    cx="12"
-                                                                    cy="12"
-                                                                    r="10"
-                                                                    stroke="currentColor"
-                                                                    strokeWidth="4"
-                                                                ></circle>
-                                                                <path
-                                                                    className="opacity-75"
-                                                                    fill="currentColor"
-                                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                                ></path>
-                                                            </svg>
-                                                            Sedang Mengunggah...
-                                                        </span>
-                                                    ) : (
-                                                        <span className="flex items-center gap-2">
-                                                            <Upload className="h-4 w-4" />
-                                                            Unggah Bukti Pembayaran ({formData.payment_proof.length} file)
-                                                        </span>
-                                                    )}
-                                                </Button>
                                             </div>
-                                        </form>
-                                    </div>
-                                )}
 
-
-                                {application.can_upload_payment_proof && auth.user.role === 'user' && application.payment_documents && application.payment_documents.length > 0 && !application.payment_proof_path && (!application.payment_proof_documents || application.payment_proof_documents.length === 0) && (
-                                    <form onSubmit={uploadPaymentProof} className="space-y-4">
-                                        <div className="rounded-lg border p-4">
-                                            <h3 className="mb-2 font-medium text-gray-800">Unggah Bukti Pembayaran</h3>
-                                            <p className="mb-4 text-sm text-gray-600">
-                                                Silakan unggah bukti transfer atau pembayaran dalam format PDF, JPG, atau PNG.
-                                            </p>
-                                            <div className="relative mb-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-purple-300">
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <Upload className="mb-1 h-8 w-8 text-gray-400" />
-                                                    <span className="text-sm font-medium text-gray-900">
-                                                        {formData.payment_proof.length > 0
-                                                            ? `${formData.payment_proof.length} file dipilih`
-                                                            : 'Klik untuk memilih file bukti pembayaran'}
+                                            <Button
+                                                type="submit"
+                                                disabled={uploading || formData.payment_proof.length === 0}
+                                                className="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800"
+                                            >
+                                                {uploading ? (
+                                                    <span className="flex items-center gap-2">
+                                                        <svg
+                                                            className="mr-2 -ml-1 h-4 w-4 animate-spin text-white"
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <circle
+                                                                className="opacity-25"
+                                                                cx="12"
+                                                                cy="12"
+                                                                r="10"
+                                                                stroke="currentColor"
+                                                                strokeWidth="4"
+                                                            ></circle>
+                                                            <path
+                                                                className="opacity-75"
+                                                                fill="currentColor"
+                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                            ></path>
+                                                        </svg>
+                                                        Sedang Mengunggah...
                                                     </span>
-                                                    <span className="text-xs text-gray-500">Format: PDF, JPG, JPEG, PNG (Maks. 5MB per file)</span>
-                                                </div>
-                                                <label htmlFor="payment_proof_new" className="absolute inset-0 cursor-pointer">
-                                                    <span className="sr-only">Pilih file</span>
-                                                </label>
-                                                <input
-                                                    id="payment_proof_new"
-                                                    type="file"
-                                                    accept=".pdf,.jpg,.jpeg,.png"
-                                                    onChange={handleFileChange}
-                                                    className="hidden"
-                                                    multiple
-                                                />
-                                            </div>
+                                                ) : (
+                                                    <span className="flex items-center gap-2">
+                                                        <Upload className="h-4 w-4" />
+                                                        Unggah Bukti Pembayaran ({formData.payment_proof.length} file)
+                                                    </span>
+                                                )}
+                                            </Button>
+                                        </form>
+                                    )}
 
-                                            {/* Display selected files */}
-                                            {formData.payment_proof.length > 0 && (
-                                                <div className="mb-4 space-y-2">
-                                                    <p className="text-sm font-medium text-gray-700">File yang dipilih:</p>
-                                                    {formData.payment_proof.map((file: File, index: number) => (
-                                                        <div key={index} className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-2">
-                                                            <div className="flex items-center gap-2">
-                                                                <FileText className="h-4 w-4 text-gray-500" />
-                                                                <span className="text-sm text-gray-700">{file.name}</span>
-                                                                <span className="text-xs text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                                                            </div>
-                                                            <Button
-                                                                type="button"
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                onClick={() => removeFile(index)}
-                                                                className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-                                                            >
-                                                                <X className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            {uploadProgress > 0 && (
-                                                <div className="space-y-1">
-                                                    <div className="flex justify-between text-xs">
-                                                        <span>Mengunggah...</span>
-                                                        <span>{uploadProgress}%</span>
-                                                    </div>
-                                                    <div className="h-2.5 w-full rounded-full bg-gray-200">
-                                                        <div
-                                                            className="h-2.5 rounded-full bg-gradient-to-r from-purple-500 to-purple-700 transition-all duration-300"
-                                                            style={{ width: `${uploadProgress}%` }}
-                                                        ></div>
-                                                    </div>
-                                                </div>
-                                            )}
+                                {!application.payment_proof_path &&
+                                    (!application.payment_proof_documents || application.payment_proof_documents.length === 0) &&
+                                    (!application.can_upload_payment_proof ||
+                                        auth.user.role !== 'user' ||
+                                        !application.payment_documents ||
+                                        application.payment_documents.length === 0) && (
+                                        <div className="p-8 text-center">
+                                            <CreditCard className="mx-auto mb-3 h-12 w-12 text-gray-300" />
+                                            <h3 className="mb-1 text-lg font-medium text-gray-700">Belum Ada Informasi Pembayaran</h3>
+                                            <p className="text-gray-500">
+                                                {application.status === 'pengajuan' || application.status === 'perbaikan'
+                                                    ? 'Aplikasi masih dalam tahap pengajuan. Informasi pembayaran akan tersedia setelah aplikasi diverifikasi.'
+                                                    : 'Tidak ada informasi pembayaran yang tersedia saat ini.'}
+                                            </p>
                                         </div>
-
-                                        <Button
-                                            type="submit"
-                                            disabled={uploading || formData.payment_proof.length === 0}
-                                            className="w-full bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800"
-                                        >
-                                            {uploading ? (
-                                                <span className="flex items-center gap-2">
-                                                    <svg
-                                                        className="mr-2 -ml-1 h-4 w-4 animate-spin text-white"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none"
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <circle
-                                                            className="opacity-25"
-                                                            cx="12"
-                                                            cy="12"
-                                                            r="10"
-                                                            stroke="currentColor"
-                                                            strokeWidth="4"
-                                                        ></circle>
-                                                        <path
-                                                            className="opacity-75"
-                                                            fill="currentColor"
-                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                        ></path>
-                                                    </svg>
-                                                    Sedang Mengunggah...
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-2">
-                                                    <Upload className="h-4 w-4" />
-                                                    Unggah Bukti Pembayaran ({formData.payment_proof.length} file)
-                                                </span>
-                                            )}
-                                        </Button>
-                                    </form>
-                                )}
-
-                                {!application.payment_proof_path && (!application.payment_proof_documents || application.payment_proof_documents.length === 0) && (!application.can_upload_payment_proof || auth.user.role !== 'user' || !application.payment_documents || application.payment_documents.length === 0) && (
-                                    <div className="p-8 text-center">
-                                        <CreditCard className="mx-auto mb-3 h-12 w-12 text-gray-300" />
-                                        <h3 className="mb-1 text-lg font-medium text-gray-700">Belum Ada Informasi Pembayaran</h3>
-                                        <p className="text-gray-500">
-                                            {application.status === 'pengajuan' || application.status === 'perbaikan'
-                                                ? 'Aplikasi masih dalam tahap pengajuan. Informasi pembayaran akan tersedia setelah aplikasi diverifikasi.'
-                                                : 'Tidak ada informasi pembayaran yang tersedia saat ini.'}
-                                        </p>
-                                    </div>
-                                )}
+                                    )}
                             </CardContent>
                         </Card>
                     </TabsContent>
@@ -1115,28 +1186,30 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                                             <div key={log.id} className="p-4 transition-colors hover:bg-gray-50">
                                                 <div className="flex items-start gap-4">
                                                     <div
-                                                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${log.status_to === 'perbaikan'
-                                                            ? 'bg-amber-100'
-                                                            : log.status_to === 'pembayaran'
-                                                                ? 'bg-blue-100'
-                                                                : log.status_to === 'verifikasi-lapangan'
+                                                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                                                            log.status_to === 'perbaikan'
+                                                                ? 'bg-amber-100'
+                                                                : log.status_to === 'pembayaran'
+                                                                  ? 'bg-blue-100'
+                                                                  : log.status_to === 'verifikasi-lapangan'
                                                                     ? 'bg-purple-100'
                                                                     : log.status_to === 'terbit'
-                                                                        ? 'bg-green-100'
-                                                                        : 'bg-gray-100'
-                                                            }`}
+                                                                      ? 'bg-green-100'
+                                                                      : 'bg-gray-100'
+                                                        }`}
                                                     >
                                                         <span
-                                                            className={`${log.status_to === 'perbaikan'
-                                                                ? 'text-amber-600'
-                                                                : log.status_to === 'pembayaran'
-                                                                    ? 'text-blue-600'
-                                                                    : log.status_to === 'verifikasi-lapangan'
+                                                            className={`${
+                                                                log.status_to === 'perbaikan'
+                                                                    ? 'text-amber-600'
+                                                                    : log.status_to === 'pembayaran'
+                                                                      ? 'text-blue-600'
+                                                                      : log.status_to === 'verifikasi-lapangan'
                                                                         ? 'text-purple-600'
                                                                         : log.status_to === 'terbit'
-                                                                            ? 'text-green-600'
-                                                                            : 'text-gray-600'
-                                                                }`}
+                                                                          ? 'text-green-600'
+                                                                          : 'text-gray-600'
+                                                            }`}
                                                         >
                                                             {getStatusIcon(log.status_to)}
                                                         </span>
@@ -1197,6 +1270,6 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                 }}
                 onFileUpload={(file: File) => handleQrisFileUpload(file)}
             />
-        </DashboardLayout >
+        </DashboardLayout>
     );
 }

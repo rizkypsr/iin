@@ -3,11 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import DashboardLayout from '@/layouts/dashboard-layout';
-import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
+import { showErrorToast } from '@/lib/toast-helper';
+import { PageProps } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft, FileText, Shield } from 'lucide-react';
-import { PageProps } from '@/types';
 import { useState } from 'react';
 
 interface Props extends PageProps {
@@ -55,15 +55,19 @@ export default function PengawasanSingleIinCreate() {
         setIsSubmitting(true);
 
         try {
-            router.post(route('pengawasan-single-iin.store'), {}, {
-                onError: (errors) => {
-                    const errorMessage = (Object.values(errors)[0] as string) || 'Terjadi kesalahan saat mengajukan aplikasi pengawasan';
-                    showErrorToast(errorMessage);
+            router.post(
+                route('pengawasan-single-iin.store'),
+                {},
+                {
+                    onError: (errors) => {
+                        const errorMessage = (Object.values(errors)[0] as string) || 'Terjadi kesalahan saat mengajukan aplikasi pengawasan';
+                        showErrorToast(errorMessage);
+                    },
+                    onFinish: () => {
+                        setIsSubmitting(false);
+                    },
                 },
-                onFinish: () => {
-                    setIsSubmitting(false);
-                }
-            });
+            );
         } catch (error) {
             showErrorToast('Terjadi kesalahan saat mengajukan aplikasi pengawasan');
             setIsSubmitting(false);
@@ -99,7 +103,7 @@ export default function PengawasanSingleIinCreate() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <Label className="text-sm font-medium text-gray-700">Nama Institusi</Label>
                                     <p className="mt-1 text-sm text-gray-900">{singleIinProfile.institution_name}</p>
@@ -118,7 +122,9 @@ export default function PengawasanSingleIinCreate() {
                                 </div>
                                 <div>
                                     <Label className="text-sm font-medium text-gray-700">Tanggal Assignment</Label>
-                                    <p className="mt-1 text-sm text-gray-900">{new Date(singleIinProfile.assignment_date).toLocaleDateString('id-ID')}</p>
+                                    <p className="mt-1 text-sm text-gray-900">
+                                        {new Date(singleIinProfile.assignment_date).toLocaleDateString('id-ID')}
+                                    </p>
                                 </div>
                                 <div>
                                     <Label className="text-sm font-medium text-gray-700">Regional</Label>
@@ -176,25 +182,19 @@ export default function PengawasanSingleIinCreate() {
                 )}
 
                 {/* Submit Button */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                >
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                     <Card>
                         <CardContent className="p-6">
                             <div className="flex flex-col items-center space-y-4">
                                 <div className="text-center">
                                     <h3 className="text-lg font-semibold text-gray-900">Ajukan Pengawasan</h3>
-                                    <p className="text-sm text-gray-600 mt-1">
-                                        Pastikan semua informasi sudah benar sebelum mengajukan pengawasan
-                                    </p>
+                                    <p className="mt-1 text-sm text-gray-600">Pastikan semua informasi sudah benar sebelum mengajukan pengawasan</p>
                                 </div>
 
                                 <Button
                                     onClick={handleSubmit}
                                     disabled={isSubmitting || !singleIinProfile}
-                                    className="bg-blue-600 hover:bg-blue-700 px-8 py-2 text-white"
+                                    className="bg-blue-600 px-8 py-2 text-white hover:bg-blue-700"
                                     size="lg"
                                 >
                                     {isSubmitting ? (

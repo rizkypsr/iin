@@ -4,13 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast } from '@/lib/toast-helper';
+import { PageProps } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft, Download, FileText, Upload } from 'lucide-react';
 import { FormEventHandler } from 'react';
-import { PageProps } from '@/types';
-
-
 
 interface Props extends PageProps {
     documentRequirements?: {
@@ -102,14 +100,12 @@ export default function IinNasionalCreate() {
                     </CardHeader>
                     <CardContent>
                         {documentRequirements?.content ? (
-                            <div 
+                            <div
                                 className="prose prose-sm max-w-none text-gray-900"
                                 dangerouslySetInnerHTML={{ __html: documentRequirements.content }}
                             />
                         ) : (
-                            <div className="text-gray-500 italic">
-                                Dokumen persyaratan belum dikonfigurasi. Silakan hubungi administrator.
-                            </div>
+                            <div className="text-gray-500 italic">Dokumen persyaratan belum dikonfigurasi. Silakan hubungi administrator.</div>
                         )}
                     </CardContent>
                 </Card>
@@ -185,8 +181,6 @@ export default function IinNasionalCreate() {
                                 </motion.div>
                                 {errors.requirements_archive && <p className="text-sm text-red-600">{errors.requirements_archive}</p>}
                             </div>
-
-
 
                             {/* Submit Buttons */}
                             <div className="flex items-center gap-4 pt-4">

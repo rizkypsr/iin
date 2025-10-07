@@ -63,9 +63,7 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
             <div className="space-y-8">
                 {/* Header */}
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                    <h1 className="mb-2 bg-gradient-to-r from-[#01AEEC] to-[#01AEEC] bg-clip-text text-3xl font-bold text-transparent">
-                        Dashboard
-                    </h1>
+                    <h1 className="mb-2 bg-gradient-to-r from-[#01AEEC] to-[#01AEEC] bg-clip-text text-3xl font-bold text-transparent">Dashboard</h1>
                     <p className="text-gray-600">Selamat datang kembali! Berikut adalah ringkasan aktivitas investasi Anda.</p>
                 </motion.div>
 
@@ -122,21 +120,17 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
                                         </motion.div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-8">
+                                    <div className="py-8 text-center">
                                         <p className="text-gray-500">Belum ada aplikasi yang diajukan</p>
-                                        <Link href="/iin-nasional/create" className="text-[#01AEEC] hover:text-[#01AEEC] text-sm mt-2 inline-block">
-                            Ajukan aplikasi pertama Anda
-                        </Link>
+                                        <Link href="/iin-nasional/create" className="mt-2 inline-block text-sm text-[#01AEEC] hover:text-[#01AEEC]">
+                                            Ajukan aplikasi pertama Anda
+                                        </Link>
                                     </div>
                                 )}
                             </div>
                         </CardContent>
                     </Card>
                 </motion.div>
-
-
-
-
             </div>
         </DashboardLayout>
     );

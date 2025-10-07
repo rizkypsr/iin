@@ -139,7 +139,7 @@ export default function Welcome() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.8, ease: 'easeOut' }}
                             >
-                                Layanan Otoritas Sponsor adalah Layanan yang diberikan BSN untuk  menerima, memproses dan meninjau / menyetujui
+                                Layanan Otoritas Sponsor adalah Layanan yang diberikan BSN untuk menerima, memproses dan meninjau / menyetujui
                                 permohonan untuk IIN (Issuer Identification Number)
                             </motion.p>
                         </motion.div>
@@ -429,7 +429,8 @@ export default function Welcome() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
                         >
-                            Bergabunglah dengan ribuan investor yang telah mempercayai Portal Layanan Otoritas Sponsor untuk mengelola investasi mereka
+                            Bergabunglah dengan ribuan investor yang telah mempercayai Portal Layanan Otoritas Sponsor untuk mengelola investasi
+                            mereka
                         </motion.p>
                         <motion.div
                             className="flex flex-col justify-center gap-4 sm:flex-row"

@@ -1,15 +1,15 @@
+import QrisModal from '@/components/QrisModal';
+import SurveyModal from '@/components/SurveyModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/layouts/dashboard-layout';
+import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, Upload, User } from 'lucide-react';
 import { useState } from 'react';
-import SurveyModal from '@/components/SurveyModal';
-import QrisModal from '@/components/QrisModal';
-import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 
 interface IinSingleBlockholderApplication {
     id: number;
@@ -132,20 +132,16 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
         const formData = new FormData();
         formData.append('file', file);
 
-        router.post(
-            route('iin-single-blockholder.upload-additional-documents', selectedApplication?.id),
-            formData,
-            {
-                onSuccess: () => {
-                    showSuccessToast('File QRIS berhasil diupload!');
-                    setIsQrisModalOpen(false);
-                },
-                onError: (errors) => {
-                    console.error(errors);
-                    showErrorToast('Gagal mengupload file QRIS');
-                },
-            }
-        );
+        router.post(route('iin-single-blockholder.upload-additional-documents', selectedApplication?.id), formData, {
+            onSuccess: () => {
+                showSuccessToast('File QRIS berhasil diupload!');
+                setIsQrisModalOpen(false);
+            },
+            onError: (errors) => {
+                console.error(errors);
+                showErrorToast('Gagal mengupload file QRIS');
+            },
+        });
     };
 
     return (
@@ -182,7 +178,11 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                             <div className="rounded-lg border p-4 transition-colors hover:border-purple-300">
                                 <h3 className="font-semibold text-gray-900">Single IIN/Blockholder</h3>
                                 <p className="mb-3 text-sm text-gray-600">Permohonan Single IIN/Blockholder</p>
-                                <Button variant="outline" size="sm" onClick={() => window.open(route('download-form', 'single-blockholder'), '_blank')}>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => window.open(route('download-form', 'single-blockholder'), '_blank')}
+                                >
                                     <Download className="mr-2 h-4 w-4" />
                                     Download File
                                 </Button>
@@ -245,10 +245,11 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                 {applications.data.map((application) => (
                                     <motion.div
                                         key={application.id}
-                                        className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${application.status === 'perbaikan' && auth.user.role === 'user'
+                                        className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${
+                                            application.status === 'perbaikan' && auth.user.role === 'user'
                                                 ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
                                                 : ''
-                                            }`}
+                                        }`}
                                         variants={itemAnimation}
                                     >
                                         {/* Alert notification removed as requested */}
@@ -281,16 +282,16 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                                             application.status === 'pengajuan'
                                                                 ? '33%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                 : application.status === 'perbaikan'
-                                                                    ? '33%' // Perbaikan also means user is in Verifikasi Dokumen phase
-                                                                    : application.status === 'pembayaran'
-                                                                        ? '50%'
-                                                                        : application.status === 'verifikasi-lapangan'
-                                                                            ? '67%'
-                                                                            : application.status === 'pembayaran-tahap-2'
-                                                                                ? '83%'
-                                                                                : application.status === 'terbit'
-                                                                                    ? '100%'
-                                                                                    : '0%',
+                                                                  ? '33%' // Perbaikan also means user is in Verifikasi Dokumen phase
+                                                                  : application.status === 'pembayaran'
+                                                                    ? '50%'
+                                                                    : application.status === 'verifikasi-lapangan'
+                                                                      ? '67%'
+                                                                      : application.status === 'pembayaran-tahap-2'
+                                                                        ? '83%'
+                                                                        : application.status === 'terbit'
+                                                                          ? '100%'
+                                                                          : '0%',
                                                     }}
                                                 ></div>
                                             </div>
@@ -357,18 +358,19 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                                             </Link>
                                                         )}
 
-                                                    {(application.status === 'pembayaran' || application.status === 'pembayaran-tahap-2') && auth.user.role === 'user' && (
-                                                        <Link href={route('iin-single-blockholder.show', application.id) + '#payment'}>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="border-orange-200 text-orange-600 hover:bg-orange-50"
-                                                            >
-                                                                <Upload className="mr-2 h-4 w-4" />
-                                                                Upload Bukti Pembayaran
-                                                            </Button>
-                                                        </Link>
-                                                    )}
+                                                    {(application.status === 'pembayaran' || application.status === 'pembayaran-tahap-2') &&
+                                                        auth.user.role === 'user' && (
+                                                            <Link href={route('iin-single-blockholder.show', application.id) + '#payment'}>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="border-orange-200 text-orange-600 hover:bg-orange-50"
+                                                                >
+                                                                    <Upload className="mr-2 h-4 w-4" />
+                                                                    Upload Bukti Pembayaran
+                                                                </Button>
+                                                            </Link>
+                                                        )}
 
                                                     {application.status === 'terbit' && !application.additional_documents && (
                                                         <Button
@@ -385,21 +387,22 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                                         </Button>
                                                     )}
 
-
-                                                    {application.status === 'terbit' && application.iin_number && application.additional_documents && (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="border-green-200 text-green-600 hover:bg-green-50"
-                                                            onClick={() => {
-                                                                setSelectedApplication(application);
-                                                                setIsSurveyModalOpen(true);
-                                                            }}
-                                                        >
-                                                            <Download className="mr-2 h-4 w-4" />
-                                                            Download Sertifikat
-                                                        </Button>
-                                                    )}
+                                                    {application.status === 'terbit' &&
+                                                        application.iin_number &&
+                                                        application.additional_documents && (
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="border-green-200 text-green-600 hover:bg-green-50"
+                                                                onClick={() => {
+                                                                    setSelectedApplication(application);
+                                                                    setIsSurveyModalOpen(true);
+                                                                }}
+                                                            >
+                                                                <Download className="mr-2 h-4 w-4" />
+                                                                Download Sertifikat
+                                                            </Button>
+                                                        )}
                                                 </div>
 
                                                 <div className="flex items-center text-sm text-gray-500">
@@ -448,12 +451,13 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`rounded px-3 py-1 ${link.active
+                                        className={`rounded px-3 py-1 ${
+                                            link.active
                                                 ? 'bg-blue-100 text-blue-700'
                                                 : link.url
-                                                    ? 'text-gray-600 hover:bg-gray-100'
-                                                    : 'cursor-not-allowed text-gray-300'
-                                            }`}
+                                                  ? 'text-gray-600 hover:bg-gray-100'
+                                                  : 'cursor-not-allowed text-gray-300'
+                                        }`}
                                         disabled={!link.url}
                                     >
                                         {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
@@ -470,10 +474,7 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                 onClose={() => setIsSurveyModalOpen(false)}
                 onDownload={() => {
                     if (selectedApplication) {
-                        window.open(
-                            route('iin-single-blockholder.download-file', [selectedApplication.id, 'certificate']),
-                            '_blank'
-                        );
+                        window.open(route('iin-single-blockholder.download-file', [selectedApplication.id, 'certificate']), '_blank');
                     }
                 }}
                 certificateType="IIN Single Blockholder"

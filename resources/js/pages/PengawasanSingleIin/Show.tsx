@@ -9,7 +9,7 @@ import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Upload, User, X, Shield } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Shield, Upload, User } from 'lucide-react';
 import { useState } from 'react';
 
 interface PaymentDocument {
@@ -93,22 +93,17 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
         const formData = new FormData();
         formData.append('file', file);
 
-        router.post(
-            route('pengawasan-single-iin.upload-additional-documents', selectedApplication?.id),
-            formData,
-            {
-                onSuccess: () => {
-                    showSuccessToast('File QRIS berhasil diupload!');
-                    setIsQrisModalOpen(false);
-                },
-                onError: (errors) => {
-                    console.error(errors);
-                    showErrorToast('Gagal mengupload file QRIS');
-                },
-            }
-        );
+        router.post(route('pengawasan-single-iin.upload-additional-documents', selectedApplication?.id), formData, {
+            onSuccess: () => {
+                showSuccessToast('File QRIS berhasil diupload!');
+                setIsQrisModalOpen(false);
+            },
+            onError: (errors) => {
+                console.error(errors);
+                showErrorToast('Gagal mengupload file QRIS');
+            },
+        });
     };
-
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -242,13 +237,13 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">
-                                Pengawasan Single IIN
-                            </h1>
+                            <h1 className="text-2xl font-bold text-gray-900">Pengawasan Single IIN</h1>
                             <p className="text-gray-600">{application.application_number}</p>
                         </div>
                     </div>
-                    <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${getStatusBadgeClass(application.status)}`}>
+                    <div
+                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${getStatusBadgeClass(application.status)}`}
+                    >
                         {getStatusLabel(application.status)}
                     </div>
                 </div>
@@ -268,9 +263,7 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                     <Alert>
                         <CreditCard className="h-4 w-4" />
                         <AlertTitle>Upload Bukti Pembayaran</AlertTitle>
-                        <AlertDescription>
-                            Silakan upload bukti pembayaran untuk melanjutkan proses pengawasan.
-                        </AlertDescription>
+                        <AlertDescription>Silakan upload bukti pembayaran untuk melanjutkan proses pengawasan.</AlertDescription>
                     </Alert>
                 )}
 
@@ -323,14 +316,16 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
                                         <Label className="text-sm font-medium text-gray-500">Nomor Aplikasi</Label>
                                         <p className="mt-1 text-sm text-gray-900">{application.application_number}</p>
                                     </div>
                                     <div>
                                         <Label className="text-sm font-medium text-gray-500">Status</Label>
-                                        <div className={`mt-1 inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium ${getStatusBadgeClass(application.status)}`}>
+                                        <div
+                                            className={`mt-1 inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium ${getStatusBadgeClass(application.status)}`}
+                                        >
                                             {getStatusLabel(application.status)}
                                         </div>
                                     </div>
@@ -345,8 +340,7 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                         <p className="mt-1 text-sm text-gray-900">
                                             {application.submitted_at
                                                 ? format(new Date(application.submitted_at), 'dd MMMM yyyy HH:mm', { locale: id })
-                                                : '-'
-                                            }
+                                                : '-'}
                                         </p>
                                     </div>
                                     <div>
@@ -384,12 +378,15 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                 {/* Issuance Documents */}
                                 {application.issuance_documents && application.issuance_documents.length > 0 && application.additional_documents && (
                                     <div className="space-y-2">
-                                        <h4 className="font-medium text-green-800 flex items-center gap-2">
+                                        <h4 className="flex items-center gap-2 font-medium text-green-800">
                                             <Award className="h-5 w-5" />
                                             Dokumen Pengawasan Terbit
                                         </h4>
                                         {application.issuance_documents.map((doc, index) => (
-                                            <div key={index} className="flex items-center justify-between rounded-lg border border-green-200 bg-gradient-to-r from-green-50 to-green-100 p-4">
+                                            <div
+                                                key={index}
+                                                className="flex items-center justify-between rounded-lg border border-green-200 bg-gradient-to-r from-green-50 to-green-100 p-4"
+                                            >
                                                 <div className="flex items-center gap-3">
                                                     <FileText className="h-8 w-8 text-green-600" />
                                                     <div>
@@ -402,7 +399,12 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => window.open(route('pengawasan-single-iin.download-issuance-document', [application.id, index]), '_blank')}
+                                                    onClick={() =>
+                                                        window.open(
+                                                            route('pengawasan-single-iin.download-issuance-document', [application.id, index]),
+                                                            '_blank',
+                                                        )
+                                                    }
                                                     className="border-green-200 bg-white text-green-700 hover:bg-green-50 hover:text-green-800"
                                                 >
                                                     <Download className="mr-2 h-4 w-4" />
@@ -421,15 +423,17 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                             </div>
                                             <div>
                                                 <h3 className="font-semibold text-yellow-800">Surat Pernyataan Penggunaan QRIS</h3>
-                                                <p className="text-sm text-yellow-700">Sebelum dapat mendownload sertifikat, harap mengisi surat pernyataan ini.</p>
+                                                <p className="text-sm text-yellow-700">
+                                                    Sebelum dapat mendownload sertifikat, harap mengisi surat pernyataan ini.
+                                                </p>
                                             </div>
                                         </div>
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={() => {
-                                                setSelectedApplication(application)
-                                                setIsQrisModalOpen(true)
+                                                setSelectedApplication(application);
+                                                setIsQrisModalOpen(true);
                                             }}
                                             className="border-yellow-200 bg-white text-yellow-700 hover:bg-yellow-50 hover:text-yellow-800"
                                         >
@@ -457,7 +461,15 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => window.open(route('pengawasan-single-iin.download-field-verification-document', [application.id, index]), '_blank')}
+                                                    onClick={() =>
+                                                        window.open(
+                                                            route('pengawasan-single-iin.download-field-verification-document', [
+                                                                application.id,
+                                                                index,
+                                                            ]),
+                                                            '_blank',
+                                                        )
+                                                    }
                                                 >
                                                     <Download className="mr-2 h-4 w-4" />
                                                     Download
@@ -488,17 +500,22 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                     <div className="flex-1">
                                                         <h3 className="mb-2 font-semibold text-gray-900">Dokumen Pembayaran dari Admin</h3>
                                                         <p className="mb-4 text-sm text-gray-700">
-                                                            Admin telah mengunggah dokumen pembayaran untuk aplikasi Anda. Silakan unduh dan isi dokumen tersebut sebagai bukti pembayaran.
+                                                            Admin telah mengunggah dokumen pembayaran untuk aplikasi Anda. Silakan unduh dan isi
+                                                            dokumen tersebut sebagai bukti pembayaran.
                                                         </p>
                                                         <div className="space-y-3">
                                                             {application.payment_documents.map((document: PaymentDocument, index: number) => (
-                                                                <div key={index} className="flex items-center justify-between rounded-lg border border-white/40 bg-white/60 p-4 backdrop-blur-sm">
+                                                                <div
+                                                                    key={index}
+                                                                    className="flex items-center justify-between rounded-lg border border-white/40 bg-white/60 p-4 backdrop-blur-sm"
+                                                                >
                                                                     <div className="flex items-center gap-3">
                                                                         <FileText className="h-5 w-5 text-green-600" />
                                                                         <div>
                                                                             <div className="font-medium text-gray-900">{document.original_name}</div>
                                                                             <div className="text-sm text-gray-600">
-                                                                                Diunggah pada {new Date(document.uploaded_at).toLocaleDateString('id-ID')}
+                                                                                Diunggah pada{' '}
+                                                                                {new Date(document.uploaded_at).toLocaleDateString('id-ID')}
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -506,7 +523,13 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                                         variant="outline"
                                                                         size="sm"
                                                                         onClick={() =>
-                                                                            window.open(route('pengawasan-single-iin.download-payment-document', [application.id, index]), '_blank')
+                                                                            window.open(
+                                                                                route('pengawasan-single-iin.download-payment-document', [
+                                                                                    application.id,
+                                                                                    index,
+                                                                                ]),
+                                                                                '_blank',
+                                                                            )
                                                                         }
                                                                         className="bg-white hover:bg-green-50"
                                                                     >
@@ -542,7 +565,8 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                     <div className="flex-1">
                                                         <h3 className="mb-2 font-semibold text-gray-900">Menunggu Dokumen Pembayaran</h3>
                                                         <p className="text-sm text-gray-700">
-                                                            Admin sedang memproses dokumen pembayaran untuk aplikasi Anda. Silakan tunggu hingga admin mengunggah dokumen pembayaran.
+                                                            Admin sedang memproses dokumen pembayaran untuk aplikasi Anda. Silakan tunggu hingga admin
+                                                            mengunggah dokumen pembayaran.
                                                         </p>
                                                         <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
                                                             <div className="flex items-start gap-2">
@@ -552,8 +576,13 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                                     <ul className="list-inside list-disc space-y-1 text-blue-700">
                                                                         <li>Dokumen pembayaran akan dikirim oleh admin dalam 1-2 hari kerja</li>
                                                                         <li>Anda akan mendapat notifikasi ketika dokumen sudah tersedia</li>
-                                                                        <li>Setelah dokumen tersedia, Anda dapat mengunduh dan mengisi dokumen tersebut</li>
-                                                                        <li>Kemudian unggah kembali dokumen yang telah diisi sebagai bukti pembayaran</li>
+                                                                        <li>
+                                                                            Setelah dokumen tersedia, Anda dapat mengunduh dan mengisi dokumen
+                                                                            tersebut
+                                                                        </li>
+                                                                        <li>
+                                                                            Kemudian unggah kembali dokumen yang telah diisi sebagai bukti pembayaran
+                                                                        </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
@@ -577,17 +606,22 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                     <div className="flex-1">
                                                         <h3 className="mb-2 font-semibold text-gray-900">Dokumen Pembayaran Tahap 2 dari Admin</h3>
                                                         <p className="mb-4 text-sm text-gray-700">
-                                                            Admin telah mengunggah dokumen pembayaran tahap 2 untuk aplikasi Anda. Silakan unduh dan isi dokumen tersebut sebagai bukti pembayaran tahap 2.
+                                                            Admin telah mengunggah dokumen pembayaran tahap 2 untuk aplikasi Anda. Silakan unduh dan
+                                                            isi dokumen tersebut sebagai bukti pembayaran tahap 2.
                                                         </p>
                                                         <div className="space-y-3">
                                                             {application.payment_documents_stage_2.map((document: PaymentDocument, index: number) => (
-                                                                <div key={index} className="flex items-center justify-between rounded-lg border border-white/40 bg-white/60 p-4 backdrop-blur-sm">
+                                                                <div
+                                                                    key={index}
+                                                                    className="flex items-center justify-between rounded-lg border border-white/40 bg-white/60 p-4 backdrop-blur-sm"
+                                                                >
                                                                     <div className="flex items-center gap-3">
                                                                         <FileText className="h-5 w-5 text-indigo-600" />
                                                                         <div>
                                                                             <div className="font-medium text-gray-900">{document.original_name}</div>
                                                                             <div className="text-sm text-gray-600">
-                                                                                Diunggah pada {new Date(document.uploaded_at).toLocaleDateString('id-ID')}
+                                                                                Diunggah pada{' '}
+                                                                                {new Date(document.uploaded_at).toLocaleDateString('id-ID')}
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -595,7 +629,13 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                                         variant="outline"
                                                                         size="sm"
                                                                         onClick={() =>
-                                                                            window.open(route('iin-single-blockholder.download-payment-document-stage-2', [application.id, index]), '_blank')
+                                                                            window.open(
+                                                                                route('iin-single-blockholder.download-payment-document-stage-2', [
+                                                                                    application.id,
+                                                                                    index,
+                                                                                ]),
+                                                                                '_blank',
+                                                                            )
                                                                         }
                                                                         className="bg-white hover:bg-indigo-50"
                                                                     >
@@ -613,7 +653,9 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                                     <ul className="list-inside list-disc space-y-1 text-blue-700">
                                                                         <li>Unduh dokumen pembayaran tahap 2 yang telah disediakan admin</li>
                                                                         <li>Isi dokumen tersebut dengan lengkap dan benar</li>
-                                                                        <li>Unggah kembali dokumen yang telah diisi sebagai bukti pembayaran tahap 2</li>
+                                                                        <li>
+                                                                            Unggah kembali dokumen yang telah diisi sebagai bukti pembayaran tahap 2
+                                                                        </li>
                                                                         <li>Pastikan semua informasi yang diisi sudah sesuai</li>
                                                                     </ul>
                                                                 </div>
@@ -631,7 +673,8 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                     <div className="flex-1">
                                                         <h3 className="mb-2 font-semibold text-gray-900">Menunggu Dokumen Pembayaran Tahap 2</h3>
                                                         <p className="text-sm text-gray-700">
-                                                            Admin sedang memproses dokumen pembayaran tahap 2 untuk aplikasi Anda. Silakan tunggu hingga admin mengunggah dokumen pembayaran tahap 2.
+                                                            Admin sedang memproses dokumen pembayaran tahap 2 untuk aplikasi Anda. Silakan tunggu
+                                                            hingga admin mengunggah dokumen pembayaran tahap 2.
                                                         </p>
                                                         <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
                                                             <div className="flex items-start gap-2">
@@ -639,10 +682,18 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                                 <div className="text-sm text-blue-800">
                                                                     <div className="mb-1 font-medium">Informasi:</div>
                                                                     <ul className="list-inside list-disc space-y-1 text-blue-700">
-                                                                        <li>Dokumen pembayaran tahap 2 akan dikirim oleh admin dalam 1-2 hari kerja</li>
+                                                                        <li>
+                                                                            Dokumen pembayaran tahap 2 akan dikirim oleh admin dalam 1-2 hari kerja
+                                                                        </li>
                                                                         <li>Anda akan mendapat notifikasi ketika dokumen sudah tersedia</li>
-                                                                        <li>Setelah dokumen tersedia, Anda dapat mengunduh dan mengisi dokumen tersebut</li>
-                                                                        <li>Kemudian unggah kembali dokumen yang telah diisi sebagai bukti pembayaran tahap 2</li>
+                                                                        <li>
+                                                                            Setelah dokumen tersedia, Anda dapat mengunduh dan mengisi dokumen
+                                                                            tersebut
+                                                                        </li>
+                                                                        <li>
+                                                                            Kemudian unggah kembali dokumen yang telah diisi sebagai bukti pembayaran
+                                                                            tahap 2
+                                                                        </li>
                                                                     </ul>
                                                                 </div>
                                                             </div>
@@ -655,14 +706,18 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                 )}
 
                                 {/* Bukti Pembayaran Tahap 1 */}
-                                {(application.payment_proof_path || (application.payment_proof_documents && application.payment_proof_documents.length > 0)) && (
+                                {(application.payment_proof_path ||
+                                    (application.payment_proof_documents && application.payment_proof_documents.length > 0)) && (
                                     <div className="space-y-4">
                                         <div className="rounded-lg border bg-gradient-to-r from-gray-50 to-gray-100 p-4">
                                             <h3 className="mb-2 font-medium text-gray-800">Bukti Pembayaran Tahap 1</h3>
                                             {application.payment_proof_documents && application.payment_proof_documents.length > 0 ? (
                                                 <div className="space-y-3">
                                                     {application.payment_proof_documents.map((document: PaymentDocument, index: number) => (
-                                                        <div key={index} className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3">
+                                                        <div
+                                                            key={index}
+                                                            className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3"
+                                                        >
                                                             <div className="flex items-center gap-3">
                                                                 <FileText className="h-5 w-5 text-purple-500" />
                                                                 <div>
@@ -676,7 +731,14 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                                 variant="outline"
                                                                 size="sm"
                                                                 onClick={() =>
-                                                                    window.open(route('pengawasan-single-iin.download-payment-proof', [application.id, index, 1]), '_blank')
+                                                                    window.open(
+                                                                        route('pengawasan-single-iin.download-payment-proof', [
+                                                                            application.id,
+                                                                            index,
+                                                                            1,
+                                                                        ]),
+                                                                        '_blank',
+                                                                    )
                                                                 }
                                                             >
                                                                 <Download className="mr-2 h-4 w-4" />
@@ -701,7 +763,9 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                     <div className="flex items-center gap-3">
                                                         <FileText className="h-6 w-6 text-purple-500" />
                                                         <div>
-                                                            <p className="text-sm font-medium text-gray-700">Bukti pembayaran tahap 1 telah diunggah</p>
+                                                            <p className="text-sm font-medium text-gray-700">
+                                                                Bukti pembayaran tahap 1 telah diunggah
+                                                            </p>
                                                             {application.payment_verified_at ? (
                                                                 <p className="mt-1 flex items-center gap-1 text-sm font-medium text-green-600">
                                                                     <CheckCircle className="h-3.5 w-3.5" />
@@ -719,7 +783,10 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() =>
-                                                            window.open(route('iin-single-blockholder.download-file', [application.id, 'payment_proof']), '_blank')
+                                                            window.open(
+                                                                route('iin-single-blockholder.download-file', [application.id, 'payment_proof']),
+                                                                '_blank',
+                                                            )
                                                         }
                                                     >
                                                         <Download className="mr-2 h-4 w-4" />
@@ -732,13 +799,16 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                 )}
 
                                 {/* Bukti Pembayaran Tahap 2 */}
-                                {(application.payment_proof_documents_stage_2 && application.payment_proof_documents_stage_2.length > 0) && (
+                                {application.payment_proof_documents_stage_2 && application.payment_proof_documents_stage_2.length > 0 && (
                                     <div className="space-y-4">
                                         <div className="rounded-lg border bg-gradient-to-r from-indigo-50 to-indigo-100 p-4">
                                             <h3 className="mb-2 font-medium text-gray-800">Bukti Pembayaran Tahap 2</h3>
                                             <div className="space-y-3">
                                                 {application.payment_proof_documents_stage_2.map((document: PaymentDocument, index: number) => (
-                                                    <div key={index} className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3">
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3"
+                                                    >
                                                         <div className="flex items-center gap-3">
                                                             <FileText className="h-5 w-5 text-indigo-500" />
                                                             <div>
@@ -752,7 +822,14 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                             variant="outline"
                                                             size="sm"
                                                             onClick={() =>
-                                                                window.open(route('iin-single-blockholder.download-payment-proof', [application.id, index, 2]), '_blank')
+                                                                window.open(
+                                                                    route('iin-single-blockholder.download-payment-proof', [
+                                                                        application.id,
+                                                                        index,
+                                                                        2,
+                                                                    ]),
+                                                                    '_blank',
+                                                                )
                                                             }
                                                         >
                                                             <Download className="mr-2 h-4 w-4" />
@@ -773,8 +850,6 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                 )}
                                             </div>
                                         </div>
-
-
                                     </div>
                                 )}
 
@@ -783,7 +858,8 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                         <Alert className="border border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800">
                                             <CreditCard className="h-4 w-4 text-blue-600" />
                                             <AlertDescription className="text-blue-700">
-                                                Silakan unggah bukti pembayaran {application.status === 'pembayaran-tahap-2' ? 'tahap 2' : 'tahap 1'} untuk melanjutkan proses aplikasi Anda.
+                                                Silakan unggah bukti pembayaran {application.status === 'pembayaran-tahap-2' ? 'tahap 2' : 'tahap 1'}{' '}
+                                                untuk melanjutkan proses aplikasi Anda.
                                             </AlertDescription>
                                         </Alert>
 
@@ -792,7 +868,9 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                 Unggah Bukti Pembayaran {application.status === 'pembayaran-tahap-2' ? 'Tahap 2' : 'Tahap 1'}
                                             </h3>
                                             <p className="mb-4 text-sm text-gray-600">
-                                                Silakan unggah bukti transfer atau pembayaran {application.status === 'pembayaran-tahap-2' ? 'tahap 2' : 'tahap 1'} dalam format PDF, JPG, atau PNG. Anda dapat mengunggah beberapa file sekaligus.
+                                                Silakan unggah bukti transfer atau pembayaran{' '}
+                                                {application.status === 'pembayaran-tahap-2' ? 'tahap 2' : 'tahap 1'} dalam format PDF, JPG, atau PNG.
+                                                Anda dapat mengunggah beberapa file sekaligus.
                                             </p>
 
                                             {/* Selected Files Display */}
@@ -800,11 +878,16 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                 <div className="mb-4 space-y-2">
                                                     <h4 className="text-sm font-medium text-gray-700">File yang dipilih:</h4>
                                                     {formData.payment_proof.map((file, index) => (
-                                                        <div key={index} className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3">
+                                                        <div
+                                                            key={index}
+                                                            className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3"
+                                                        >
                                                             <div className="flex items-center gap-2">
                                                                 <FileText className="h-4 w-4 text-purple-500" />
                                                                 <span className="text-sm text-gray-700">{file.name}</span>
-                                                                <span className="text-xs text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                                                <span className="text-xs text-gray-500">
+                                                                    ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                                                                </span>
                                                             </div>
                                                             <Button
                                                                 type="button"
@@ -926,25 +1009,17 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                 <div className={`flex h-8 w-8 items-center justify-center rounded-full`}>
                                                     <FileText className="h-4 w-4" />
                                                 </div>
-                                                {index < statusLogs.length - 1 && (
-                                                    <div className="mt-2 h-8 w-px bg-gray-200" />
-                                                )}
+                                                {index < statusLogs.length - 1 && <div className="mt-2 h-8 w-px bg-gray-200" />}
                                             </div>
                                             <div className="flex-1 pb-4">
                                                 <div className="flex items-center gap-2">
-                                                    <p className="font-medium text-gray-900">
-                                                        Status diubah ke: {getStatusLabel(log.status_to)}
-                                                    </p>
-                                                    <span className="text-sm text-gray-500">
-                                                        oleh {log.changed_by.name}
-                                                    </span>
+                                                    <p className="font-medium text-gray-900">Status diubah ke: {getStatusLabel(log.status_to)}</p>
+                                                    <span className="text-sm text-gray-500">oleh {log.changed_by.name}</span>
                                                 </div>
                                                 <p className="text-sm text-gray-500">
                                                     {format(new Date(log.created_at), 'dd MMMM yyyy HH:mm', { locale: id })}
                                                 </p>
-                                                {log.notes && (
-                                                    <p className="mt-1 text-sm text-gray-700">{log.notes}</p>
-                                                )}
+                                                {log.notes && <p className="mt-1 text-sm text-gray-700">{log.notes}</p>}
                                             </div>
                                         </div>
                                     ))}

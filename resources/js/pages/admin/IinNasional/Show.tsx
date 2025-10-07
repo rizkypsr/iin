@@ -473,7 +473,7 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
             }),
             '_blank',
         );
-    }
+    };
 
     const downloadFile = (type: string) => {
         window.open(
@@ -819,7 +819,7 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                         Proses ke Verifikasi Lapangan
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Proses ke Verifikasi Lapangan</DialogTitle>
                                         <DialogDescription>
@@ -847,7 +847,8 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                    beberapa file sekaligus.
                                                 </p>
                                             </div>
 
@@ -905,7 +906,7 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                         <DialogClose asChild>
                                             <Button
                                                 onClick={() => handleStatusChangeToFieldVerification()}
-                                                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                className="bg-indigo-600 text-white hover:bg-indigo-700"
                                                 disabled={loading || fieldVerificationDocuments.length === 0}
                                             >
                                                 {loading ? 'Memproses...' : 'Proses ke Verifikasi Lapangan'}
@@ -1251,8 +1252,8 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                                     {application.field_verification_documents.length} dokumen diupload pada{' '}
                                                     {application.field_verification_documents_uploaded_at
                                                         ? format(new Date(application.field_verification_documents_uploaded_at), 'dd MMMM yyyy', {
-                                                            locale: id,
-                                                        })
+                                                              locale: id,
+                                                          })
                                                         : '-'}
                                                 </p>
                                             </div>
@@ -1293,28 +1294,30 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                             <div key={log.id} className="p-4 transition-colors hover:bg-gray-50">
                                                 <div className="flex items-start gap-4">
                                                     <div
-                                                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${log.status_to === 'perbaikan'
-                                                            ? 'bg-amber-100'
-                                                            : log.status_to === 'pembayaran'
-                                                                ? 'bg-blue-100'
-                                                                : log.status_to === 'verifikasi-lapangan'
+                                                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                                                            log.status_to === 'perbaikan'
+                                                                ? 'bg-amber-100'
+                                                                : log.status_to === 'pembayaran'
+                                                                  ? 'bg-blue-100'
+                                                                  : log.status_to === 'verifikasi-lapangan'
                                                                     ? 'bg-purple-100'
                                                                     : log.status_to === 'terbit'
-                                                                        ? 'bg-green-100'
-                                                                        : 'bg-gray-100'
-                                                            }`}
+                                                                      ? 'bg-green-100'
+                                                                      : 'bg-gray-100'
+                                                        }`}
                                                     >
                                                         <span
-                                                            className={`${log.status_to === 'perbaikan'
-                                                                ? 'text-amber-600'
-                                                                : log.status_to === 'pembayaran'
-                                                                    ? 'text-blue-600'
-                                                                    : log.status_to === 'verifikasi-lapangan'
+                                                            className={`${
+                                                                log.status_to === 'perbaikan'
+                                                                    ? 'text-amber-600'
+                                                                    : log.status_to === 'pembayaran'
+                                                                      ? 'text-blue-600'
+                                                                      : log.status_to === 'verifikasi-lapangan'
                                                                         ? 'text-purple-600'
                                                                         : log.status_to === 'terbit'
-                                                                            ? 'text-green-600'
-                                                                            : 'text-gray-600'
-                                                                }`}
+                                                                          ? 'text-green-600'
+                                                                          : 'text-gray-600'
+                                                            }`}
                                                         >
                                                             {log.status_to === 'pengajuan' ? (
                                                                 <FileText className="h-4 w-4" />

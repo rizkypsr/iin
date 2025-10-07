@@ -1,11 +1,11 @@
-import { Building2, Calendar, CreditCard, FileText, Mail, MapPin, Phone, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Building2, Calendar, CreditCard, Mail, MapPin, Phone, User } from 'lucide-react';
 
+import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import InputError from '@/components/input-error';
+import { Textarea } from '@/components/ui/textarea';
 
 interface SingleIinProfileData {
     institution_name?: string;
@@ -51,7 +51,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Institution Name */}
                     <div className="space-y-2">
                         <Label htmlFor="single_institution_name" className="text-sm font-medium text-gray-700">
-                            <Building2 className="inline h-4 w-4 mr-1" />
+                            <Building2 className="mr-1 inline h-4 w-4" />
                             Nama Institusi <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -71,10 +71,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                         <Label htmlFor="single_institution_type" className="text-sm font-medium text-gray-700">
                             Tipe Institusi <span className="text-red-500">*</span>
                         </Label>
-                        <Select 
-                            value={data.institution_type || ''} 
-                            onValueChange={(value) => setData('institution_type', value)}
-                        >
+                        <Select value={data.institution_type || ''} onValueChange={(value) => setData('institution_type', value)}>
                             <SelectTrigger className="h-11 w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20">
                                 <SelectValue placeholder="Pilih tipe institusi" />
                             </SelectTrigger>
@@ -92,7 +89,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Year */}
                     <div className="space-y-2">
                         <Label htmlFor="single_year" className="text-sm font-medium text-gray-700">
-                            <Calendar className="inline h-4 w-4 mr-1" />
+                            <Calendar className="mr-1 inline h-4 w-4" />
                             Tahun <span className="text-red-500">*</span>
                         </Label>
 
@@ -128,7 +125,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Assignment Date */}
                     <div className="space-y-2">
                         <Label htmlFor="single_assignment_date" className="text-sm font-medium text-gray-700">
-                            <Calendar className="inline h-4 w-4 mr-1" />
+                            <Calendar className="mr-1 inline h-4 w-4" />
                             Tanggal Assignment <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -145,7 +142,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Regional */}
                     <div className="space-y-2">
                         <Label htmlFor="single_regional" className="text-sm font-medium text-gray-700">
-                            <MapPin className="inline h-4 w-4 mr-1" />
+                            <MapPin className="mr-1 inline h-4 w-4" />
                             Regional <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -163,7 +160,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Phone/Fax */}
                     <div className="space-y-2">
                         <Label htmlFor="single_phone_fax" className="text-sm font-medium text-gray-700">
-                            <Phone className="inline h-4 w-4 mr-1" />
+                            <Phone className="mr-1 inline h-4 w-4" />
                             Telepon/Fax <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -181,7 +178,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Phone/Fax Updated */}
                     <div className="space-y-2">
                         <Label htmlFor="single_phone_fax_updated" className="text-sm font-medium text-gray-700">
-                            <Phone className="inline h-4 w-4 mr-1" />
+                            <Phone className="mr-1 inline h-4 w-4" />
                             Telepon/Fax (Updated) <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -199,7 +196,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Email */}
                     <div className="space-y-2">
                         <Label htmlFor="single_email" className="text-sm font-medium text-gray-700">
-                            <Mail className="inline h-4 w-4 mr-1" />
+                            <Mail className="mr-1 inline h-4 w-4" />
                             Email <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -217,7 +214,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Contact Person */}
                     <div className="space-y-2">
                         <Label htmlFor="single_contact_person" className="text-sm font-medium text-gray-700">
-                            <User className="inline h-4 w-4 mr-1" />
+                            <User className="mr-1 inline h-4 w-4" />
                             Contact Person <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -252,7 +249,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Card Specimen */}
                     <div className="space-y-2">
                         <Label htmlFor="single_card_specimen" className="text-sm font-medium text-gray-700">
-                            <CreditCard className="inline h-4 w-4 mr-1" />
+                            <CreditCard className="mr-1 inline h-4 w-4" />
                             Card Specimen <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -306,7 +303,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Address */}
                     <div className="space-y-2">
                         <Label htmlFor="single_address" className="text-sm font-medium text-gray-700">
-                            <MapPin className="inline h-4 w-4 mr-1" />
+                            <MapPin className="mr-1 inline h-4 w-4" />
                             Alamat <span className="text-red-500">*</span>
                         </Label>
                         <Textarea
@@ -323,7 +320,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Address Updated */}
                     <div className="space-y-2">
                         <Label htmlFor="single_address_updated" className="text-sm font-medium text-gray-700">
-                            <MapPin className="inline h-4 w-4 mr-1" />
+                            <MapPin className="mr-1 inline h-4 w-4" />
                             Alamat (Updated) <span className="text-red-500">*</span>
                         </Label>
                         <Textarea

@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
-import DashboardLayout from '@/layouts/dashboard-layout';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import DashboardLayout from '@/layouts/dashboard-layout';
+import { Head, router } from '@inertiajs/react';
 import { Download, FileSpreadsheet, Filter } from 'lucide-react';
+import { useState } from 'react';
 
 interface Report {
     company_name: string;
@@ -32,10 +31,14 @@ export default function Index({ reports, currentType }: Props) {
 
     const handleFilterChange = (type: string) => {
         setSelectedType(type);
-        router.get(route('admin.reports.index'), { type }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        router.get(
+            route('admin.reports.index'),
+            { type },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
     };
 
     const handleExport = () => {
@@ -55,11 +58,7 @@ export default function Index({ reports, currentType }: Props) {
             'Pengawasan Single IIN': 'bg-orange-100 text-orange-800',
         };
 
-        return (
-            <Badge className={variants[serviceType] || 'bg-gray-100 text-gray-800'}>
-                {serviceType}
-            </Badge>
-        );
+        return <Badge className={variants[serviceType] || 'bg-gray-100 text-gray-800'}>{serviceType}</Badge>;
     };
 
     return (
@@ -70,9 +69,7 @@ export default function Index({ reports, currentType }: Props) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Laporan</h1>
-                        <p className="text-muted-foreground">
-                            Kelola dan ekspor laporan aplikasi IIN
-                        </p>
+                        <p className="text-muted-foreground">Kelola dan ekspor laporan aplikasi IIN</p>
                     </div>
                 </div>
 
@@ -84,7 +81,7 @@ export default function Index({ reports, currentType }: Props) {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex items-center justify-between mb-6">
+                        <div className="mb-6 flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
                                     <Filter className="h-4 w-4" />

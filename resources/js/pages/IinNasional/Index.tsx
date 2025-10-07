@@ -1,19 +1,19 @@
+import QrisModal from '@/components/QrisModal';
+import SurveyModal from '@/components/SurveyModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import DashboardLayout from '@/layouts/dashboard-layout';
-import { PageProps } from '@/types';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { motion } from 'framer-motion';
-import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, TriangleAlert, Upload, User } from 'lucide-react';
-import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
-import { useEffect, useState } from 'react';
-import SurveyModal from '@/components/SurveyModal';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import QrisModal from '@/components/QrisModal';
+import DashboardLayout from '@/layouts/dashboard-layout';
+import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
+import { PageProps } from '@/types';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import { AlertCircle, Award, Calendar, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, TriangleAlert, Upload, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface IinNasionalApplication {
     id: number;
@@ -24,7 +24,7 @@ interface IinNasionalApplication {
     created_at: string;
     submitted_at: string;
     iin_number?: string;
-    additional_documents?: string
+    additional_documents?: string;
     can_upload_payment_proof: boolean;
     can_download_certificate: boolean;
     user: {
@@ -164,26 +164,22 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
 
     const expenseReimSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-    }
+    };
 
     const handleQrisFileUpload = (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
 
-        router.post(
-            route('iin-nasional.upload-additional-documents', selectedApplication?.id),
-            formData,
-            {
-                onSuccess: () => {
-                    showSuccessToast('File QRIS berhasil diupload!');
-                    setIsQrisModalOpen(false);
-                },
-                onError: (errors) => {
-                    console.error(errors);
-                    showErrorToast('Gagal mengupload file QRIS');
-                },
-            }
-        );
+        router.post(route('iin-nasional.upload-additional-documents', selectedApplication?.id), formData, {
+            onSuccess: () => {
+                showSuccessToast('File QRIS berhasil diupload!');
+                setIsQrisModalOpen(false);
+            },
+            onError: (errors) => {
+                console.error(errors);
+                showErrorToast('Gagal mengupload file QRIS');
+            },
+        });
     };
 
     return (
@@ -282,10 +278,11 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                 {applications.data.map((application) => (
                                     <motion.div
                                         key={application.id}
-                                        className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${application.status === 'perbaikan' && auth.user.role === 'user'
-                                            ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
-                                            : ''
-                                            }`}
+                                        className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${
+                                            application.status === 'perbaikan' && auth.user.role === 'user'
+                                                ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
+                                                : ''
+                                        }`}
                                         variants={itemAnimation}
                                     >
                                         {/* Alert notification removed as requested */}
@@ -318,16 +315,16 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                             application.status === 'pengajuan'
                                                                 ? '40%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                 : application.status === 'perbaikan'
-                                                                    ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
-                                                                    : application.status === 'pembayaran'
-                                                                        ? '60%'
-                                                                        : application.status === 'verifikasi-lapangan'
-                                                                            ? '80%'
-                                                                            : application.status === 'menunggu-terbit'
-                                                                                ? '80%'
-                                                                                : application.status === 'terbit'
-                                                                                    ? '100%'
-                                                                                    : '0%',
+                                                                  ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
+                                                                  : application.status === 'pembayaran'
+                                                                    ? '60%'
+                                                                    : application.status === 'verifikasi-lapangan'
+                                                                      ? '80%'
+                                                                      : application.status === 'menunggu-terbit'
+                                                                        ? '80%'
+                                                                        : application.status === 'terbit'
+                                                                          ? '100%'
+                                                                          : '0%',
                                                     }}
                                                 ></div>
                                             </div>
@@ -370,7 +367,7 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
 
                                         <div className="mt-2 border-t pt-3">
                                             <div className="flex flex-wrap items-center justify-between gap-2">
-                                                <div className="flex items-center gap-2 w-full">
+                                                <div className="flex w-full items-center gap-2">
                                                     <Link href={route('iin-nasional.show', application.id)}>
                                                         <Button variant="outline" size="sm">
                                                             <Eye className="mr-2 h-4 w-4" />
@@ -436,7 +433,11 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                     {application.status === 'verifikasi-lapangan' && (
                                                         <Dialog>
                                                             <DialogTrigger asChild>
-                                                                <Button variant="outline" size="sm" className='border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:text-red-500'>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-500"
+                                                                >
                                                                     <TriangleAlert className="mr-2 h-4 w-4 text-red-500" />
                                                                     Silahkan isi Form Bukti Penggantian Transport dan Uang Harian
                                                                 </Button>
@@ -445,77 +446,159 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                                 <DialogHeader>
                                                                     <DialogTitle>Form Bukti Penggantian Transport dan Uang Harian</DialogTitle>
                                                                     <DialogDescription>
-                                                                        Silahkan isi form berikut untuk mengajukan penggantian transport dan uang harian.
+                                                                        Silahkan isi form berikut untuk mengajukan penggantian transport dan uang
+                                                                        harian.
                                                                     </DialogDescription>
                                                                 </DialogHeader>
-                                                                <form id="expense-reim-form" className='flex flex-col gap-4' onSubmit={expenseReimSubmit}>
+                                                                <form
+                                                                    id="expense-reim-form"
+                                                                    className="flex flex-col gap-4"
+                                                                    onSubmit={expenseReimSubmit}
+                                                                >
                                                                     <div>
-                                                                        <Label htmlFor="company_name" className="text-sm font-medium text-gray-700 mb-1">
+                                                                        <Label
+                                                                            htmlFor="company_name"
+                                                                            className="mb-1 text-sm font-medium text-gray-700"
+                                                                        >
                                                                             Nama Perusahaan
                                                                         </Label>
-                                                                        <Input required type='text' placeholder='Nama Perusahaan' value={data.company_name} onChange={e => setData('company_name', e.target.value)} />
-                                                                        {errors.company_name && <p className="mt-1 text-xs text-red-600">{errors.company_name}</p>}
+                                                                        <Input
+                                                                            required
+                                                                            type="text"
+                                                                            placeholder="Nama Perusahaan"
+                                                                            value={data.company_name}
+                                                                            onChange={(e) => setData('company_name', e.target.value)}
+                                                                        />
+                                                                        {errors.company_name && (
+                                                                            <p className="mt-1 text-xs text-red-600">{errors.company_name}</p>
+                                                                        )}
                                                                     </div>
 
                                                                     <div>
-                                                                        <Label htmlFor="pic_name" className="text-sm font-medium text-gray-700 mb-1">
+                                                                        <Label htmlFor="pic_name" className="mb-1 text-sm font-medium text-gray-700">
                                                                             Nama PIC
                                                                         </Label>
-                                                                        <Input required type='text' placeholder='Nama PIC' value={data.pic_name} onChange={e => setData('pic_name', e.target.value)} />
+                                                                        <Input
+                                                                            required
+                                                                            type="text"
+                                                                            placeholder="Nama PIC"
+                                                                            value={data.pic_name}
+                                                                            onChange={(e) => setData('pic_name', e.target.value)}
+                                                                        />
                                                                     </div>
 
                                                                     <div>
-                                                                        <Label htmlFor="pic_contact" className="text-sm font-medium text-gray-700 mb-1">
+                                                                        <Label
+                                                                            htmlFor="pic_contact"
+                                                                            className="mb-1 text-sm font-medium text-gray-700"
+                                                                        >
                                                                             Kontak PIC
                                                                         </Label>
-                                                                        <Input required type='text' placeholder='Kontak PIC' value={data.pic_contact} onChange={e => setData('pic_contact', e.target.value)} />
+                                                                        <Input
+                                                                            required
+                                                                            type="text"
+                                                                            placeholder="Kontak PIC"
+                                                                            value={data.pic_contact}
+                                                                            onChange={(e) => setData('pic_contact', e.target.value)}
+                                                                        />
                                                                     </div>
 
                                                                     <div>
-                                                                        <Label htmlFor="verification_date" className="text-sm font-medium text-gray-700 mb-1">
+                                                                        <Label
+                                                                            htmlFor="verification_date"
+                                                                            className="mb-1 text-sm font-medium text-gray-700"
+                                                                        >
                                                                             Tanggal Verifikasi
                                                                         </Label>
-                                                                        <Input required type='date' placeholder='Tanggal Verifikasi' value={data.verification_date} onChange={e => setData('verification_date', e.target.value)} />
+                                                                        <Input
+                                                                            required
+                                                                            type="date"
+                                                                            placeholder="Tanggal Verifikasi"
+                                                                            value={data.verification_date}
+                                                                            onChange={(e) => setData('verification_date', e.target.value)}
+                                                                        />
                                                                     </div>
 
                                                                     <div>
-                                                                        <Label htmlFor="is_acknowledged" className="text-sm font-medium text-gray-700 mb-1">
-                                                                            Dengan ini saya menyatakan bahwa penggantian transport dan uang harian yang diberikan kepada tim verifikator sudah sesuai dengan ketentuan surat informasi pembebanan biaya dari sekretariat Layanan Otoritas Sponsor
+                                                                        <Label
+                                                                            htmlFor="is_acknowledged"
+                                                                            className="mb-1 text-sm font-medium text-gray-700"
+                                                                        >
+                                                                            Dengan ini saya menyatakan bahwa penggantian transport dan uang harian
+                                                                            yang diberikan kepada tim verifikator sudah sesuai dengan ketentuan surat
+                                                                            informasi pembebanan biaya dari sekretariat Layanan Otoritas Sponsor
                                                                         </Label>
-                                                                        <Checkbox checked={data.is_acknowledged} onCheckedChange={(checked) => setData('is_acknowledged', Boolean(checked))} />
+                                                                        <Checkbox
+                                                                            checked={data.is_acknowledged}
+                                                                            onCheckedChange={(checked) =>
+                                                                                setData('is_acknowledged', Boolean(checked))
+                                                                            }
+                                                                        />
                                                                     </div>
 
                                                                     <div>
-                                                                        <Label htmlFor="chief_verificator_amount" className="text-sm font-medium text-gray-700 mb-1">
+                                                                        <Label
+                                                                            htmlFor="chief_verificator_amount"
+                                                                            className="mb-1 text-sm font-medium text-gray-700"
+                                                                        >
                                                                             Nominal yang di berikan kepada Verifikator Kepala
                                                                         </Label>
-                                                                        <Input required type='number' placeholder='Nominal yang di berikan kepada Verifikator Kepala' value={data.chief_verificator_amount} onChange={e => setData('chief_verificator_amount', parseInt(e.target.value))} />
+                                                                        <Input
+                                                                            required
+                                                                            type="number"
+                                                                            placeholder="Nominal yang di berikan kepada Verifikator Kepala"
+                                                                            value={data.chief_verificator_amount}
+                                                                            onChange={(e) =>
+                                                                                setData('chief_verificator_amount', parseInt(e.target.value))
+                                                                            }
+                                                                        />
                                                                     </div>
 
                                                                     <div>
-                                                                        <Label htmlFor="member_verificator_amount" className="text-sm font-medium text-gray-700 mb-1">
+                                                                        <Label
+                                                                            htmlFor="member_verificator_amount"
+                                                                            className="mb-1 text-sm font-medium text-gray-700"
+                                                                        >
                                                                             Nominal yang diberikan kepada Verifikator Anggota
                                                                         </Label>
-                                                                        <Input required type='number' placeholder='Nominal yang diberikan kepada Verifikator Anggota' value={data.member_verificator_amount} onChange={e => setData('member_verificator_amount', parseInt(e.target.value))} />
+                                                                        <Input
+                                                                            required
+                                                                            type="number"
+                                                                            placeholder="Nominal yang diberikan kepada Verifikator Anggota"
+                                                                            value={data.member_verificator_amount}
+                                                                            onChange={(e) =>
+                                                                                setData('member_verificator_amount', parseInt(e.target.value))
+                                                                            }
+                                                                        />
                                                                     </div>
 
                                                                     <div>
-                                                                        <Label htmlFor="payment_proof_path" className="text-sm font-medium text-gray-700 mb-1">
-                                                                            Upload bukti transfer penggantian transport dan uang harian tim verifikator
-
+                                                                        <Label
+                                                                            htmlFor="payment_proof_path"
+                                                                            className="mb-1 text-sm font-medium text-gray-700"
+                                                                        >
+                                                                            Upload bukti transfer penggantian transport dan uang harian tim
+                                                                            verifikator
                                                                         </Label>
-                                                                        <Input required type='file' accept=".jpg,.jpeg,.png,.pdf" onChange={e => {
-                                                                            if (e.target.files && e.target.files.length > 0) {
-                                                                                setData('payment_proof_path', e.target.files[0]);
-                                                                            }
-                                                                        }} />
+                                                                        <Input
+                                                                            required
+                                                                            type="file"
+                                                                            accept=".jpg,.jpeg,.png,.pdf"
+                                                                            onChange={(e) => {
+                                                                                if (e.target.files && e.target.files.length > 0) {
+                                                                                    setData('payment_proof_path', e.target.files[0]);
+                                                                                }
+                                                                            }}
+                                                                        />
                                                                     </div>
                                                                 </form>
                                                                 <DialogFooter>
                                                                     <Button variant="outline" onClick={() => setIsSurveyModalOpen(false)}>
                                                                         Batal
                                                                     </Button>
-                                                                    <Button form="expense-reim-form" type="submit">Kirim</Button>
+                                                                    <Button form="expense-reim-form" type="submit">
+                                                                        Kirim
+                                                                    </Button>
                                                                 </DialogFooter>
                                                             </DialogContent>
                                                         </Dialog>
@@ -536,20 +619,22 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                         </Button>
                                                     )}
 
-                                                    {application.status === 'terbit' && application.iin_number && application.additional_documents && (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="border-green-200 text-green-600 hover:bg-green-50"
-                                                            onClick={() => {
-                                                                setSelectedApplication(application);
-                                                                setIsSurveyModalOpen(true);
-                                                            }}
-                                                        >
-                                                            <Download className="mr-2 h-4 w-4" />
-                                                            Download Sertifikat
-                                                        </Button>
-                                                    )}
+                                                    {application.status === 'terbit' &&
+                                                        application.iin_number &&
+                                                        application.additional_documents && (
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="border-green-200 text-green-600 hover:bg-green-50"
+                                                                onClick={() => {
+                                                                    setSelectedApplication(application);
+                                                                    setIsSurveyModalOpen(true);
+                                                                }}
+                                                            >
+                                                                <Download className="mr-2 h-4 w-4" />
+                                                                Download Sertifikat
+                                                            </Button>
+                                                        )}
                                                 </div>
                                             </div>
                                         </div>
@@ -565,12 +650,13 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`rounded px-3 py-1 ${link.active
-                                            ? 'bg-blue-100 text-blue-700'
-                                            : link.url
-                                                ? 'text-gray-600 hover:bg-gray-100'
-                                                : 'cursor-not-allowed text-gray-300'
-                                            }`}
+                                        className={`rounded px-3 py-1 ${
+                                            link.active
+                                                ? 'bg-blue-100 text-blue-700'
+                                                : link.url
+                                                  ? 'text-gray-600 hover:bg-gray-100'
+                                                  : 'cursor-not-allowed text-gray-300'
+                                        }`}
                                         disabled={!link.url}
                                     >
                                         {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
@@ -587,10 +673,7 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                 onClose={() => setIsSurveyModalOpen(false)}
                 onDownload={() => {
                     if (selectedApplication) {
-                        window.open(
-                            route('iin-nasional.download-file', [selectedApplication.id, 'certificate']),
-                            '_blank'
-                        );
+                        window.open(route('iin-nasional.download-file', [selectedApplication.id, 'certificate']), '_blank');
                     }
                 }}
                 certificateType="IIN Nasional"

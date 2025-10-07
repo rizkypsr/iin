@@ -1,9 +1,9 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { User, PageProps } from '@/types';
+import { PageProps, User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ChevronRight, FileText, LayoutDashboard, LogOut, User as UserIcon, Users, CreditCard, Settings, Shield, BarChart3 } from 'lucide-react';
+import { BarChart3, ChevronRight, CreditCard, FileText, LayoutDashboard, LogOut, Settings, Shield, User as UserIcon, Users } from 'lucide-react';
 
 interface DashboardSidebarProps {
     user?: User;
@@ -32,7 +32,6 @@ const menuItems = {
         { name: 'Laporan', href: '/admin/reports', icon: BarChart3 },
         { name: 'Settings', href: '/admin/settings', icon: Settings },
     ],
-
 };
 
 export default function DashboardSidebar({ user, applicationCounts }: DashboardSidebarProps) {
@@ -46,7 +45,6 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
     let currentMenuItems;
     if (userRole === 'admin') {
         currentMenuItems = menuItems.admin;
-
     } else {
         // Default to user menu for any other role
         currentMenuItems = menuItems.user;
@@ -68,11 +66,8 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                         </div>
                         <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold text-gray-900">{currentUser.name}</p>
-                            <p className="truncate text-xs text-gray-500 mb-1">{currentUser.email}</p>
-                            <Badge
-                                variant={userRole === 'admin' ? 'destructive' : 'default'}
-                                className="h-4 py-0 text-xs inline-flex"
-                            >
+                            <p className="mb-1 truncate text-xs text-gray-500">{currentUser.email}</p>
+                            <Badge variant={userRole === 'admin' ? 'destructive' : 'default'} className="inline-flex h-4 py-0 text-xs">
                                 {userRole === 'admin' ? 'Admin' : 'User'}
                             </Badge>
                         </div>
@@ -109,15 +104,17 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                                     </div>
                                     <span className="flex-1 group-hover:text-gray-900">{item.name}</span>
                                     {/* Show badge for new applications - only visible for admin */}
-                                    {userRole === 'admin' && applicationCounts && (
-                                        (item.name === 'IIN Nasional' && applicationCounts.iin_nasional > 0) ||
-                                        (item.name === 'Single IIN/Blockholder' && applicationCounts.iin_single_blockholder > 0)
-                                    ) && (
+                                    {userRole === 'admin' &&
+                                        applicationCounts &&
+                                        ((item.name === 'IIN Nasional' && applicationCounts.iin_nasional > 0) ||
+                                            (item.name === 'Single IIN/Blockholder' && applicationCounts.iin_single_blockholder > 0)) && (
                                             <Badge
                                                 variant="destructive"
-                                                className="mr-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                                                className="mr-2 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs"
                                             >
-                                                {item.name === 'IIN Nasional' ? applicationCounts.iin_nasional : applicationCounts.iin_single_blockholder}
+                                                {item.name === 'IIN Nasional'
+                                                    ? applicationCounts.iin_nasional
+                                                    : applicationCounts.iin_single_blockholder}
                                             </Badge>
                                         )}
                                     <ChevronRight className="h-4 w-4 transform text-gray-400 transition-all duration-200 group-hover:translate-x-1 group-hover:text-purple-600" />

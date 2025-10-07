@@ -1,14 +1,29 @@
+import QrisModal from '@/components/QrisModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/layouts/dashboard-layout';
-import { PageProps } from '@/types';
-import { Head, Link, usePage, router } from '@inertiajs/react';
-import { motion } from 'framer-motion';
-import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, Shield, Upload, User } from 'lucide-react';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
+import { PageProps } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import {
+    AlertCircle,
+    Award,
+    Calendar,
+    CheckCircle,
+    Clock,
+    CreditCard,
+    Download,
+    Eye,
+    FileText,
+    MapPin,
+    Plus,
+    Shield,
+    Upload,
+    User,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
-import QrisModal from '@/components/QrisModal';
 
 interface PengawasanIinNasionalApplication {
     id: number;
@@ -119,20 +134,16 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
         const formData = new FormData();
         formData.append('file', file);
 
-        router.post(
-            route('pengawasan-iin-nasional.upload-additional-documents', selectedApplication?.id),
-            formData,
-            {
-                onSuccess: () => {
-                    showSuccessToast('File QRIS berhasil diupload!');
-                    setIsQrisModalOpen(false);
-                },
-                onError: (errors) => {
-                    console.error(errors);
-                    showErrorToast('Gagal mengupload file QRIS');
-                },
-            }
-        );
+        router.post(route('pengawasan-iin-nasional.upload-additional-documents', selectedApplication?.id), formData, {
+            onSuccess: () => {
+                showSuccessToast('File QRIS berhasil diupload!');
+                setIsQrisModalOpen(false);
+            },
+            onError: (errors) => {
+                console.error(errors);
+                showErrorToast('Gagal mengupload file QRIS');
+            },
+        });
     };
 
     useEffect(() => {
@@ -153,12 +164,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
         <DashboardLayout user={auth.user}>
             <Head title="Pengawasan IIN Nasional" />
 
-            <motion.div
-                className="space-y-6"
-                initial="hidden"
-                animate="visible"
-                variants={containerAnimation}
-            >
+            <motion.div className="space-y-6" initial="hidden" animate="visible" variants={containerAnimation}>
                 {/* Header */}
                 <motion.div variants={itemAnimation} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -199,7 +205,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                 <div className="ml-4">
                                     <p className="text-sm font-medium text-gray-600">Dalam Proses</p>
                                     <p className="text-2xl font-bold text-gray-900">
-                                        {applications.data.filter(app => !['terbit'].includes(app.status)).length}
+                                        {applications.data.filter((app) => !['terbit'].includes(app.status)).length}
                                     </p>
                                 </div>
                             </div>
@@ -214,7 +220,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                 <div className="ml-4">
                                     <p className="text-sm font-medium text-gray-600">Selesai</p>
                                     <p className="text-2xl font-bold text-gray-900">
-                                        {applications.data.filter(app => app.status === 'terbit').length}
+                                        {applications.data.filter((app) => app.status === 'terbit').length}
                                     </p>
                                 </div>
                             </div>
@@ -276,10 +282,11 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                     {applications.data.map((application) => (
                                         <motion.div
                                             key={application.id}
-                                            className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${application.status === 'perbaikan' && auth.user.role === 'user'
-                                                ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
-                                                : ''
-                                                }`}
+                                            className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${
+                                                application.status === 'perbaikan' && auth.user.role === 'user'
+                                                    ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
+                                                    : ''
+                                            }`}
                                             variants={itemAnimation}
                                         >
                                             <div className="mb-3 flex items-start justify-between">
@@ -310,16 +317,16 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                                                 application.status === 'pengajuan'
                                                                     ? '40%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                     : application.status === 'perbaikan'
-                                                                        ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
-                                                                        : application.status === 'pembayaran'
-                                                                            ? '60%'
-                                                                            : application.status === 'verifikasi-lapangan'
-                                                                                ? '80%'
-                                                                                : application.status === 'menunggu-terbit'
-                                                                                    ? '80%'
-                                                                                    : application.status === 'terbit'
-                                                                                        ? '100%'
-                                                                                        : '0%',
+                                                                      ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
+                                                                      : application.status === 'pembayaran'
+                                                                        ? '60%'
+                                                                        : application.status === 'verifikasi-lapangan'
+                                                                          ? '80%'
+                                                                          : application.status === 'menunggu-terbit'
+                                                                            ? '80%'
+                                                                            : application.status === 'terbit'
+                                                                              ? '100%'
+                                                                              : '0%',
                                                         }}
                                                     ></div>
                                                 </div>
@@ -417,7 +424,12 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                                                 variant="outline"
                                                                 size="sm"
                                                                 className="border-green-200 text-green-600 hover:bg-green-50"
-                                                                onClick={() => window.open(route('pengawasan-iin-nasional.download-certificate', application.id), '_blank')}
+                                                                onClick={() =>
+                                                                    window.open(
+                                                                        route('pengawasan-iin-nasional.download-certificate', application.id),
+                                                                        '_blank',
+                                                                    )
+                                                                }
                                                             >
                                                                 <Download className="mr-2 h-4 w-4" />
                                                                 Download Sertifikat
@@ -442,10 +454,9 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    className={`px-3 py-2 text-sm rounded-md ${link.active
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-white text-gray-700 border hover:bg-gray-50'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`rounded-md px-3 py-2 text-sm ${
+                                        link.active ? 'bg-blue-600 text-white' : 'border bg-white text-gray-700 hover:bg-gray-50'
+                                    } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

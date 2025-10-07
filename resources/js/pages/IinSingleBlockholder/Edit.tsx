@@ -32,7 +32,7 @@ export default function IinSingleBlockholderEdit({ application, auth }: Props) {
     const { data, setData, post, processing, errors, progress } = useForm({
         application_form: null as File | null,
         requirements_archive: null as File | null,
-        _method: 'PUT'
+        _method: 'PUT',
     });
 
     // Handle flash messages
@@ -128,18 +128,25 @@ export default function IinSingleBlockholderEdit({ application, auth }: Props) {
                     </CardHeader>
                     <CardContent>
                         <ol className="list-decimal space-y-2 pl-6 text-sm text-gray-900">
-                            <li>Surat Pengantar Perihal Permohonan Layanan IIN / IIN Nasional kepada Direktur Penguatan Penerapan Standar dan Penilaian Kesesuaian - BSN di Jakarta</li>
+                            <li>
+                                Surat Pengantar Perihal Permohonan Layanan IIN / IIN Nasional kepada Direktur Penguatan Penerapan Standar dan
+                                Penilaian Kesesuaian - BSN di Jakarta
+                            </li>
                             <li>Salinan Akta Pendirian Perusahaan</li>
                             <li>Salinan Akta Perubahan Nama (jika ada)</li>
                             <li>Salinan Akta Terakhir</li>
                             <li>Salinan Izin Usaha (NIB) Perusahaan yang terkini</li>
                             <li>Salinan NPWP Perusahaan</li>
                             <li>Salinan Identitas Pimpinan Perusahaan (KTP/KITAS)</li>
-                            <li>Salinan Surat Izin Penyelenggaraan Sistem Pembayaran oleh pihak yang berwenang (Surat Izin Bank Indonesia atau Otoritas Jasa Keuangan)</li>
+                            <li>
+                                Salinan Surat Izin Penyelenggaraan Sistem Pembayaran oleh pihak yang berwenang (Surat Izin Bank Indonesia atau
+                                Otoritas Jasa Keuangan)
+                            </li>
                             <li>Form Pendaftaran</li>
                             <li>Term and condition yang sudah ditandatangani</li>
                             <li>
-                                Salah satu persyaratan yaitu kepemilikan dokumen standar SNI ISO/IEC 7812 : 2017 part 1 dan part 2 dapat dilakukan pembelian melalui{' '}
+                                Salah satu persyaratan yaitu kepemilikan dokumen standar SNI ISO/IEC 7812 : 2017 part 1 dan part 2 dapat dilakukan
+                                pembelian melalui{' '}
                                 <a
                                     href="https://pesta.bsn.go.id/"
                                     target="_blank"
@@ -170,7 +177,11 @@ export default function IinSingleBlockholderEdit({ application, auth }: Props) {
                                         <p className="font-medium text-gray-900">Formulir Aplikasi</p>
                                         <p className="text-sm text-gray-500">File sudah diupload</p>
                                     </div>
-                                    <Button variant="outline" size="sm" onClick={() => window.open(`/storage/${application.application_form_path}`, '_blank')}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => window.open(`/storage/${application.application_form_path}`, '_blank')}
+                                    >
                                         <Download className="mr-2 h-4 w-4" />
                                         Lihat
                                     </Button>
@@ -182,7 +193,11 @@ export default function IinSingleBlockholderEdit({ application, auth }: Props) {
                                         <p className="font-medium text-gray-900">Arsip Persyaratan</p>
                                         <p className="text-sm text-gray-500">File sudah diupload</p>
                                     </div>
-                                    <Button variant="outline" size="sm" onClick={() => window.open(`/storage/${application.requirements_archive_path}`, '_blank')}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => window.open(`/storage/${application.requirements_archive_path}`, '_blank')}
+                                    >
                                         <Download className="mr-2 h-4 w-4" />
                                         Lihat
                                     </Button>
@@ -246,7 +261,9 @@ export default function IinSingleBlockholderEdit({ application, auth }: Props) {
                                         <Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
                                         <div className="space-y-2">
                                             <p className="text-sm font-medium text-gray-900">Klik untuk upload atau drag and drop</p>
-                                            <p className="text-xs text-gray-500">Format ZIP/RAR, maksimal 50MB (kosongkan jika tidak ingin mengubah)</p>
+                                            <p className="text-xs text-gray-500">
+                                                Format ZIP/RAR, maksimal 50MB (kosongkan jika tidak ingin mengubah)
+                                            </p>
                                             {data.requirements_archive && (
                                                 <p className="mt-2 text-sm font-medium text-purple-600">{data.requirements_archive.name}</p>
                                             )}

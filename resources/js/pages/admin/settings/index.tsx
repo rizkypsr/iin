@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
-import DashboardLayout from '@/layouts/dashboard-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import DashboardLayout from '@/layouts/dashboard-layout';
+import { Head, useForm } from '@inertiajs/react';
 import { CheckCircle, FileText, Settings } from 'lucide-react';
+import React, { useState } from 'react';
 import ReactQuill from 'react-quill-new';
 
 import 'react-quill-new/dist/quill.snow.css';
@@ -35,23 +35,18 @@ interface Props {
 
 const modules = {
     toolbar: [
-        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ header: [1, 2, 3, 4, 5, 6, false] }],
         ['bold', 'italic', 'underline', 'strike'],
-        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-        [{ 'indent': '-1' }, { 'indent': '+1' }],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'align': [] }],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        [{ indent: '-1' }, { indent: '+1' }],
+        [{ color: [] }, { background: [] }],
+        [{ align: [] }],
         ['link', 'image'],
-        ['clean']
+        ['clean'],
     ],
 };
 
-const formats = [
-    'header', 'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet', 'indent',
-    'color', 'background', 'align',
-    'link', 'image'
-];
+const formats = ['header', 'bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'indent', 'color', 'background', 'align', 'link', 'image'];
 
 export default function SettingsIndex({ documentRequirements, flash, application_counts }: Props) {
     const [activeTab, setActiveTab] = useState('iin_nasional');
@@ -63,9 +58,7 @@ export default function SettingsIndex({ documentRequirements, flash, application
 
     const handleTabChange = (value: string) => {
         setActiveTab(value);
-        const requirement = value === 'iin_nasional'
-            ? documentRequirements.iin_nasional
-            : documentRequirements.iin_single_blockholder;
+        const requirement = value === 'iin_nasional' ? documentRequirements.iin_nasional : documentRequirements.iin_single_blockholder;
 
         setData({
             type: value,
@@ -107,9 +100,7 @@ export default function SettingsIndex({ documentRequirements, flash, application
                 {flash?.success && (
                     <Alert className="border-green-200 bg-green-50">
                         <CheckCircle className="h-4 w-4 text-green-600" />
-                        <AlertDescription className="text-green-800">
-                            {flash.success}
-                        </AlertDescription>
+                        <AlertDescription className="text-green-800">{flash.success}</AlertDescription>
                     </Alert>
                 )}
 
@@ -134,28 +125,20 @@ export default function SettingsIndex({ documentRequirements, flash, application
                             <TabsContent value="iin_nasional" className="mt-6">
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Document Requirements for IIN Nasional
-                                        </label>
-                                        <div className="border border-gray-300 rounded-md">
+                                        <label className="mb-2 block text-sm font-medium text-gray-700">Document Requirements for IIN Nasional</label>
+                                        <div className="rounded-md border border-gray-300">
                                             <ReactQuill
                                                 value={data.content}
-                                                theme='snow'
+                                                theme="snow"
                                                 onChange={handleContentChange}
                                                 placeholder="Enter document requirements for IIN Nasional applications..."
                                             />
                                         </div>
-                                        {errors.content && (
-                                            <p className="mt-1 text-sm text-red-600">{errors.content}</p>
-                                        )}
+                                        {errors.content && <p className="mt-1 text-sm text-red-600">{errors.content}</p>}
                                     </div>
 
                                     <div className="flex justify-end">
-                                        <Button
-                                            type="submit"
-                                            disabled={processing}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                                        >
+                                        <Button type="submit" disabled={processing} className="bg-blue-600 text-white hover:bg-blue-700">
                                             {processing ? 'Saving...' : 'Save Requirements'}
                                         </Button>
                                     </div>
@@ -165,28 +148,22 @@ export default function SettingsIndex({ documentRequirements, flash, application
                             <TabsContent value="iin_single_blockholder" className="mt-6">
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="mb-2 block text-sm font-medium text-gray-700">
                                             Document Requirements for Single IIN/Blockholder
                                         </label>
-                                        <div className="border border-gray-300 rounded-md">
+                                        <div className="rounded-md border border-gray-300">
                                             <ReactQuill
                                                 value={data.content}
-                                                theme='snow'
+                                                theme="snow"
                                                 onChange={handleContentChange}
                                                 placeholder="Enter document requirements for Single IIN/Blockholder applications..."
                                             />
                                         </div>
-                                        {errors.content && (
-                                            <p className="mt-1 text-sm text-red-600">{errors.content}</p>
-                                        )}
+                                        {errors.content && <p className="mt-1 text-sm text-red-600">{errors.content}</p>}
                                     </div>
 
                                     <div className="flex justify-end">
-                                        <Button
-                                            type="submit"
-                                            disabled={processing}
-                                            className="bg-blue-600 hover:bg-blue-700"
-                                        >
+                                        <Button type="submit" disabled={processing} className="bg-blue-600 hover:bg-blue-700">
                                             {processing ? 'Saving...' : 'Save Requirements'}
                                         </Button>
                                     </div>

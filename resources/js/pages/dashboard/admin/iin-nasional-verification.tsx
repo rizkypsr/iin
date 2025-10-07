@@ -271,30 +271,26 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
         formData.append('status', 'verifikasi-lapangan');
         formData.append('notes', notes || 'Status diubah ke verifikasi lapangan oleh admin');
         formData.append('upload_and_change_status', '1');
-        
+
         fieldVerificationDocuments.forEach((file, index) => {
             formData.append(`field_verification_documents[${index}]`, file);
         });
 
         try {
-            router.post(
-                route('iin-nasional.upload-field-verification-documents', application.id),
-                formData,
-                {
-                    onSuccess: () => {
-                        showSuccessToast('Status berhasil diubah ke verifikasi lapangan');
-                        setNotes('');
-                        setFieldVerificationDocuments([]);
-                    },
-                    onError: (errors) => {
-                        console.error('Error changing status:', errors);
-                        showErrorToast('Gagal mengubah status. Silakan coba lagi.');
-                    },
-                    onFinish: () => {
-                        setLoading(false);
-                    },
+            router.post(route('iin-nasional.upload-field-verification-documents', application.id), formData, {
+                onSuccess: () => {
+                    showSuccessToast('Status berhasil diubah ke verifikasi lapangan');
+                    setNotes('');
+                    setFieldVerificationDocuments([]);
                 },
-            );
+                onError: (errors) => {
+                    console.error('Error changing status:', errors);
+                    showErrorToast('Gagal mengubah status. Silakan coba lagi.');
+                },
+                onFinish: () => {
+                    setLoading(false);
+                },
+            });
         } catch (error) {
             console.error('Error changing status:', error);
             showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
@@ -344,7 +340,7 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
 
         const formData = new FormData();
         formData.append('certificate', certificateFile);
-        
+
         // Add additional documents if any
         additionalDocuments.forEach((file, index) => {
             formData.append(`additional_documents[${index}]`, file);
@@ -411,19 +407,19 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
     };
 
     const addPaymentDocument = (file: File) => {
-        setPaymentDocuments(prev => [...prev, file]);
+        setPaymentDocuments((prev) => [...prev, file]);
     };
 
     const removePaymentDocument = (index: number) => {
-        setPaymentDocuments(prev => prev.filter((_, i) => i !== index));
+        setPaymentDocuments((prev) => prev.filter((_, i) => i !== index));
     };
 
     const addFieldVerificationDocument = (file: File) => {
-        setFieldVerificationDocuments(prev => [...prev, file]);
+        setFieldVerificationDocuments((prev) => [...prev, file]);
     };
 
     const removeFieldVerificationDocument = (index: number) => {
-        setFieldVerificationDocuments(prev => prev.filter((_, i) => i !== index));
+        setFieldVerificationDocuments((prev) => prev.filter((_, i) => i !== index));
     };
 
     const downloadPaymentDocument = (index: number) => {
@@ -503,7 +499,8 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                     <DialogHeader>
                                         <DialogTitle>Konfirmasi Selesaikan Verifikasi Lapangan</DialogTitle>
                                         <DialogDescription>
-                                            Apakah Anda yakin ingin menyelesaikan verifikasi lapangan? Status aplikasi akan berubah menjadi <strong>menunggu terbit</strong> dan siap untuk penerbitan IIN.
+                                            Apakah Anda yakin ingin menyelesaikan verifikasi lapangan? Status aplikasi akan berubah menjadi{' '}
+                                            <strong>menunggu terbit</strong> dan siap untuk penerbitan IIN.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <DialogFooter>
@@ -513,7 +510,7 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                         <DialogClose asChild>
                                             <Button
                                                 onClick={handleCompleteFieldVerification}
-                                                className="bg-green-600 hover:bg-green-700 text-white"
+                                                className="bg-green-600 text-white hover:bg-green-700"
                                                 disabled={loading}
                                             >
                                                 {loading ? 'Memproses...' : 'Ya, Selesaikan Verifikasi Lapangan'}
@@ -531,7 +528,7 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                         Proses ke Verifikasi Lapangan
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Proses ke Verifikasi Lapangan</DialogTitle>
                                         <DialogDescription>
@@ -553,13 +550,14 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                                     multiple
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files || []);
-                                                        files.forEach(file => addFieldVerificationDocument(file));
+                                                        files.forEach((file) => addFieldVerificationDocument(file));
                                                         e.target.value = ''; // Reset input
                                                     }}
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                    beberapa file sekaligus.
                                                 </p>
                                             </div>
 
@@ -614,7 +612,7 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                         <DialogClose asChild>
                                             <Button
                                                 onClick={handleStatusChangeToFieldVerification}
-                                                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                className="bg-indigo-600 text-white hover:bg-indigo-700"
                                                 disabled={loading || fieldVerificationDocuments.length === 0}
                                             >
                                                 {loading ? 'Memproses...' : 'Proses ke Verifikasi Lapangan'}
@@ -642,8 +640,8 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                         <DialogHeader>
                                             <DialogTitle>Konfirmasi Kembalikan untuk Perbaikan</DialogTitle>
                                             <DialogDescription>
-                                                Apakah Anda yakin ingin mengembalikan aplikasi ini untuk <strong>perbaikan</strong>?
-                                                Pemohon akan diminta untuk memperbaiki dokumen atau informasi yang diperlukan.
+                                                Apakah Anda yakin ingin mengembalikan aplikasi ini untuk <strong>perbaikan</strong>? Pemohon akan
+                                                diminta untuk memperbaiki dokumen atau informasi yang diperlukan.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="space-y-4 py-4">
@@ -668,7 +666,7 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                             <DialogClose asChild>
                                                 <Button
                                                     onClick={handleStatusChangeToRevision}
-                                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                                    className="bg-red-600 text-white hover:bg-red-700"
                                                     disabled={loading}
                                                 >
                                                     {loading ? 'Memproses...' : 'Ya, Kembalikan untuk Perbaikan'}
@@ -684,12 +682,12 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                             Ubah ke Pembayaran
                                         </Button>
                                     </DialogTrigger>
-                                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                    <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                         <DialogHeader>
                                             <DialogTitle>Ubah Status ke Pembayaran</DialogTitle>
                                             <DialogDescription>
-                                                Upload dokumen pembayaran dan ubah status aplikasi ke <strong>pembayaran</strong>.
-                                                Dokumen ini akan tersedia untuk diunduh oleh pemohon.
+                                                Upload dokumen pembayaran dan ubah status aplikasi ke <strong>pembayaran</strong>. Dokumen ini akan
+                                                tersedia untuk diunduh oleh pemohon.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="space-y-6 py-4">
@@ -706,13 +704,14 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                                         multiple
                                                         onChange={(e) => {
                                                             const files = Array.from(e.target.files || []);
-                                                            files.forEach(file => addPaymentDocument(file));
+                                                            files.forEach((file) => addPaymentDocument(file));
                                                             e.target.value = ''; // Reset input
                                                         }}
                                                         className="mt-1"
                                                     />
                                                     <p className="mt-1 text-xs text-gray-500">
-                                                        Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                        Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                        beberapa file sekaligus.
                                                     </p>
                                                 </div>
 
@@ -749,7 +748,10 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-medium text-gray-700">Dokumen yang Sudah Diupload:</Label>
                                                         {application.payment_documents.map((document, index) => (
-                                                            <div key={index} className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
+                                                            <div
+                                                                key={index}
+                                                                className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
+                                                            >
                                                                 <div className="flex items-center gap-2">
                                                                     <FileText className="h-4 w-4 text-gray-600" />
                                                                     <span className="text-sm text-gray-700">Dokumen Pembayaran {index + 1}</span>
@@ -786,50 +788,51 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                             <Button
                                                 onClick={async () => {
                                                     setLoading(true);
-                                                    
+
                                                     try {
                                                         // Siapkan FormData untuk upload dokumen dan perubahan status bersamaan
                                                         const formData = new FormData();
-                                                        
+
                                                         // Tambahkan dokumen pembayaran jika ada
                                                         if (paymentDocuments.length > 0) {
                                                             paymentDocuments.forEach((file, index) => {
                                                                 formData.append(`payment_documents[${index}]`, file);
                                                             });
                                                         }
-                                                        
+
                                                         // Tambahkan parameter untuk perubahan status
                                                         formData.append('status', 'pembayaran');
                                                         formData.append('notes', notes || 'Status diubah ke pembayaran oleh admin');
                                                         formData.append('upload_and_change_status', '1');
-                                                        
+
                                                         // Kirim request untuk upload dokumen dan ubah status bersamaan
-                                                        router.post(
-                                                            route('iin-nasional.upload-payment-documents', application.id),
-                                                            formData,
-                                                            {
-                                                                onSuccess: () => {
-                                                                    showSuccessToast('Dokumen berhasil diupload dan status diubah ke pembayaran');
-                                                                    setPaymentDocuments([]);
-                                                                    setNotes('');
-                                                                },
-                                                                onError: (errors) => {
-                                                                    console.error('Error uploading documents and changing status:', errors);
-                                                                    showErrorToast('Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.');
-                                                                },
-                                                                onFinish: () => {
-                                                                    setLoading(false);
-                                                                },
+                                                        router.post(route('iin-nasional.upload-payment-documents', application.id), formData, {
+                                                            onSuccess: () => {
+                                                                showSuccessToast('Dokumen berhasil diupload dan status diubah ke pembayaran');
+                                                                setPaymentDocuments([]);
+                                                                setNotes('');
                                                             },
-                                                        );
+                                                            onError: (errors) => {
+                                                                console.error('Error uploading documents and changing status:', errors);
+                                                                showErrorToast('Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.');
+                                                            },
+                                                            onFinish: () => {
+                                                                setLoading(false);
+                                                            },
+                                                        });
                                                     } catch (error) {
                                                         console.error('Error in upload and status change:', error);
                                                         showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
                                                         setLoading(false);
                                                     }
                                                 }}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white"
-                                                disabled={loading || uploadingPaymentDocuments || (paymentDocuments.length === 0 && (!application.payment_documents || application.payment_documents.length === 0))}
+                                                className="bg-blue-600 text-white hover:bg-blue-700"
+                                                disabled={
+                                                    loading ||
+                                                    uploadingPaymentDocuments ||
+                                                    (paymentDocuments.length === 0 &&
+                                                        (!application.payment_documents || application.payment_documents.length === 0))
+                                                }
                                             >
                                                 {loading || uploadingPaymentDocuments ? 'Memproses...' : 'Upload & Ubah Status'}
                                             </Button>
@@ -846,9 +849,7 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                     <Alert className="border-blue-200 bg-blue-50">
                         <Clock className="h-4 w-4 text-blue-600" />
                         <AlertTitle className="text-blue-800">Siap untuk Diproses</AlertTitle>
-                        <AlertDescription className="text-blue-700">
-                            Aplikasi ini siap untuk diubah statusnya ke pembayaran.
-                        </AlertDescription>
+                        <AlertDescription className="text-blue-700">Aplikasi ini siap untuk diubah statusnya ke pembayaran.</AlertDescription>
                     </Alert>
                 )}
 
@@ -881,8 +882,6 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                         </AlertDescription>
                     </Alert>
                 )}
-
-
 
                 {canUploadCertificate && (
                     <Alert className="border-orange-200 bg-orange-50">
@@ -943,7 +942,6 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                             <Clock className="mr-1 h-4 w-4" />
                             Status
                         </TabsTrigger>
-
 
                         {canIssueIIN && (
                             <TabsTrigger
@@ -1109,7 +1107,10 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                             </div>
                                         </div>
                                         {application.payment_proof_documents.map((document: PaymentDocument, index: number) => (
-                                            <div key={index} className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2">
+                                            <div
+                                                key={index}
+                                                className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2"
+                                            >
                                                 <div className="flex items-center gap-2">
                                                     <FileText className="h-4 w-4 text-gray-600" />
                                                     <span className="text-sm text-gray-700">{document.original_name}</span>
@@ -1124,19 +1125,20 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                 )}
 
                                 {/* No Payment Proof */}
-                                {!application.payment_proof_path && (!application.payment_proof_documents || application.payment_proof_documents.length === 0) && (
-                                    <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="rounded-lg bg-gray-100 p-2">
-                                                <CreditCard className="h-5 w-5 text-gray-400" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium text-gray-800">Bukti Pembayaran</p>
-                                                <p className="text-sm text-gray-500">Belum ada bukti pembayaran</p>
+                                {!application.payment_proof_path &&
+                                    (!application.payment_proof_documents || application.payment_proof_documents.length === 0) && (
+                                        <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="rounded-lg bg-gray-100 p-2">
+                                                    <CreditCard className="h-5 w-5 text-gray-400" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-gray-800">Bukti Pembayaran</p>
+                                                    <p className="text-sm text-gray-500">Belum ada bukti pembayaran</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
                                 {/* Payment Documents */}
                                 {application.payment_documents && application.payment_documents.length > 0 && (
@@ -1156,7 +1158,10 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                             </div>
                                         </div>
                                         {application.payment_documents.map((document: PaymentDocument, index: number) => (
-                                            <div key={index} className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2">
+                                            <div
+                                                key={index}
+                                                className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2"
+                                            >
                                                 <div className="flex items-center gap-2">
                                                     <FileText className="h-4 w-4 text-gray-600" />
                                                     <span className="text-sm text-gray-700">{document.original_name}</span>
@@ -1182,13 +1187,18 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                                 <p className="text-sm text-gray-500">
                                                     {application.field_verification_documents.length} dokumen diupload pada{' '}
                                                     {application.field_verification_documents_uploaded_at
-                                                        ? format(new Date(application.field_verification_documents_uploaded_at), 'dd MMMM yyyy', { locale: id })
+                                                        ? format(new Date(application.field_verification_documents_uploaded_at), 'dd MMMM yyyy', {
+                                                              locale: id,
+                                                          })
                                                         : '-'}
                                                 </p>
                                             </div>
                                         </div>
                                         {application.field_verification_documents.map((document: PaymentDocument, index: number) => (
-                                            <div key={index} className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2">
+                                            <div
+                                                key={index}
+                                                className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2"
+                                            >
                                                 <div className="flex items-center gap-2">
                                                     <FileText className="h-4 w-4 text-gray-600" />
                                                     <span className="text-sm text-gray-700">{document.original_name}</span>
@@ -1290,7 +1300,9 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                                                     ? `Status diubah dari ${getStatusLabel(log.status_from)} menjadi ${getStatusLabel(log.status_to)}`
                                                                     : `Status awal: ${getStatusLabel(log.status_to)}`}
                                                             </span>
-                                                            <span className="text-sm text-gray-500">{format(new Date(log.created_at), 'dd MMMM yyyy', { locale: id })}</span>
+                                                            <span className="text-sm text-gray-500">
+                                                                {format(new Date(log.created_at), 'dd MMMM yyyy', { locale: id })}
+                                                            </span>
                                                         </div>
                                                         <div className="mb-2 flex items-center gap-2 text-sm text-gray-700">
                                                             <Shield className="h-3.5 w-3.5" />
@@ -1319,10 +1331,6 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                             </CardContent>
                         </Card>
                     </TabsContent>
-
-
-
-
 
                     {canIssueIIN && (
                         <TabsContent value="issue">
@@ -1466,7 +1474,9 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                                 }}
                                                 className="mt-1"
                                             />
-                                            <p className="mt-1 text-xs text-gray-500">Format yang didukung: PDF. Maksimal 5MB per file. Dapat memilih multiple files.</p>
+                                            <p className="mt-1 text-xs text-gray-500">
+                                                Format yang didukung: PDF. Maksimal 5MB per file. Dapat memilih multiple files.
+                                            </p>
                                         </div>
 
                                         {additionalDocuments.length > 0 && (
@@ -1492,7 +1502,7 @@ export default function AdminIinNasionalVerification({ application, statusLogs, 
                                                                         const newFiles = additionalDocuments.filter((_, i) => i !== index);
                                                                         setAdditionalDocuments(newFiles);
                                                                     }}
-                                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
                                                                 >
                                                                     Hapus
                                                                 </Button>

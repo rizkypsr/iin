@@ -29,11 +29,11 @@
         --radius: 0.5rem;
 
         /* Gradient Colors */
-        --gradient-primary-start: #01AEEC;
-        --gradient-primary-end: #0088CC;
-        --gradient-accent-start: #33BBFF;
-        --gradient-accent-end: #0077BB;
-        --gradient-secondary-start: #0077BB;
+        --gradient-primary-start: #01aeec;
+        --gradient-primary-end: #0088cc;
+        --gradient-accent-start: #33bbff;
+        --gradient-accent-end: #0077bb;
+        --gradient-secondary-start: #0077bb;
         --gradient-secondary-end: #005599;
         --gradient-footer-start: #005599;
         --gradient-footer-end: #003366;

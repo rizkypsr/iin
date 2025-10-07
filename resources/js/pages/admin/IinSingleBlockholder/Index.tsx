@@ -1,11 +1,10 @@
-import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import DashboardLayout from '@/layouts/dashboard-layout';
-import { PageProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import DashboardLayout from '@/layouts/dashboard-layout';
+import { PageProps } from '@/types';
+import { Head, Link } from '@inertiajs/react';
 import { Eye, FileText } from 'lucide-react';
 
 interface IinSingleBlockholderApplication {
@@ -84,17 +83,11 @@ const getStatusLabel = (status: string) => {
 
 export default function Index({ auth, applications, application_counts }: Props) {
     return (
-        <DashboardLayout
-            user={auth.user}
-            title="Admin - IIN Single Blockholder"
-            applicationCounts={application_counts}
-        >
+        <DashboardLayout user={auth.user} title="Admin - IIN Single Blockholder" applicationCounts={application_counts}>
             <Head title="Admin - IIN Single Blockholder" />
 
             <div className="mb-8">
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Manajemen Aplikasi IIN Single Blockholder
-                </h2>
+                <h2 className="text-xl leading-tight font-semibold text-gray-800">Manajemen Aplikasi IIN Single Blockholder</h2>
             </div>
 
             <div>
@@ -108,10 +101,10 @@ export default function Index({ auth, applications, application_counts }: Props)
                         </CardHeader>
                         <CardContent>
                             {applications.data.length === 0 ? (
-                                <div className="text-center py-8">
-                                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500 text-lg">Belum Ada Aplikasi</p>
-                                    <p className="text-gray-400 text-sm mt-2">
+                                <div className="py-8 text-center">
+                                    <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-lg text-gray-500">Belum Ada Aplikasi</p>
+                                    <p className="mt-2 text-sm text-gray-400">
                                         Tidak ada aplikasi IIN Single Blockholder yang tersedia untuk ditinjau.
                                     </p>
                                 </div>
@@ -130,34 +123,26 @@ export default function Index({ auth, applications, application_counts }: Props)
                                         <TableBody>
                                             {applications.data.map((application) => (
                                                 <TableRow key={application.id}>
-                                                    <TableCell className="font-medium">
-                                                        {application.application_number}
-                                                    </TableCell>
+                                                    <TableCell className="font-medium">{application.application_number}</TableCell>
                                                     <TableCell>
                                                         <div>
                                                             <div className="font-medium">{application.user?.name}</div>
                                                             <div className="text-sm text-gray-500">{application.user?.email}</div>
                                                         </div>
                                                     </TableCell>
-                                                    <TableCell>
-                                                        {getStatusBadge(application.status)}
-                                                    </TableCell>
+                                                    <TableCell>{getStatusBadge(application.status)}</TableCell>
                                                     <TableCell>
                                                         {new Date(application.created_at).toLocaleDateString('id-ID', {
                                                             year: 'numeric',
                                                             month: 'long',
-                                                            day: 'numeric'
+                                                            day: 'numeric',
                                                         })}
                                                     </TableCell>
                                                     <TableCell>
                                                         <div className="flex items-center gap-2">
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                asChild
-                                                            >
+                                                            <Button variant="outline" size="sm" asChild>
                                                                 <Link href={route('admin.iin-single-blockholder.show', application.id)}>
-                                                                    <Eye className="h-4 w-4 mr-1" />
+                                                                    <Eye className="mr-1 h-4 w-4" />
                                                                     Detail
                                                                 </Link>
                                                             </Button>

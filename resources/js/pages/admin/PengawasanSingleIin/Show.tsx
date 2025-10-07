@@ -1,15 +1,6 @@
-import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import DashboardLayout from '@/layouts/dashboard-layout';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
     Dialog,
     DialogClose,
@@ -20,19 +11,18 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-    ArrowLeft,
-    FileText,
-    Download,
-    Clock,
-    CreditCard,
-    Shield,
-    CheckCircle,
-    AlertCircle,
-    X,
-} from 'lucide-react';
-import { showSuccessToast, showErrorToast } from '@/lib/toast-helper';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import DashboardLayout from '@/layouts/dashboard-layout';
+import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { User } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { ArrowLeft, CheckCircle, Clock, CreditCard, Download, FileText, Shield, X } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface PaymentDocument {
     original_name: string;
@@ -88,7 +78,7 @@ interface PengawasanSingleIinApplication {
         remarks_status: string;
         card_specimen: string;
         previous_name: string;
-    }
+    };
 }
 
 interface StatusLog {
@@ -129,7 +119,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
         const url = route('pengawasan-single-iin.download-file', {
             pengawasanSingleIin: application.id,
             type: type,
-            ...(stage && { stage })
+            ...(stage && { stage }),
         });
         window.open(url, '_blank');
     };
@@ -149,24 +139,20 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
             formData.append('status', 'pembayaran');
             formData.append('notes', notes || 'Status diubah ke pembayaran oleh admin');
 
-            router.post(
-                route('admin.pengawasan-single-iin.upload-payment-documents', application.id),
-                formData,
-                {
-                    onSuccess: () => {
-                        showSuccessToast('Dokumen pembayaran berhasil diupload dan status diubah ke pembayaran');
-                        setPaymentDocuments([]);
-                        setNotes('');
-                    },
-                    onError: (errors) => {
-                        console.error('Error uploading documents and changing status:', errors);
-                        showErrorToast('Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.');
-                    },
-                    onFinish: () => {
-                        setLoading(false);
-                    },
+            router.post(route('admin.pengawasan-single-iin.upload-payment-documents', application.id), formData, {
+                onSuccess: () => {
+                    showSuccessToast('Dokumen pembayaran berhasil diupload dan status diubah ke pembayaran');
+                    setPaymentDocuments([]);
+                    setNotes('');
                 },
-            );
+                onError: (errors) => {
+                    console.error('Error uploading documents and changing status:', errors);
+                    showErrorToast('Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.');
+                },
+                onFinish: () => {
+                    setLoading(false);
+                },
+            });
         } catch (error) {
             console.error('Error in upload and status change:', error);
             showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
@@ -199,7 +185,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                     console.error('Error:', errors);
                     showErrorToast('Gagal mengupload dokumen pembayaran tahap 2');
                 },
-                onFinish: () => setLoading(false)
+                onFinish: () => setLoading(false),
             });
         } catch (error) {
             console.error('Error:', error);
@@ -233,7 +219,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                 console.error('Error uploading payment documents stage 2:', errors);
                 showErrorToast('Gagal mengupload dokumen pembayaran tahap 2');
                 setLoading(false);
-            }
+            },
         });
     };
 
@@ -243,7 +229,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
             showErrorToast('Ukuran file tidak boleh lebih dari 10MB');
             return;
         }
-        setPaymentDocuments(prev => [...prev, file]);
+        setPaymentDocuments((prev) => [...prev, file]);
     };
 
     const addFieldVerificationDocument = (file: File) => {
@@ -251,7 +237,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
             showErrorToast('Ukuran file tidak boleh lebih dari 10MB');
             return;
         }
-        setFieldVerificationDocuments(prev => [...prev, file]);
+        setFieldVerificationDocuments((prev) => [...prev, file]);
     };
 
     // Status conditions
@@ -262,22 +248,22 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
 
     const getStatusLabel = (status: string) => {
         const statusMap: { [key: string]: string } = {
-            'pengajuan': 'Diajukan',
-            'pembayaran': 'Pembayaran',
+            pengajuan: 'Diajukan',
+            pembayaran: 'Pembayaran',
             'verifikasi-lapangan': 'Verifikasi Lapangan',
             'pembayaran-tahap-2': 'Pembayaran Tahap 2',
-            'terbit': 'Terbit',
+            terbit: 'Terbit',
         };
         return statusMap[status] || status;
     };
 
     const getStatusBadgeClass = (status: string) => {
         const statusClasses: { [key: string]: string } = {
-            'pengajuan': 'bg-blue-100 text-blue-800 border-blue-200',
-            'pembayaran': 'bg-orange-100 text-orange-800 border-orange-200',
-            'verifikasi_lapangan': 'bg-purple-100 text-purple-800 border-purple-200',
+            pengajuan: 'bg-blue-100 text-blue-800 border-blue-200',
+            pembayaran: 'bg-orange-100 text-orange-800 border-orange-200',
+            verifikasi_lapangan: 'bg-purple-100 text-purple-800 border-purple-200',
             'pembayaran-tahap-2': 'bg-green-100 text-green-800 border-green-200',
-            'terbit': 'bg-gray-100 text-gray-800 border-gray-200',
+            terbit: 'bg-gray-100 text-gray-800 border-gray-200',
         };
         return statusClasses[status] || 'bg-gray-100 text-gray-800 border-gray-200';
     };
@@ -298,24 +284,20 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
             formData.append('notes', notes || 'Status diubah ke pembayaran terverifikasi oleh admin');
             formData.append('upload_and_change_status', '1');
 
-            router.post(
-                route('pengawasan-single-iin.upload-payment-documents', application.id),
-                formData,
-                {
-                    onSuccess: () => {
-                        showSuccessToast('Dokumen berhasil diupload dan status diubah ke pembayaran terverifikasi');
-                        setPaymentDocuments([]);
-                        setNotes('');
-                    },
-                    onError: (errors) => {
-                        console.error('Error uploading documents and changing status:', errors);
-                        showErrorToast('Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.');
-                    },
-                    onFinish: () => {
-                        setLoading(false);
-                    },
+            router.post(route('pengawasan-single-iin.upload-payment-documents', application.id), formData, {
+                onSuccess: () => {
+                    showSuccessToast('Dokumen berhasil diupload dan status diubah ke pembayaran terverifikasi');
+                    setPaymentDocuments([]);
+                    setNotes('');
                 },
-            );
+                onError: (errors) => {
+                    console.error('Error uploading documents and changing status:', errors);
+                    showErrorToast('Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.');
+                },
+                onFinish: () => {
+                    setLoading(false);
+                },
+            });
         } catch (error) {
             console.error('Error in upload and status change:', error);
             showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
@@ -339,24 +321,20 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
             formData.append('status', 'verifikasi-lapangan');
             formData.append('notes', notes || 'Status diubah ke verifikasi lapangan oleh admin');
 
-            router.post(
-                route('admin.pengawasan-single-iin.upload-field-verification-documents', application.id),
-                formData,
-                {
-                    onSuccess: () => {
-                        showSuccessToast('Dokumen berhasil diupload dan status diubah ke verifikasi lapangan');
-                        setFieldVerificationDocuments([]);
-                        setNotes('');
-                    },
-                    onError: (errors) => {
-                        console.error('Error uploading documents and changing status:', errors);
-                        showErrorToast('Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.');
-                    },
-                    onFinish: () => {
-                        setLoading(false);
-                    },
+            router.post(route('admin.pengawasan-single-iin.upload-field-verification-documents', application.id), formData, {
+                onSuccess: () => {
+                    showSuccessToast('Dokumen berhasil diupload dan status diubah ke verifikasi lapangan');
+                    setFieldVerificationDocuments([]);
+                    setNotes('');
                 },
-            );
+                onError: (errors) => {
+                    console.error('Error uploading documents and changing status:', errors);
+                    showErrorToast('Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.');
+                },
+                onFinish: () => {
+                    setLoading(false);
+                },
+            });
         } catch (error) {
             console.error('Error in upload and status change:', error);
             showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
@@ -383,24 +361,20 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                 formData.append(`issuance_documents[${index}]`, file);
             });
 
-            router.post(
-                route('admin.pengawasan-single-iin.upload-issuance-documents', application.id),
-                formData,
-                {
-                    forceFormData: true,
-                    onSuccess: () => {
-                        showSuccessToast('Dokumen pengawasan berhasil diupload dan status diubah ke terbit');
-                        setVerificationCompletionFiles([]);
-                    },
-                    onError: (errors) => {
-                        console.error('Error uploading issuance documents:', errors);
-                        showErrorToast('Gagal mengupload dokumen pengawasan. Silakan coba lagi.');
-                    },
-                    onFinish: () => {
-                        setLoading(false);
-                    },
+            router.post(route('admin.pengawasan-single-iin.upload-issuance-documents', application.id), formData, {
+                forceFormData: true,
+                onSuccess: () => {
+                    showSuccessToast('Dokumen pengawasan berhasil diupload dan status diubah ke terbit');
+                    setVerificationCompletionFiles([]);
                 },
-            );
+                onError: (errors) => {
+                    console.error('Error uploading issuance documents:', errors);
+                    showErrorToast('Gagal mengupload dokumen pengawasan. Silakan coba lagi.');
+                },
+                onFinish: () => {
+                    setLoading(false);
+                },
+            });
         } catch (error) {
             console.error('Error uploading issuance documents:', error);
             showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
@@ -421,36 +395,29 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
     };
 
     const removePaymentDocument = (index: number) => {
-        setPaymentDocuments(prev => prev.filter((_, i) => i !== index));
+        setPaymentDocuments((prev) => prev.filter((_, i) => i !== index));
     };
 
     const removeFieldVerificationDocument = (index: number) => {
-        setFieldVerificationDocuments(prev => prev.filter((_, i) => i !== index));
+        setFieldVerificationDocuments((prev) => prev.filter((_, i) => i !== index));
     };
 
     return (
-        <DashboardLayout
-            user={auth.user}
-            title="Admin - Detail Pengawasan Single IIN"
-        >
+        <DashboardLayout user={auth.user} title="Admin - Detail Pengawasan Single IIN">
             <Head title={`Admin - Detail Pengawasan Single IIN - ${application.application_number}`} />
 
             <div className="mb-8">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 mb-4">
+                    <div className="mb-4 flex items-center gap-4">
                         <Link href={route('admin.pengawasan-single-iin.index')}>
                             <Button variant="outline" size="sm">
-                                <ArrowLeft className="h-4 w-4 mr-2" />
+                                <ArrowLeft className="mr-2 h-4 w-4" />
                                 Kembali
                             </Button>
                         </Link>
                         <div>
-                            <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                                Detail Pengawasan Single IIN
-                            </h2>
-                            <p className="text-gray-600 text-sm">
-                                {application.application_number}
-                            </p>
+                            <h2 className="text-xl leading-tight font-semibold text-gray-800">Detail Pengawasan Single IIN</h2>
+                            <p className="text-sm text-gray-600">{application.application_number}</p>
                         </div>
                     </div>
 
@@ -458,12 +425,12 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                         {application.status == 'pengajuan' && (
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white">
+                                    <Button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700">
                                         <CreditCard className="mr-2 h-4 w-4" />
                                         Lanjutkan ke Pembayaran
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Upload Dokumen Pembayaran</DialogTitle>
                                         <DialogDescription>
@@ -484,13 +451,14 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     multiple
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files || []);
-                                                        files.forEach(file => addPaymentDocument(file));
+                                                        files.forEach((file) => addPaymentDocument(file));
                                                         e.target.value = ''; // Reset input
                                                     }}
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                    beberapa file sekaligus.
                                                 </p>
                                             </div>
 
@@ -548,7 +516,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                             <Button
                                                 onClick={handleStatusChangeToPayment}
                                                 disabled={loading || paymentDocuments.length === 0}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                className="bg-blue-600 text-white hover:bg-blue-700"
                                             >
                                                 {loading ? 'Memproses...' : 'Upload'}
                                             </Button>
@@ -561,12 +529,12 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                         {application.status == 'pembayaran' && (
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <Button className="bg-green-600 hover:bg-green-700 text-white">
+                                    <Button className="bg-green-600 text-white hover:bg-green-700">
                                         <CheckCircle className="mr-2 h-4 w-4" />
                                         Proses ke Verifikasi Lapangan
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Upload Dokumen Verifikasi Lapangan</DialogTitle>
                                         <DialogDescription>
@@ -589,7 +557,8 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                    beberapa file sekaligus.
                                                 </p>
                                             </div>
 
@@ -648,7 +617,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                             <Button
                                                 onClick={handleStatusChangeToFieldVerification}
                                                 disabled={loading || fieldVerificationDocuments.length === 0}
-                                                className="bg-green-600 hover:bg-green-700 text-white"
+                                                className="bg-green-600 text-white hover:bg-green-700"
                                             >
                                                 {loading ? 'Memproses...' : 'Upload dan Lanjutkan'}
                                             </Button>
@@ -667,7 +636,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                         Proses ke Pembayaran Tahap 2
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Proses ke Pembayaran Tahap 2</DialogTitle>
                                         <DialogDescription>
@@ -694,7 +663,8 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                    beberapa file sekaligus.
                                                 </p>
                                             </div>
 
@@ -752,7 +722,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                         <DialogClose asChild>
                                             <Button
                                                 onClick={handleProcessToSecondPayment}
-                                                className="bg-green-600 hover:bg-green-700 text-white"
+                                                className="bg-green-600 text-white hover:bg-green-700"
                                                 disabled={loading || paymentDocuments.length === 0}
                                             >
                                                 {loading ? 'Memproses...' : 'Proses ke Pembayaran Tahap 2'}
@@ -767,12 +737,12 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                         {canIssuePengawasan && (
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <Button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white">
+                                    <Button className="bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700">
                                         <CheckCircle className="mr-2 h-4 w-4" />
                                         Terbitkan Pengawasan
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Terbitkan Dokumen Pengawasan</DialogTitle>
                                         <DialogDescription>
@@ -793,13 +763,14 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     multiple
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files || []);
-                                                        setVerificationCompletionFiles(prev => [...prev, ...files]);
+                                                        setVerificationCompletionFiles((prev) => [...prev, ...files]);
                                                         e.target.value = ''; // Reset input
                                                     }}
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                    beberapa file sekaligus.
                                                 </p>
                                             </div>
 
@@ -857,7 +828,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                         <DialogClose asChild>
                                             <Button
                                                 onClick={handleCompleteFieldVerification}
-                                                className="bg-green-600 hover:bg-green-700 text-white"
+                                                className="bg-green-600 text-white hover:bg-green-700"
                                                 disabled={loading || verificationCompletionFiles.length === 0}
                                             >
                                                 {loading ? 'Memproses...' : 'Terbitkan Pengawasan'}
@@ -887,37 +858,29 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <Label className="text-sm font-medium text-gray-500">Nomor Aplikasi</Label>
-                                    <p className="text-sm font-mono">{application.application_number}</p>
+                                    <p className="font-mono text-sm">{application.application_number}</p>
                                 </div>
                                 <div>
                                     <Label className="text-sm font-medium text-gray-500">Status</Label>
                                     <div className="mt-1">
-                                        <Badge className={getStatusBadgeClass(application.status)}>
-                                            {getStatusLabel(application.status)}
-                                        </Badge>
+                                        <Badge className={getStatusBadgeClass(application.status)}>{getStatusLabel(application.status)}</Badge>
                                     </div>
                                 </div>
                                 <div>
                                     <Label className="text-sm font-medium text-gray-500">Tanggal Dibuat</Label>
-                                    <p className="text-sm">
-                                        {format(new Date(application.created_at), 'dd MMMM yyyy HH:mm', { locale: id })}
-                                    </p>
+                                    <p className="text-sm">{format(new Date(application.created_at), 'dd MMMM yyyy HH:mm', { locale: id })}</p>
                                 </div>
                                 <div>
                                     <Label className="text-sm font-medium text-gray-500">Terakhir Diperbarui</Label>
-                                    <p className="text-sm">
-                                        {format(new Date(application.updated_at), 'dd MMMM yyyy HH:mm', { locale: id })}
-                                    </p>
+                                    <p className="text-sm">{format(new Date(application.updated_at), 'dd MMMM yyyy HH:mm', { locale: id })}</p>
                                 </div>
                                 {application.issued_at && (
                                     <div>
                                         <Label className="text-sm font-medium text-gray-500">Tanggal Terbit</Label>
-                                        <p className="text-sm">
-                                            {format(new Date(application.issued_at), 'dd MMMM yyyy', { locale: id })}
-                                        </p>
+                                        <p className="text-sm">{format(new Date(application.issued_at), 'dd MMMM yyyy', { locale: id })}</p>
                                     </div>
                                 )}
                             </div>
@@ -929,7 +892,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                             <CardTitle>Informasi Pemohon</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <Label className="text-sm font-medium text-gray-500">Nama</Label>
                                     <p className="text-sm">{application.user.name}</p>
@@ -947,7 +910,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                             <CardTitle>Profil Single IIN</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <Label className="text-sm font-medium text-gray-500">Nama Perusahaan</Label>
                                     <p className="text-sm">{application.single_iin_profile.contact_person}</p>
@@ -1020,16 +983,16 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                     Dokumen Verifikasi Lapangan
                                 </CardTitle>
                                 <CardDescription>
-                                    Diupload pada: {application.field_verification_documents_uploaded_at
+                                    Diupload pada:{' '}
+                                    {application.field_verification_documents_uploaded_at
                                         ? format(new Date(application.field_verification_documents_uploaded_at), 'dd MMMM yyyy HH:mm', { locale: id })
-                                        : '-'
-                                    }
+                                        : '-'}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-2">
                                     {application.field_verification_documents.map((doc, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div key={index} className="flex items-center justify-between rounded-lg border p-3">
                                             <div className="flex items-center gap-3">
                                                 <FileText className="h-4 w-4 text-gray-500" />
                                                 <span className="text-sm">{doc.original_name}</span>
@@ -1037,9 +1000,17 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => window.open(route('admin.pengawasan-single-iin.download-field-verification-document', [application.id, index]), '_blank')}
+                                                onClick={() =>
+                                                    window.open(
+                                                        route('admin.pengawasan-single-iin.download-field-verification-document', [
+                                                            application.id,
+                                                            index,
+                                                        ]),
+                                                        '_blank',
+                                                    )
+                                                }
                                             >
-                                                <Download className="h-4 w-4 mr-2" />
+                                                <Download className="mr-2 h-4 w-4" />
                                                 Unduh
                                             </Button>
                                         </div>
@@ -1059,15 +1030,13 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                     <FileText className="h-5 w-5" />
                                     Dokumen Pengawasan Terbit
                                 </CardTitle>
-                                <CardDescription>
-                                    Dokumen yang diterbitkan setelah proses pengawasan selesai
-                                </CardDescription>
+                                <CardDescription>Dokumen yang diterbitkan setelah proses pengawasan selesai</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 {application.issuance_documents && application.issuance_documents.length > 0 ? (
                                     <div className="space-y-2">
                                         {application.issuance_documents.map((document, index) => (
-                                            <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                                            <div key={index} className="flex items-center justify-between rounded-lg border p-3">
                                                 <div className="flex items-center gap-3">
                                                     <FileText className="h-4 w-4 text-gray-500" />
                                                     <span className="text-sm">{document.original_name}</span>
@@ -1075,21 +1044,24 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => window.open(route('admin.pengawasan-single-iin.download-issuance-document', [application.id, index]), '_blank')}
+                                                    onClick={() =>
+                                                        window.open(
+                                                            route('admin.pengawasan-single-iin.download-issuance-document', [application.id, index]),
+                                                            '_blank',
+                                                        )
+                                                    }
                                                 >
-                                                    <Download className="h-4 w-4 mr-2" />
+                                                    <Download className="mr-2 h-4 w-4" />
                                                     Unduh
                                                 </Button>
                                             </div>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-center py-8">
-                                        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                        <p className="text-gray-500 text-lg">Dokumen Belum Tersedia</p>
-                                        <p className="text-gray-400 text-sm mt-2">
-                                            Dokumen akan tersedia setelah proses pengawasan selesai.
-                                        </p>
+                                    <div className="py-8 text-center">
+                                        <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                        <p className="text-lg text-gray-500">Dokumen Belum Tersedia</p>
+                                        <p className="mt-2 text-sm text-gray-400">Dokumen akan tersedia setelah proses pengawasan selesai.</p>
                                     </div>
                                 )}
                             </CardContent>
@@ -1106,13 +1078,13 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-2">
-                                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                                    <div className="flex items-center justify-between rounded-lg border p-3">
                                         <div className="flex items-center gap-3">
                                             <FileText className="h-4 w-4 text-gray-500" />
                                             <span className="text-sm">Surat Pernyataan Penggunaan QRIS</span>
                                         </div>
                                         <Button onClick={() => downloadFile('qris')}>
-                                            <Download className="h-4 w-4 mr-2" />
+                                            <Download className="mr-2 h-4 w-4" />
                                             Unduh
                                         </Button>
                                     </div>
@@ -1128,15 +1100,13 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                 <CreditCard className="h-5 w-5" />
                                 Bukti Pembayaran dari User
                             </CardTitle>
-                            <CardDescription>
-                                Dokumen bukti pembayaran yang diupload oleh user
-                            </CardDescription>
+                            <CardDescription>Dokumen bukti pembayaran yang diupload oleh user</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {application.payment_proof_documents && application.payment_proof_documents.length > 0 ? (
                                 <div className="space-y-2">
                                     {application.payment_proof_documents.map((doc, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div key={index} className="flex items-center justify-between rounded-lg border p-3">
                                             <div className="flex items-center gap-3">
                                                 <CreditCard className="h-4 w-4 text-gray-500" />
                                                 <div>
@@ -1152,21 +1122,24 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => window.open(route('admin.pengawasan-single-iin.download-payment-proof', [application.id, index]), '_blank')}
+                                                onClick={() =>
+                                                    window.open(
+                                                        route('admin.pengawasan-single-iin.download-payment-proof', [application.id, index]),
+                                                        '_blank',
+                                                    )
+                                                }
                                             >
-                                                <Download className="h-4 w-4 mr-2" />
+                                                <Download className="mr-2 h-4 w-4" />
                                                 Unduh
                                             </Button>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-8">
-                                    <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500 text-lg">Belum Ada Bukti Pembayaran</p>
-                                    <p className="text-gray-400 text-sm mt-2">
-                                        Bukti pembayaran akan muncul setelah diupload oleh user.
-                                    </p>
+                                <div className="py-8 text-center">
+                                    <CreditCard className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-lg text-gray-500">Belum Ada Bukti Pembayaran</p>
+                                    <p className="mt-2 text-sm text-gray-400">Bukti pembayaran akan muncul setelah diupload oleh user.</p>
                                 </div>
                             )}
                         </CardContent>
@@ -1179,15 +1152,13 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                 <FileText className="h-5 w-5" />
                                 Dokumen Pembayaran
                             </CardTitle>
-                            <CardDescription>
-                                Dokumen pembayaran resmi dari sistem
-                            </CardDescription>
+                            <CardDescription>Dokumen pembayaran resmi dari sistem</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {application.payment_documents && application.payment_documents.length > 0 ? (
                                 <div className="space-y-2">
                                     {application.payment_documents.map((doc, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div key={index} className="flex items-center justify-between rounded-lg border p-3">
                                             <div className="flex items-center gap-3">
                                                 <FileText className="h-4 w-4 text-gray-500" />
                                                 <div>
@@ -1195,7 +1166,9 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     <p className="text-xs text-gray-500">
                                                         Diupload pada{' '}
                                                         {application.payment_documents_uploaded_at
-                                                            ? format(new Date(application.payment_documents_uploaded_at), 'dd MMMM yyyy', { locale: id })
+                                                            ? format(new Date(application.payment_documents_uploaded_at), 'dd MMMM yyyy', {
+                                                                  locale: id,
+                                                              })
                                                             : '-'}
                                                     </p>
                                                 </div>
@@ -1203,21 +1176,24 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => window.open(route('admin.pengawasan-single-iin.download-payment-document', [application.id, index]), '_blank')}
+                                                onClick={() =>
+                                                    window.open(
+                                                        route('admin.pengawasan-single-iin.download-payment-document', [application.id, index]),
+                                                        '_blank',
+                                                    )
+                                                }
                                             >
-                                                <Download className="h-4 w-4 mr-2" />
+                                                <Download className="mr-2 h-4 w-4" />
                                                 Unduh
                                             </Button>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-8">
-                                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500 text-lg">Belum Ada Dokumen Pembayaran</p>
-                                    <p className="text-gray-400 text-sm mt-2">
-                                        Dokumen pembayaran akan muncul setelah diupload.
-                                    </p>
+                                <div className="py-8 text-center">
+                                    <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-lg text-gray-500">Belum Ada Dokumen Pembayaran</p>
+                                    <p className="mt-2 text-sm text-gray-400">Dokumen pembayaran akan muncul setelah diupload.</p>
                                 </div>
                             )}
                         </CardContent>
@@ -1230,15 +1206,13 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                 <CreditCard className="h-5 w-5" />
                                 Bukti Pembayaran Tahap 2 dari User
                             </CardTitle>
-                            <CardDescription>
-                                Dokumen bukti pembayaran tahap 2 yang diupload oleh user
-                            </CardDescription>
+                            <CardDescription>Dokumen bukti pembayaran tahap 2 yang diupload oleh user</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {application.payment_proof_documents_stage_2 && application.payment_proof_documents_stage_2.length > 0 ? (
                                 <div className="space-y-2">
                                     {application.payment_proof_documents_stage_2.map((doc, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div key={index} className="flex items-center justify-between rounded-lg border p-3">
                                             <div className="flex items-center gap-3">
                                                 <CreditCard className="h-4 w-4 text-gray-500" />
                                                 <div>
@@ -1246,7 +1220,9 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     <p className="text-xs text-gray-500">
                                                         Diupload pada{' '}
                                                         {application.payment_proof_uploaded_at_stage_2
-                                                            ? format(new Date(application.payment_proof_uploaded_at_stage_2), 'dd MMMM yyyy', { locale: id })
+                                                            ? format(new Date(application.payment_proof_uploaded_at_stage_2), 'dd MMMM yyyy', {
+                                                                  locale: id,
+                                                              })
                                                             : '-'}
                                                     </p>
                                                 </div>
@@ -1254,21 +1230,24 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => window.open(route('admin.pengawasan-single-iin.download-payment-proof-stage-2', [application.id, index]), '_blank')}
+                                                onClick={() =>
+                                                    window.open(
+                                                        route('admin.pengawasan-single-iin.download-payment-proof-stage-2', [application.id, index]),
+                                                        '_blank',
+                                                    )
+                                                }
                                             >
-                                                <Download className="h-4 w-4 mr-2" />
+                                                <Download className="mr-2 h-4 w-4" />
                                                 Unduh
                                             </Button>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-8">
-                                    <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500 text-lg">Belum Ada Bukti Pembayaran Tahap 2</p>
-                                    <p className="text-gray-400 text-sm mt-2">
-                                        Bukti pembayaran tahap 2 akan muncul setelah diupload oleh user.
-                                    </p>
+                                <div className="py-8 text-center">
+                                    <CreditCard className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-lg text-gray-500">Belum Ada Bukti Pembayaran Tahap 2</p>
+                                    <p className="mt-2 text-sm text-gray-400">Bukti pembayaran tahap 2 akan muncul setelah diupload oleh user.</p>
                                 </div>
                             )}
                         </CardContent>
@@ -1281,15 +1260,13 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                 <FileText className="h-5 w-5" />
                                 Dokumen Pembayaran Tahap 2
                             </CardTitle>
-                            <CardDescription>
-                                Dokumen pembayaran tahap 2 resmi dari sistem
-                            </CardDescription>
+                            <CardDescription>Dokumen pembayaran tahap 2 resmi dari sistem</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {application.payment_documents_stage_2 && application.payment_documents_stage_2.length > 0 ? (
                                 <div className="space-y-2">
                                     {application.payment_documents_stage_2.map((doc, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div key={index} className="flex items-center justify-between rounded-lg border p-3">
                                             <div className="flex items-center gap-3">
                                                 <FileText className="h-4 w-4 text-gray-500" />
                                                 <div>
@@ -1297,7 +1274,9 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     <p className="text-xs text-gray-500">
                                                         Diupload pada{' '}
                                                         {application.payment_documents_uploaded_at_stage_2
-                                                            ? format(new Date(application.payment_documents_uploaded_at_stage_2), 'dd MMMM yyyy', { locale: id })
+                                                            ? format(new Date(application.payment_documents_uploaded_at_stage_2), 'dd MMMM yyyy', {
+                                                                  locale: id,
+                                                              })
                                                             : '-'}
                                                     </p>
                                                 </div>
@@ -1305,21 +1284,27 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => window.open(route('admin.pengawasan-single-iin.download-payment-document-stage-2', [application.id, index]), '_blank')}
+                                                onClick={() =>
+                                                    window.open(
+                                                        route('admin.pengawasan-single-iin.download-payment-document-stage-2', [
+                                                            application.id,
+                                                            index,
+                                                        ]),
+                                                        '_blank',
+                                                    )
+                                                }
                                             >
-                                                <Download className="h-4 w-4 mr-2" />
+                                                <Download className="mr-2 h-4 w-4" />
                                                 Unduh
                                             </Button>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-8">
-                                    <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500 text-lg">Belum Ada Dokumen Pembayaran Tahap 2</p>
-                                    <p className="text-gray-400 text-sm mt-2">
-                                        Dokumen pembayaran tahap 2 akan muncul setelah diupload.
-                                    </p>
+                                <div className="py-8 text-center">
+                                    <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-lg text-gray-500">Belum Ada Dokumen Pembayaran Tahap 2</p>
+                                    <p className="mt-2 text-sm text-gray-400">Dokumen pembayaran tahap 2 akan muncul setelah diupload.</p>
                                 </div>
                             )}
                         </CardContent>
@@ -1332,15 +1317,13 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                 <Shield className="h-5 w-5" />
                                 Dokumen Verifikasi Lapangan
                             </CardTitle>
-                            <CardDescription>
-                                Dokumen hasil verifikasi lapangan
-                            </CardDescription>
+                            <CardDescription>Dokumen hasil verifikasi lapangan</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {application.field_verification_documents && application.field_verification_documents.length > 0 ? (
                                 <div className="space-y-2">
                                     {application.field_verification_documents.map((doc, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div key={index} className="flex items-center justify-between rounded-lg border p-3">
                                             <div className="flex items-center gap-3">
                                                 <Shield className="h-4 w-4 text-gray-500" />
                                                 <div>
@@ -1348,7 +1331,9 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     <p className="text-xs text-gray-500">
                                                         Diupload pada{' '}
                                                         {application.field_verification_documents_uploaded_at
-                                                            ? format(new Date(application.field_verification_documents_uploaded_at), 'dd MMMM yyyy', { locale: id })
+                                                            ? format(new Date(application.field_verification_documents_uploaded_at), 'dd MMMM yyyy', {
+                                                                  locale: id,
+                                                              })
                                                             : '-'}
                                                     </p>
                                                 </div>
@@ -1356,26 +1341,31 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => window.open(route('admin.pengawasan-single-iin.download-field-verification-document', [application.id, index]), '_blank')}
+                                                onClick={() =>
+                                                    window.open(
+                                                        route('admin.pengawasan-single-iin.download-field-verification-document', [
+                                                            application.id,
+                                                            index,
+                                                        ]),
+                                                        '_blank',
+                                                    )
+                                                }
                                             >
-                                                <Download className="h-4 w-4 mr-2" />
+                                                <Download className="mr-2 h-4 w-4" />
                                                 Unduh
                                             </Button>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-8">
-                                    <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500 text-lg">Belum Ada Dokumen Verifikasi</p>
-                                    <p className="text-gray-400 text-sm mt-2">
-                                        Dokumen verifikasi lapangan akan muncul setelah diupload.
-                                    </p>
+                                <div className="py-8 text-center">
+                                    <Shield className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-lg text-gray-500">Belum Ada Dokumen Verifikasi</p>
+                                    <p className="mt-2 text-sm text-gray-400">Dokumen verifikasi lapangan akan muncul setelah diupload.</p>
                                 </div>
                             )}
                         </CardContent>
                     </Card>
-
                 </TabsContent>
 
                 <TabsContent value="history" className="space-y-6">
@@ -1385,18 +1375,14 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                 <Clock className="h-5 w-5" />
                                 Riwayat Status
                             </CardTitle>
-                            <CardDescription>
-                                Riwayat perubahan status aplikasi pengawasan
-                            </CardDescription>
+                            <CardDescription>Riwayat perubahan status aplikasi pengawasan</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {statusLogs.length === 0 ? (
-                                <div className="text-center py-8">
-                                    <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500 text-lg">Belum Ada Riwayat Status</p>
-                                    <p className="text-gray-400 text-sm mt-2">
-                                        Riwayat perubahan status akan muncul di sini.
-                                    </p>
+                                <div className="py-8 text-center">
+                                    <Clock className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-lg text-gray-500">Belum Ada Riwayat Status</p>
+                                    <p className="mt-2 text-sm text-gray-400">Riwayat perubahan status akan muncul di sini.</p>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
@@ -1406,25 +1392,17 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                 <div className={`flex h-8 w-8 items-center justify-center rounded-full`}>
                                                     <FileText className="h-4 w-4" />
                                                 </div>
-                                                {index < statusLogs.length - 1 && (
-                                                    <div className="mt-2 h-8 w-px bg-gray-200" />
-                                                )}
+                                                {index < statusLogs.length - 1 && <div className="mt-2 h-8 w-px bg-gray-200" />}
                                             </div>
                                             <div className="flex-1 pb-4">
                                                 <div className="flex items-center gap-2">
-                                                    <p className="font-medium text-gray-900">
-                                                        Status diubah ke: {getStatusLabel(log.status_to)}
-                                                    </p>
-                                                    <span className="text-sm text-gray-500">
-                                                        oleh {log.changed_by.name}
-                                                    </span>
+                                                    <p className="font-medium text-gray-900">Status diubah ke: {getStatusLabel(log.status_to)}</p>
+                                                    <span className="text-sm text-gray-500">oleh {log.changed_by.name}</span>
                                                 </div>
                                                 <p className="text-sm text-gray-500">
                                                     {format(new Date(log.created_at), 'dd MMMM yyyy HH:mm', { locale: id })}
                                                 </p>
-                                                {log.notes && (
-                                                    <p className="mt-1 text-sm text-gray-700">{log.notes}</p>
-                                                )}
+                                                {log.notes && <p className="mt-1 text-sm text-gray-700">{log.notes}</p>}
                                             </div>
                                         </div>
                                     ))}

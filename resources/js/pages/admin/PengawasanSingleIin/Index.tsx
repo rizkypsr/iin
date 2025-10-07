@@ -1,11 +1,10 @@
-import React from 'react';
-import { Head, Link, router } from '@inertiajs/react';
-import DashboardLayout from '@/layouts/dashboard-layout';
-import { PageProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import DashboardLayout from '@/layouts/dashboard-layout';
+import { PageProps } from '@/types';
+import { Head, Link } from '@inertiajs/react';
 import { Eye, Shield } from 'lucide-react';
 
 interface PengawasanSingleIinApplication {
@@ -44,7 +43,7 @@ interface PengawasanSingleIinApplication {
         remarks_status: string;
         card_specimen: string;
         previous_name: string;
-    }
+    };
 }
 
 interface Props extends PageProps {
@@ -95,16 +94,11 @@ const getStatusLabel = (status: string) => {
 
 export default function Index({ auth, applications, application_counts }: Props) {
     return (
-        <DashboardLayout
-            user={auth.user}
-            title="Admin - Pengawasan Single IIN"
-        >
+        <DashboardLayout user={auth.user} title="Admin - Pengawasan Single IIN">
             <Head title="Admin - Pengawasan Single IIN" />
 
             <div className="mb-8">
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Manajemen Aplikasi Pengawasan Single IIN
-                </h2>
+                <h2 className="text-xl leading-tight font-semibold text-gray-800">Manajemen Aplikasi Pengawasan Single IIN</h2>
             </div>
 
             <div>
@@ -118,10 +112,10 @@ export default function Index({ auth, applications, application_counts }: Props)
                         </CardHeader>
                         <CardContent>
                             {applications.data.length === 0 ? (
-                                <div className="text-center py-8">
-                                    <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500 text-lg">Belum Ada Aplikasi</p>
-                                    <p className="text-gray-400 text-sm mt-2">
+                                <div className="py-8 text-center">
+                                    <Shield className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-lg text-gray-500">Belum Ada Aplikasi</p>
+                                    <p className="mt-2 text-sm text-gray-400">
                                         Tidak ada aplikasi Pengawasan Single IIN yang tersedia untuk ditinjau.
                                     </p>
                                 </div>
@@ -140,9 +134,7 @@ export default function Index({ auth, applications, application_counts }: Props)
                                     <TableBody>
                                         {applications.data.map((application) => (
                                             <TableRow key={application.id}>
-                                                <TableCell className="font-medium">
-                                                    {application.application_number}
-                                                </TableCell>
+                                                <TableCell className="font-medium">{application.application_number}</TableCell>
                                                 <TableCell>
                                                     <div>
                                                         <p className="font-medium">{application.single_iin_profile.institution_name}</p>
@@ -155,19 +147,14 @@ export default function Index({ auth, applications, application_counts }: Props)
                                                         <p className="text-sm text-gray-500">{application.single_iin_profile.email}</p>
                                                     </div>
                                                 </TableCell>
+                                                <TableCell>{getStatusBadge(application.status)}</TableCell>
                                                 <TableCell>
-                                                    {getStatusBadge(application.status)}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {application.submitted_at
-                                                        ? new Date(application.submitted_at).toLocaleDateString('id-ID')
-                                                        : '-'
-                                                    }
+                                                    {application.submitted_at ? new Date(application.submitted_at).toLocaleDateString('id-ID') : '-'}
                                                 </TableCell>
                                                 <TableCell>
                                                     <Link href={route('admin.pengawasan-single-iin.show', application.id)}>
                                                         <Button variant="outline" size="sm">
-                                                            <Eye className="h-4 w-4 mr-1" />
+                                                            <Eye className="mr-1 h-4 w-4" />
                                                             Lihat
                                                         </Button>
                                                     </Link>

@@ -1,18 +1,18 @@
 import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { LoaderCircle, Key, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Key, LoaderCircle } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
 import FlashMessage from '@/components/flash-message';
+import IinNasionalProfileForm from '@/components/iin-nasional-profile-form';
 import InputError from '@/components/input-error';
+import SingleIinProfileForm from '@/components/single-iin-profile-form';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import DashboardLayout from '@/layouts/dashboard-layout';
-import IinNasionalProfileForm from '@/components/iin-nasional-profile-form';
-import SingleIinProfileForm from '@/components/single-iin-profile-form';
 
 type CreateUserForm = {
     name: string;
@@ -157,13 +157,15 @@ export default function CreateUser({ flash, application_counts }: CreateUserProp
         created_at: '2024-01-01T00:00:00.000000Z',
         updated_at: '2024-01-01T00:00:00.000000Z',
         role: 'admin' as const,
-        roles: [{
-            id: 1,
-            name: 'admin',
-            guard_name: 'web',
-            created_at: '2024-01-01T00:00:00.000000Z',
-            updated_at: '2024-01-01T00:00:00.000000Z',
-        }],
+        roles: [
+            {
+                id: 1,
+                name: 'admin',
+                guard_name: 'web',
+                created_at: '2024-01-01T00:00:00.000000Z',
+                updated_at: '2024-01-01T00:00:00.000000Z',
+            },
+        ],
     };
 
     return (
@@ -275,18 +277,18 @@ export default function CreateUser({ flash, application_counts }: CreateUserProp
                                                 />
                                                 <Label
                                                     htmlFor="use-default-password"
-                                                    className="text-sm font-medium text-gray-700 cursor-pointer flex items-center gap-2"
+                                                    className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700"
                                                 >
                                                     <Key className="h-4 w-4" />
                                                     Gunakan password default
                                                 </Label>
                                             </div>
                                             {useDefaultPassword && (
-                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
                                                     <p className="text-sm text-blue-800">
                                                         <strong>Password default:</strong> {defaultPassword}
                                                     </p>
-                                                    <p className="text-xs text-blue-600 mt-1">
+                                                    <p className="mt-1 text-xs text-blue-600">
                                                         User dapat mengubah password setelah login pertama kali.
                                                     </p>
                                                 </div>
@@ -300,7 +302,7 @@ export default function CreateUser({ flash, application_counts }: CreateUserProp
                                             <div className="relative">
                                                 <Input
                                                     id="password"
-                                                    type={showPassword ? "text" : "password"}
+                                                    type={showPassword ? 'text' : 'password'}
                                                     required
                                                     value={data.password}
                                                     onChange={(e) => setData('password', e.target.value)}
@@ -314,11 +316,7 @@ export default function CreateUser({ flash, application_counts }: CreateUserProp
                                                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
                                                     disabled={processing}
                                                 >
-                                                    {showPassword ? (
-                                                        <EyeOff className="h-4 w-4" />
-                                                    ) : (
-                                                        <Eye className="h-4 w-4" />
-                                                    )}
+                                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                                 </button>
                                             </div>
                                             <InputError message={errors.password} className="text-xs" />

@@ -1,16 +1,14 @@
 import InputError from '@/components/input-error';
-import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
-import HeadingSmall from '@/components/heading-small';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, Lock, LogOut } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Link } from '@inertiajs/react';
+import { AlertTriangle, Lock, LogOut } from 'lucide-react';
 
 export default function ChangePassword() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -46,20 +44,16 @@ export default function ChangePassword() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
             <Head title="Ubah Password Wajib" />
-            
+
             <Card className="w-full max-w-md shadow-lg">
-                <CardHeader className="text-center space-y-4">
-                    <div className="mx-auto w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
-                        <Lock className="w-6 h-6 text-amber-600" />
+                <CardHeader className="space-y-4 text-center">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+                        <Lock className="h-6 w-6 text-amber-600" />
                     </div>
-                    <CardTitle className="text-2xl font-bold text-gray-900">
-                        Ubah Password Wajib
-                    </CardTitle>
-                    <CardDescription className="text-gray-600">
-                        Anda harus mengubah password default untuk melanjutkan
-                    </CardDescription>
+                    <CardTitle className="text-2xl font-bold text-gray-900">Ubah Password Wajib</CardTitle>
+                    <CardDescription className="text-gray-600">Anda harus mengubah password default untuk melanjutkan</CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
@@ -124,32 +118,30 @@ export default function ChangePassword() {
                             <InputError message={errors.password_confirmation} className="text-xs" />
                         </div>
 
-                    <div className="pt-4 space-y-3">
-                        <Button 
-                            type="submit"
-                            disabled={processing}
-                            className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200"
-                        >
-                            {processing ? 'Mengubah Password...' : 'Ubah Password'}
-                        </Button>
-                        
-                        <Link
-                            href={route('logout')}
-                            method="post"
-                            as="button"
-                            onBefore={() => confirm('Apakah Anda yakin ingin keluar dari sistem?')}
-                            className="w-full h-11 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-colors duration-200 rounded-md flex items-center justify-center gap-2 border border-gray-300"
-                        >
-                            <LogOut className="h-4 w-4" />
-                            Keluar
-                        </Link>
-                    </div>
+                        <div className="space-y-3 pt-4">
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                className="h-11 w-full bg-blue-600 font-medium text-white transition-colors duration-200 hover:bg-blue-700"
+                            >
+                                {processing ? 'Mengubah Password...' : 'Ubah Password'}
+                            </Button>
+
+                            <Link
+                                href={route('logout')}
+                                method="post"
+                                as="button"
+                                onBefore={() => confirm('Apakah Anda yakin ingin keluar dari sistem?')}
+                                className="flex h-11 w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-gray-100 font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200"
+                            >
+                                <LogOut className="h-4 w-4" />
+                                Keluar
+                            </Link>
+                        </div>
                     </form>
 
                     <div className="text-center">
-                        <p className="text-xs text-gray-500">
-                            Password harus minimal 8 karakter dan mengandung kombinasi huruf dan angka
-                        </p>
+                        <p className="text-xs text-gray-500">Password harus minimal 8 karakter dan mengandung kombinasi huruf dan angka</p>
                     </div>
                 </CardContent>
             </Card>

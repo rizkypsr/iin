@@ -22,7 +22,7 @@ import { PageProps } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Settings, Shield, Upload, X } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Shield, Upload, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface PaymentDocument {
@@ -119,7 +119,10 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
     const canCompleteFieldVerification = application.status === 'verifikasi-lapangan' && !application.field_verification_at;
 
     // Admin can change status from pembayaran-tahap-2 to menunggu-terbit when user has uploaded payment proof stage 2
-    const canChangeToWaitingForIssuance = application.status === 'pembayaran-tahap-2' && application.payment_proof_documents_stage_2 && application.payment_proof_documents_stage_2.length > 0;
+    const canChangeToWaitingForIssuance =
+        application.status === 'pembayaran-tahap-2' &&
+        application.payment_proof_documents_stage_2 &&
+        application.payment_proof_documents_stage_2.length > 0;
 
     const getStatusBadgeClass = (status: string) => {
         switch (status) {
@@ -228,24 +231,20 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
         });
 
         try {
-            router.post(
-                route('iin-single-blockholder.issue-iin-with-certificate', application.id),
-                formData,
-                {
-                    onSuccess: () => {
-                        showSuccessToast('IIN berhasil diterbitkan dan sertifikat diupload');
-                        setCertificateFile(null);
-                        setAdditionalDocuments([]);
-                    },
-                    onError: (errors) => {
-                        console.error('Error issuing IIN:', errors);
-                        showErrorToast('Gagal menerbitkan IIN. Silakan coba lagi.');
-                    },
-                    onFinish: () => {
-                        setLoading(false);
-                    },
+            router.post(route('iin-single-blockholder.issue-iin-with-certificate', application.id), formData, {
+                onSuccess: () => {
+                    showSuccessToast('IIN berhasil diterbitkan dan sertifikat diupload');
+                    setCertificateFile(null);
+                    setAdditionalDocuments([]);
                 },
-            );
+                onError: (errors) => {
+                    console.error('Error issuing IIN:', errors);
+                    showErrorToast('Gagal menerbitkan IIN. Silakan coba lagi.');
+                },
+                onFinish: () => {
+                    setLoading(false);
+                },
+            });
         } catch (error) {
             console.error('Error issuing IIN:', error);
             showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
@@ -268,7 +267,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
         paymentDocuments.forEach((file, index) => {
             formData.append(`payment_documents[${index}]`, file);
         });
-        
+
         // Add stage parameter based on current status
         const stage = application.status === 'pembayaran-tahap-2' ? '2' : '1';
         formData.append('stage', stage);
@@ -307,30 +306,26 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
         formData.append('status', 'verifikasi-lapangan');
         formData.append('notes', statusNotes || 'Status diubah ke verifikasi lapangan oleh admin');
         formData.append('upload_and_change_status', '1');
-        
+
         fieldVerificationDocuments.forEach((file, index) => {
             formData.append(`field_verification_documents[${index}]`, file);
         });
 
         try {
-            router.post(
-                route('iin-single-blockholder.upload-field-verification-documents', application.id),
-                formData,
-                {
-                    onSuccess: () => {
-                        showSuccessToast('Status berhasil diubah ke verifikasi lapangan');
-                        setStatusNotes('');
-                        setFieldVerificationDocuments([]);
-                    },
-                    onError: (errors) => {
-                        console.error('Error changing status:', errors);
-                        showErrorToast('Gagal mengubah status. Silakan coba lagi.');
-                    },
-                    onFinish: () => {
-                        setLoading(false);
-                    },
+            router.post(route('iin-single-blockholder.upload-field-verification-documents', application.id), formData, {
+                onSuccess: () => {
+                    showSuccessToast('Status berhasil diubah ke verifikasi lapangan');
+                    setStatusNotes('');
+                    setFieldVerificationDocuments([]);
                 },
-            );
+                onError: (errors) => {
+                    console.error('Error changing status:', errors);
+                    showErrorToast('Gagal mengubah status. Silakan coba lagi.');
+                },
+                onFinish: () => {
+                    setLoading(false);
+                },
+            });
         } catch (error) {
             console.error('Error changing status:', error);
             showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
@@ -350,7 +345,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
         paymentDocuments.forEach((file, index) => {
             formData.append(`payment_documents[${index}]`, file);
         });
-        
+
         // Add stage parameter for stage 2
         formData.append('stage', '2');
         formData.append('complete_field_verification', '1');
@@ -391,7 +386,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
         paymentDocuments.forEach((file, index) => {
             formData.append(`payment_documents[${index}]`, file);
         });
-        
+
         // Add stage parameter for stage 2
         formData.append('stage', '2');
         formData.append('status', 'pembayaran-tahap-2');
@@ -436,7 +431,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
     };
 
     const removePaymentDocument = (index: number) => {
-        setPaymentDocuments(prev => prev.filter((_, i) => i !== index));
+        setPaymentDocuments((prev) => prev.filter((_, i) => i !== index));
     };
 
     const addPaymentDocumentForStatusChange = (file: File) => {
@@ -444,11 +439,11 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
             showErrorToast(`File ${file.name} terlalu besar. Maksimal 10MB per file.`);
             return;
         }
-        setPaymentDocumentsForStatusChange(prev => [...prev, file]);
+        setPaymentDocumentsForStatusChange((prev) => [...prev, file]);
     };
 
     const removePaymentDocumentForStatusChange = (index: number) => {
-        setPaymentDocumentsForStatusChange(prev => prev.filter((_, i) => i !== index));
+        setPaymentDocumentsForStatusChange((prev) => prev.filter((_, i) => i !== index));
     };
 
     const downloadPaymentDocument = (index: number, stage?: string) => {
@@ -456,15 +451,12 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
             iinSingleBlockholder: application.id,
             index: index,
         };
-        
+
         if (stage) {
             params.stage = stage;
         }
-        
-        window.open(
-            route('iin-single-blockholder.download-payment-document', params),
-            '_blank',
-        );
+
+        window.open(route('iin-single-blockholder.download-payment-document', params), '_blank');
     };
 
     const downloadFile = (type: string, stage?: string) => {
@@ -472,15 +464,12 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
             iinSingleBlockholder: application.id,
             type: type,
         };
-        
+
         if (stage) {
             params.stage = stage;
         }
-        
-        window.open(
-            route('iin-single-blockholder.download-file', params),
-            '_blank',
-        );
+
+        window.open(route('iin-single-blockholder.download-file', params), '_blank');
     };
 
     const addFieldVerificationDocument = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -500,7 +489,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
     };
 
     const removeFieldVerificationDocument = (index: number) => {
-        setFieldVerificationDocuments(prev => prev.filter((_, i) => i !== index));
+        setFieldVerificationDocuments((prev) => prev.filter((_, i) => i !== index));
     };
 
     const downloadFieldVerificationDocument = (index: number) => {
@@ -536,18 +525,18 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                     </div>
                     <div className="flex items-center gap-3">
                         {/* Show status badge only when no action buttons are displayed */}
-                        {application.status !== 'pengajuan' && 
-                         application.status !== 'pembayaran' && 
-                         application.status !== 'verifikasi-lapangan' && 
-                         application.status !== 'pembayaran-tahap-2' && (
-                            <Badge className={getStatusBadgeClass(application.status)}>{getStatusLabel(application.status)}</Badge>
-                        )}
+                        {application.status !== 'pengajuan' &&
+                            application.status !== 'pembayaran' &&
+                            application.status !== 'verifikasi-lapangan' &&
+                            application.status !== 'pembayaran-tahap-2' && (
+                                <Badge className={getStatusBadgeClass(application.status)}>{getStatusLabel(application.status)}</Badge>
+                            )}
                         {application.iin_number && (
                             <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
                                 IIN: {application.iin_number}
                             </Badge>
                         )}
-                        
+
                         {/* Status Pengajuan - Tombol Perbaikan dan Proses ke Pembayaran Tahap 1 */}
                         {application.status === 'pengajuan' && (
                             <>
@@ -562,8 +551,8 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         <DialogHeader>
                                             <DialogTitle>Konfirmasi Kembalikan untuk Perbaikan</DialogTitle>
                                             <DialogDescription>
-                                                Apakah Anda yakin ingin mengembalikan aplikasi ini untuk <strong>perbaikan</strong>?
-                                                Pemohon akan diminta untuk memperbaiki dokumen atau informasi yang diperlukan.
+                                                Apakah Anda yakin ingin mengembalikan aplikasi ini untuk <strong>perbaikan</strong>? Pemohon akan
+                                                diminta untuk memperbaiki dokumen atau informasi yang diperlukan.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="space-y-4 py-4">
@@ -590,7 +579,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                     onClick={async () => {
                                                         await handleStatusUpdate('perbaikan');
                                                     }}
-                                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                                    className="bg-red-600 text-white hover:bg-red-700"
                                                     disabled={updatingStatus}
                                                 >
                                                     {updatingStatus ? 'Memproses...' : 'Ya, Kembalikan untuk Perbaikan'}
@@ -606,12 +595,12 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                             Proses ke Pembayaran Tahap 1
                                         </Button>
                                     </DialogTrigger>
-                                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                    <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                         <DialogHeader>
                                             <DialogTitle>Ubah Status ke Pembayaran</DialogTitle>
                                             <DialogDescription>
-                                                Upload dokumen pembayaran dan ubah status aplikasi ke <strong>pembayaran</strong>.
-                                                Dokumen ini akan tersedia untuk diunduh oleh pemohon.
+                                                Upload dokumen pembayaran dan ubah status aplikasi ke <strong>pembayaran</strong>. Dokumen ini akan
+                                                tersedia untuk diunduh oleh pemohon.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="space-y-6 py-4">
@@ -628,13 +617,14 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                         multiple
                                                         onChange={(e) => {
                                                             const files = Array.from(e.target.files || []);
-                                                            files.forEach(file => addPaymentDocumentForStatusChange(file));
+                                                            files.forEach((file) => addPaymentDocumentForStatusChange(file));
                                                             e.target.value = ''; // Reset input
                                                         }}
                                                         className="mt-1"
                                                     />
                                                     <p className="mt-1 text-xs text-gray-500">
-                                                        Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                        Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                        beberapa file sekaligus.
                                                     </p>
                                                 </div>
 
@@ -671,7 +661,10 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-medium text-gray-700">Dokumen yang Sudah Diupload:</Label>
                                                         {application.payment_documents.map((document, index) => (
-                                                            <div key={index} className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
+                                                            <div
+                                                                key={index}
+                                                                className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
+                                                            >
                                                                 <div className="flex items-center gap-2">
                                                                     <FileText className="h-4 w-4 text-gray-600" />
                                                                     <span className="text-sm text-gray-700">Dokumen Pembayaran {index + 1}</span>
@@ -708,23 +701,23 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                             <Button
                                                 onClick={async () => {
                                                     setUpdatingStatus(true);
-                                                    
+
                                                     try {
                                                         // Siapkan FormData untuk upload dokumen dan perubahan status bersamaan
                                                         const formData = new FormData();
-                                                        
+
                                                         // Tambahkan dokumen pembayaran jika ada
                                                         if (paymentDocumentsForStatusChange.length > 0) {
                                                             paymentDocumentsForStatusChange.forEach((file, index) => {
                                                                 formData.append(`payment_documents[${index}]`, file);
                                                             });
                                                         }
-                                                        
+
                                                         // Tambahkan parameter untuk perubahan status
                                                         formData.append('status', 'pembayaran');
                                                         formData.append('notes', statusNotes || 'Status diubah ke pembayaran oleh admin');
                                                         formData.append('upload_and_change_status', '1');
-                                                        
+
                                                         // Kirim request untuk upload dokumen dan ubah status bersamaan
                                                         router.post(
                                                             route('iin-single-blockholder.upload-payment-documents', application.id),
@@ -737,7 +730,9 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                                 },
                                                                 onError: (errors) => {
                                                                     console.error('Error uploading documents and changing status:', errors);
-                                                                    showErrorToast('Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.');
+                                                                    showErrorToast(
+                                                                        'Gagal mengupload dokumen atau mengubah status. Silakan coba lagi.',
+                                                                    );
                                                                 },
                                                                 onFinish: () => {
                                                                     setUpdatingStatus(false);
@@ -750,8 +745,12 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                         setUpdatingStatus(false);
                                                     }
                                                 }}
-                                                className="bg-blue-600 hover:bg-blue-700 text-white"
-                                                disabled={updatingStatus || (paymentDocumentsForStatusChange.length === 0 && (!application.payment_documents || application.payment_documents.length === 0))}
+                                                className="bg-blue-600 text-white hover:bg-blue-700"
+                                                disabled={
+                                                    updatingStatus ||
+                                                    (paymentDocumentsForStatusChange.length === 0 &&
+                                                        (!application.payment_documents || application.payment_documents.length === 0))
+                                                }
                                             >
                                                 {updatingStatus ? 'Memproses...' : 'Upload & Ubah Status'}
                                             </Button>
@@ -760,7 +759,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                 </Dialog>
                             </>
                         )}
-                        
+
                         {/* Status Pembayaran - Tombol Proses ke Verifikasi Lapangan */}
                         {application.status === 'pembayaran' && (
                             <Dialog>
@@ -770,7 +769,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         Proses ke Verifikasi Lapangan
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Proses ke Verifikasi Lapangan</DialogTitle>
                                         <DialogDescription>
@@ -794,7 +793,8 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                    beberapa file sekaligus.
                                                 </p>
                                             </div>
 
@@ -849,7 +849,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         <DialogClose asChild>
                                             <Button
                                                 onClick={handleStatusChangeToFieldVerification}
-                                                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                className="bg-indigo-600 text-white hover:bg-indigo-700"
                                                 disabled={loading || fieldVerificationDocuments.length === 0}
                                             >
                                                 {loading ? 'Memproses...' : 'Proses ke Verifikasi Lapangan'}
@@ -859,7 +859,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                 </DialogContent>
                             </Dialog>
                         )}
-                        
+
                         {/* Status Verifikasi Lapangan - Tombol Proses ke Pembayaran Tahap 2 */}
                         {application.status === 'verifikasi-lapangan' && (
                             <Dialog>
@@ -869,7 +869,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         Proses ke Pembayaran Tahap 2
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Proses ke Pembayaran Tahap 2</DialogTitle>
                                         <DialogDescription>
@@ -892,7 +892,8 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                    beberapa file sekaligus.
                                                 </p>
                                             </div>
 
@@ -947,7 +948,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         <DialogClose asChild>
                                             <Button
                                                 onClick={handleStatusChangeToPaymentStage2}
-                                                className="bg-green-600 hover:bg-green-700 text-white"
+                                                className="bg-green-600 text-white hover:bg-green-700"
                                                 disabled={loading || paymentDocuments.length === 0}
                                             >
                                                 {loading ? 'Memproses...' : 'Proses ke Pembayaran Tahap 2'}
@@ -957,59 +958,61 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                 </DialogContent>
                             </Dialog>
                         )}
-                        
+
                         {/* Status Pembayaran Tahap 2 - Tombol Terbitkan IIN */}
-                        {application.status === 'pembayaran-tahap-2' && application.payment_proof_documents_stage_2 && application.payment_proof_documents_stage_2.length > 0 && (
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline" size="sm" disabled={updatingStatus}>
-                                        <CheckCircle className="mr-1 h-4 w-4" />
-                                        Terbitkan IIN
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle>Terbitkan IIN</DialogTitle>
-                                        <DialogDescription>
-                                            Ubah status aplikasi menjadi <strong>menunggu terbit</strong>.
-                                            User telah mengunggah bukti pembayaran tahap 2.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="space-y-4 py-4">
-                                        <div>
-                                            <Label htmlFor="waiting_issuance_notes" className="text-sm font-medium text-gray-700">
-                                                Catatan (Opsional)
-                                            </Label>
-                                            <Textarea
-                                                id="waiting_issuance_notes"
-                                                value={statusNotes}
-                                                onChange={(e) => setStatusNotes(e.target.value)}
-                                                placeholder="Catatan untuk perubahan status ke menunggu terbit..."
-                                                rows={3}
-                                                className="mt-1"
-                                            />
+                        {application.status === 'pembayaran-tahap-2' &&
+                            application.payment_proof_documents_stage_2 &&
+                            application.payment_proof_documents_stage_2.length > 0 && (
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" size="sm" disabled={updatingStatus}>
+                                            <CheckCircle className="mr-1 h-4 w-4" />
+                                            Terbitkan IIN
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Terbitkan IIN</DialogTitle>
+                                            <DialogDescription>
+                                                Ubah status aplikasi menjadi <strong>menunggu terbit</strong>. User telah mengunggah bukti pembayaran
+                                                tahap 2.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="space-y-4 py-4">
+                                            <div>
+                                                <Label htmlFor="waiting_issuance_notes" className="text-sm font-medium text-gray-700">
+                                                    Catatan (Opsional)
+                                                </Label>
+                                                <Textarea
+                                                    id="waiting_issuance_notes"
+                                                    value={statusNotes}
+                                                    onChange={(e) => setStatusNotes(e.target.value)}
+                                                    placeholder="Catatan untuk perubahan status ke menunggu terbit..."
+                                                    rows={3}
+                                                    className="mt-1"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
-                                    <DialogFooter>
-                                        <DialogClose asChild>
-                                            <Button variant="outline">Batal</Button>
-                                        </DialogClose>
-                                        <DialogClose asChild>
-                                            <Button
-                                                onClick={async () => {
-                                                    await handleStatusUpdate('menunggu-terbit');
-                                                }}
-                                                className="bg-cyan-600 hover:bg-cyan-700 text-white"
-                                                disabled={updatingStatus}
-                                            >
-                                                {updatingStatus ? 'Memproses...' : 'Ya, Terbitkan IIN'}
-                                            </Button>
-                                        </DialogClose>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-                        )}
-                        
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button variant="outline">Batal</Button>
+                                            </DialogClose>
+                                            <DialogClose asChild>
+                                                <Button
+                                                    onClick={async () => {
+                                                        await handleStatusUpdate('menunggu-terbit');
+                                                    }}
+                                                    className="bg-cyan-600 text-white hover:bg-cyan-700"
+                                                    disabled={updatingStatus}
+                                                >
+                                                    {updatingStatus ? 'Memproses...' : 'Ya, Terbitkan IIN'}
+                                                </Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            )}
+
                         {canCompleteFieldVerification && (
                             <Dialog>
                                 <DialogTrigger asChild>
@@ -1018,11 +1021,12 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         Selesaikan Verifikasi Lapangan
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
                                         <DialogTitle>Selesaikan Verifikasi Lapangan</DialogTitle>
                                         <DialogDescription>
-                                            Upload dokumen pembayaran tahap 2 dan selesaikan verifikasi lapangan. Status aplikasi akan berubah menjadi <strong>menunggu terbit</strong>.
+                                            Upload dokumen pembayaran tahap 2 dan selesaikan verifikasi lapangan. Status aplikasi akan berubah menjadi{' '}
+                                            <strong>menunggu terbit</strong>.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="space-y-6 py-4">
@@ -1041,7 +1045,8 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
+                                                    beberapa file sekaligus.
                                                 </p>
                                             </div>
 
@@ -1096,7 +1101,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         <DialogClose asChild>
                                             <Button
                                                 onClick={handleCompleteFieldVerificationWithPayment}
-                                                className="bg-green-600 hover:bg-green-700 text-white"
+                                                className="bg-green-600 text-white hover:bg-green-700"
                                                 disabled={loading || paymentDocuments.length === 0}
                                             >
                                                 {loading ? 'Memproses...' : 'Selesaikan Verifikasi Lapangan'}
@@ -1106,7 +1111,6 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                 </DialogContent>
                             </Dialog>
                         )}
-
                     </div>
                 </div>
 
@@ -1143,8 +1147,6 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                 </AlertDescription>
                             </Alert>
                         )}
-
-
 
                         {application.status === 'terbit' && (
                             <Alert className="border-green-200 bg-green-50">
@@ -1222,7 +1224,6 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                 Terbitkan IIN
                             </TabsTrigger>
                         )}
-
                     </TabsList>
 
                     <TabsContent value="detail">
@@ -1333,11 +1334,15 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         <div>
                                             <p className="font-medium text-gray-800">Bukti Pembayaran Tahap 1</p>
                                             <p className="text-sm text-gray-500">
-                                                {(application.payment_proof_path || (application.payment_proof_documents && application.payment_proof_documents.length > 0)) ? 'Bukti pembayaran tahap 1 telah diupload' : 'Belum ada bukti pembayaran tahap 1'}
+                                                {application.payment_proof_path ||
+                                                (application.payment_proof_documents && application.payment_proof_documents.length > 0)
+                                                    ? 'Bukti pembayaran tahap 1 telah diupload'
+                                                    : 'Belum ada bukti pembayaran tahap 1'}
                                             </p>
                                         </div>
                                     </div>
-                                    {(application.payment_proof_path || (application.payment_proof_documents && application.payment_proof_documents.length > 0)) && (
+                                    {(application.payment_proof_path ||
+                                        (application.payment_proof_documents && application.payment_proof_documents.length > 0)) && (
                                         <Button variant="outline" size="sm" onClick={() => downloadFile('payment_proof', '1')}>
                                             <Download className="mr-1 h-4 w-4" />
                                             Download
@@ -1346,7 +1351,9 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                 </div>
 
                                 {/* Payment Proof Tahap 2 */}
-                                {(application.payment_proof_documents_stage_2 || application.status === 'pembayaran-tahap-2' || application.payment_verified_at_stage_2) && (
+                                {(application.payment_proof_documents_stage_2 ||
+                                    application.status === 'pembayaran-tahap-2' ||
+                                    application.payment_verified_at_stage_2) && (
                                     <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3">
                                         <div className="flex items-center gap-3">
                                             <div className="rounded-lg bg-red-100 p-2">
@@ -1355,7 +1362,9 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                             <div>
                                                 <p className="font-medium text-gray-800">Bukti Pembayaran Tahap 2</p>
                                                 <p className="text-sm text-gray-500">
-                                                    {application.payment_proof_documents_stage_2 ? 'Bukti pembayaran tahap 2 telah diupload' : 'Belum ada bukti pembayaran tahap 2'}
+                                                    {application.payment_proof_documents_stage_2
+                                                        ? 'Bukti pembayaran tahap 2 telah diupload'
+                                                        : 'Belum ada bukti pembayaran tahap 2'}
                                                 </p>
                                             </div>
                                         </div>
@@ -1386,7 +1395,10 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                             </div>
                                         </div>
                                         {application.payment_documents.map((doc, index) => (
-                                            <div key={index} className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2">
+                                            <div
+                                                key={index}
+                                                className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2"
+                                            >
                                                 <div className="flex items-center gap-2">
                                                     <FileText className="h-4 w-4 text-gray-600" />
                                                     <span className="text-sm text-gray-700">Dokumen {index + 1}</span>
@@ -1412,13 +1424,18 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                 <p className="text-sm text-gray-500">
                                                     {application.payment_documents_stage_2.length} dokumen diupload pada{' '}
                                                     {application.payment_documents_uploaded_at_stage_2
-                                                        ? format(new Date(application.payment_documents_uploaded_at_stage_2), 'dd MMMM yyyy', { locale: id })
+                                                        ? format(new Date(application.payment_documents_uploaded_at_stage_2), 'dd MMMM yyyy', {
+                                                              locale: id,
+                                                          })
                                                         : '-'}
                                                 </p>
                                             </div>
                                         </div>
                                         {application.payment_documents_stage_2.map((doc, index) => (
-                                            <div key={index} className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2">
+                                            <div
+                                                key={index}
+                                                className="ml-12 flex items-center justify-between rounded-lg border border-gray-200 p-2"
+                                            >
                                                 <div className="flex items-center gap-2">
                                                     <FileText className="h-4 w-4 text-gray-600" />
                                                     <span className="text-sm text-gray-700">Dokumen {index + 1}</span>
@@ -1520,7 +1537,9 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                                     ? `Status diubah dari ${getStatusLabel(log.status_from)} menjadi ${getStatusLabel(log.status_to)}`
                                                                     : `Status awal: ${getStatusLabel(log.status_to)}`}
                                                             </span>
-                                                            <span className="text-sm text-gray-500">{format(new Date(log.created_at), 'dd MMMM yyyy', { locale: id })}</span>
+                                                            <span className="text-sm text-gray-500">
+                                                                {format(new Date(log.created_at), 'dd MMMM yyyy', { locale: id })}
+                                                            </span>
                                                         </div>
                                                         <div className="mb-2 flex items-center gap-2 text-sm text-gray-700">
                                                             <Shield className="h-3.5 w-3.5" />
@@ -1558,7 +1577,8 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         Upload Dokumen Pembayaran {application.status === 'pembayaran-tahap-2' ? 'Tahap 2' : 'Tahap 1'}
                                     </CardTitle>
                                     <CardDescription>
-                                        Upload dokumen pembayaran {application.status === 'pembayaran-tahap-2' ? 'tahap 2' : 'tahap 1'} untuk aplikasi yang telah melewati verifikasi lapangan
+                                        Upload dokumen pembayaran {application.status === 'pembayaran-tahap-2' ? 'tahap 2' : 'tahap 1'} untuk aplikasi
+                                        yang telah melewati verifikasi lapangan
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
@@ -1568,7 +1588,8 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                             Upload Dokumen Pembayaran {application.status === 'pembayaran-tahap-2' ? 'Tahap 2' : 'Tahap 1'}
                                         </AlertTitle>
                                         <AlertDescription className="text-blue-700">
-                                            Silakan upload dokumen pembayaran {application.status === 'pembayaran-tahap-2' ? 'tahap 2' : 'tahap 1'} yang diperlukan. File yang didukung: PDF, JPG, PNG.
+                                            Silakan upload dokumen pembayaran {application.status === 'pembayaran-tahap-2' ? 'tahap 2' : 'tahap 1'}{' '}
+                                            yang diperlukan. File yang didukung: PDF, JPG, PNG.
                                         </AlertDescription>
                                     </Alert>
 
@@ -1586,7 +1607,8 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                 className="mt-1"
                                             />
                                             <p className="mt-1 text-xs text-gray-500">
-                                                Format yang didukung: PDF, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file sekaligus.
+                                                Format yang didukung: PDF, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih beberapa file
+                                                sekaligus.
                                             </p>
                                         </div>
 
@@ -1599,9 +1621,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                         <div className="flex items-center gap-2">
                                                             <FileText className="h-4 w-4 text-gray-600" />
                                                             <span className="text-sm font-medium text-gray-800">{file.name}</span>
-                                                            <span className="text-xs text-gray-500">
-                                                                ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                                                            </span>
+                                                            <span className="text-xs text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                                                         </div>
                                                         <Button
                                                             variant="ghost"
@@ -1617,13 +1637,21 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                         )}
 
                                         {/* Already Uploaded Documents */}
-                                        {((application.status === 'pembayaran' && application.payment_documents && application.payment_documents.length > 0) ||
-                                          (application.status === 'pembayaran-tahap-2' && application.payment_documents_stage_2 && application.payment_documents_stage_2.length > 0)) && (
+                                        {((application.status === 'pembayaran' &&
+                                            application.payment_documents &&
+                                            application.payment_documents.length > 0) ||
+                                            (application.status === 'pembayaran-tahap-2' &&
+                                                application.payment_documents_stage_2 &&
+                                                application.payment_documents_stage_2.length > 0)) && (
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium text-gray-700">
-                                                    Dokumen yang Sudah Diupload {application.status === 'pembayaran-tahap-2' ? '(Tahap 2)' : '(Tahap 1)'}:
+                                                    Dokumen yang Sudah Diupload{' '}
+                                                    {application.status === 'pembayaran-tahap-2' ? '(Tahap 2)' : '(Tahap 1)'}:
                                                 </Label>
-                                                {(application.status === 'pembayaran-tahap-2' ? application.payment_documents_stage_2 : application.payment_documents)?.map((doc, index) => (
+                                                {(application.status === 'pembayaran-tahap-2'
+                                                    ? application.payment_documents_stage_2
+                                                    : application.payment_documents
+                                                )?.map((doc, index) => (
                                                     <div key={index} className="flex items-center justify-between rounded-lg bg-green-50 p-3">
                                                         <div className="flex items-center gap-2">
                                                             <FileText className="h-4 w-4 text-green-600" />
@@ -1632,7 +1660,12 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
-                                                            onClick={() => downloadPaymentDocument(index, application.status === 'pembayaran-tahap-2' ? '2' : '1')}
+                                                            onClick={() =>
+                                                                downloadPaymentDocument(
+                                                                    index,
+                                                                    application.status === 'pembayaran-tahap-2' ? '2' : '1',
+                                                                )
+                                                            }
                                                             className="h-8"
                                                         >
                                                             <Download className="mr-1 h-3 w-3" />
@@ -1657,8 +1690,8 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                 <DialogHeader>
                                                     <DialogTitle>Konfirmasi Upload Dokumen Pembayaran</DialogTitle>
                                                     <DialogDescription>
-                                                        Apakah Anda yakin ingin mengupload {paymentDocuments.length} dokumen pembayaran untuk
-                                                        aplikasi ini?
+                                                        Apakah Anda yakin ingin mengupload {paymentDocuments.length} dokumen pembayaran untuk aplikasi
+                                                        ini?
                                                     </DialogDescription>
                                                 </DialogHeader>
                                                 <DialogFooter>
@@ -1668,7 +1701,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                     <DialogClose asChild>
                                                         <Button
                                                             onClick={handlePaymentDocumentsUpload}
-                                                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                            className="bg-blue-600 text-white hover:bg-blue-700"
                                                             disabled={uploadingPaymentDocuments}
                                                         >
                                                             {uploadingPaymentDocuments ? 'Mengupload...' : 'Ya, Upload Dokumen'}
@@ -1766,9 +1799,7 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                         <div className="flex items-center gap-2">
                                                             <FileText className="h-4 w-4 text-gray-600" />
                                                             <span className="text-sm font-medium text-gray-800">{file.name}</span>
-                                                            <span className="text-xs text-gray-500">
-                                                                ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                                                            </span>
+                                                            <span className="text-xs text-gray-500">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                                                         </div>
                                                         <Button
                                                             type="button"
@@ -1803,7 +1834,10 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
 
                                         <Dialog>
                                             <DialogTrigger asChild>
-                                                <Button className="w-full bg-green-600 hover:bg-green-700" disabled={!iinNumber.trim() || !certificateFile || loading}>
+                                                <Button
+                                                    className="w-full bg-green-600 hover:bg-green-700"
+                                                    disabled={!iinNumber.trim() || !certificateFile || loading}
+                                                >
                                                     <Award className="mr-2 h-4 w-4" />
                                                     Terbitkan Single IIN/Blockholder
                                                 </Button>
@@ -1812,7 +1846,9 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                                                 <DialogHeader>
                                                     <DialogTitle>Konfirmasi Penerbitan IIN</DialogTitle>
                                                     <DialogDescription>
-                                                        Apakah Anda yakin ingin menerbitkan IIN dengan nomor <strong>{iinNumber}</strong> dan mengupload sertifikat <strong>{certificateFile?.name}</strong> untuk aplikasi ini? Tindakan ini tidak dapat dibatalkan.
+                                                        Apakah Anda yakin ingin menerbitkan IIN dengan nomor <strong>{iinNumber}</strong> dan
+                                                        mengupload sertifikat <strong>{certificateFile?.name}</strong> untuk aplikasi ini? Tindakan
+                                                        ini tidak dapat dibatalkan.
                                                     </DialogDescription>
                                                 </DialogHeader>
                                                 <DialogFooter>
@@ -1836,8 +1872,6 @@ export default function AdminIinSingleBlockholderVerification({ application, sta
                             </Card>
                         </TabsContent>
                     )}
-
-
                 </Tabs>
             </div>
         </DashboardLayout>

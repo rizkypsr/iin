@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft, Download, FileText, Upload } from 'lucide-react';
 import { FormEventHandler, useEffect } from 'react';
@@ -109,14 +109,12 @@ export default function IinSingleBlockholderCreate() {
                     </CardHeader>
                     <CardContent>
                         {documentRequirements?.content ? (
-                            <div 
+                            <div
                                 className="prose prose-sm max-w-none text-gray-900"
                                 dangerouslySetInnerHTML={{ __html: documentRequirements.content }}
                             />
                         ) : (
-                            <div className="text-gray-500 italic">
-                                Dokumen persyaratan belum dikonfigurasi. Silakan hubungi administrator.
-                            </div>
+                            <div className="text-gray-500 italic">Dokumen persyaratan belum dikonfigurasi. Silakan hubungi administrator.</div>
                         )}
                     </CardContent>
                 </Card>

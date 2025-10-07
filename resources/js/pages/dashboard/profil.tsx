@@ -1,18 +1,18 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Save, Mail } from 'lucide-react';
+import { Mail, Save, User } from 'lucide-react';
+import { FormEventHandler, useEffect } from 'react';
 
-import DashboardLayout from '@/layouts/dashboard-layout';
+import IinNasionalProfileForm from '@/components/iin-nasional-profile-form';
+import InputError from '@/components/input-error';
+import SingleIinProfileForm from '@/components/single-iin-profile-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import InputError from '@/components/input-error';
+import DashboardLayout from '@/layouts/dashboard-layout';
+import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps, User as UserType } from '@/types';
-import { showSuccessToast, showErrorToast } from '@/lib/toast-helper';
-import IinNasionalProfileForm from '@/components/iin-nasional-profile-form';
-import SingleIinProfileForm from '@/components/single-iin-profile-form';
 
 type ProfileForm = {
     name: string;
@@ -60,9 +60,9 @@ interface ProfilePageProps extends PageProps {
         iin_nasional_profile?: any;
         single_iin_profile?: any;
     };
-    flash?: { 
-        success?: string; 
-        error?: string; 
+    flash?: {
+        success?: string;
+        error?: string;
     };
     application_counts: {
         iin_nasional: number;
@@ -158,20 +158,14 @@ export default function DashboardProfil() {
 
                 <form onSubmit={submit} className="space-y-8">
                     {/* Basic Profile Information */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
                         <Card className="border-blue-200/50 bg-white/95 shadow-lg shadow-blue-200/30 backdrop-blur-sm">
                             <CardHeader className="border-b border-gray-200 pb-4">
                                 <CardTitle className="flex items-center gap-3 text-xl text-gray-900">
                                     <User className="h-5 w-5 text-blue-600" />
                                     Informasi Dasar
                                 </CardTitle>
-                                <CardDescription>
-                                    Perbarui informasi dasar akun Anda
-                                </CardDescription>
+                                <CardDescription>Perbarui informasi dasar akun Anda</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6 pt-6">
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -193,7 +187,7 @@ export default function DashboardProfil() {
 
                                     <div className="space-y-2">
                                         <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                                            <Mail className="inline h-4 w-4 mr-1" />
+                                            <Mail className="mr-1 inline h-4 w-4" />
                                             Email <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
@@ -256,11 +250,7 @@ export default function DashboardProfil() {
                 </form>
 
                 {/* User Information Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.7 }}
-                >
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.7 }}>
                     <Card className="border-gray-200/50 bg-white/95 shadow-lg shadow-gray-200/30 backdrop-blur-sm">
                         <CardHeader className="border-b border-gray-200 pb-4">
                             <CardTitle className="flex items-center gap-3 text-xl text-gray-900">
@@ -276,9 +266,7 @@ export default function DashboardProfil() {
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">Role</p>
-                                    <p className="text-lg font-semibold text-gray-900 capitalize">
-                                        {user.role_names?.[0] || 'User'}
-                                    </p>
+                                    <p className="text-lg font-semibold text-gray-900 capitalize">{user.role_names?.[0] || 'User'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">Bergabung Sejak</p>

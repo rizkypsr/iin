@@ -5,19 +5,7 @@ import DashboardLayout from '@/layouts/dashboard-layout';
 import { PageProps } from '@/types';
 import { Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { 
-    Users, 
-    FileText, 
-    CheckCircle, 
-    Clock, 
-    CreditCard,
-    MapPin,
-    AlertCircle,
-    TrendingUp,
-    Eye,
-    Calendar,
-    User
-} from 'lucide-react';
+import { AlertCircle, Calendar, CheckCircle, Clock, CreditCard, Eye, FileText, MapPin, TrendingUp, User, Users } from 'lucide-react';
 
 interface Application {
     id: number;
@@ -53,21 +41,21 @@ interface AdminDashboardProps extends PageProps {
 const getStatusIcon = (status: string) => {
     switch (status) {
         case 'pengajuan':
-            return <FileText className="w-4 h-4" />;
+            return <FileText className="h-4 w-4" />;
         case 'perbaikan':
-            return <AlertCircle className="w-4 h-4" />;
+            return <AlertCircle className="h-4 w-4" />;
         case 'pembayaran':
-            return <CreditCard className="w-4 h-4" />;
+            return <CreditCard className="h-4 w-4" />;
         case 'verifikasi-lapangan':
-            return <MapPin className="w-4 h-4" />;
+            return <MapPin className="h-4 w-4" />;
         case 'menunggu-terbit':
-            return <Clock className="w-4 h-4" />;
+            return <Clock className="h-4 w-4" />;
         case 'terbit':
-            return <CheckCircle className="w-4 h-4" />;
+            return <CheckCircle className="h-4 w-4" />;
         case 'ditolak':
-            return <AlertCircle className="w-4 h-4" />;
+            return <AlertCircle className="h-4 w-4" />;
         default:
-            return <Clock className="w-4 h-4" />;
+            return <Clock className="h-4 w-4" />;
     }
 };
 
@@ -92,12 +80,7 @@ const getStatusBadgeClass = (status: string) => {
     }
 };
 
-export default function AdminDashboard({ 
-    auth, 
-    stats, 
-    recent_applications = [],
-    application_counts
-}: AdminDashboardProps) {
+export default function AdminDashboard({ auth, stats, recent_applications = [], application_counts }: AdminDashboardProps) {
     const user = auth.user;
 
     return (
@@ -110,81 +93,57 @@ export default function AdminDashboard({
 
                 {/* Admin Stats */}
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
                         <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="mb-1 text-2xl font-bold text-gray-900">
-                                            {stats.total_applications}
-                                        </div>
+                                        <div className="mb-1 text-2xl font-bold text-gray-900">{stats.total_applications}</div>
                                         <p className="text-sm font-medium text-gray-600">Total Permohonan</p>
                                     </div>
-                                    <FileText className="w-8 h-8 text-blue-600" />
+                                    <FileText className="h-8 w-8 text-blue-600" />
                                 </div>
                             </CardContent>
                         </Card>
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                         <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="mb-1 text-2xl font-bold text-gray-900">
-                                            {stats.pending_review}
-                                        </div>
+                                        <div className="mb-1 text-2xl font-bold text-gray-900">{stats.pending_review}</div>
                                         <p className="text-sm font-medium text-gray-600">Perlu Review</p>
                                     </div>
-                                    <Clock className="w-8 h-8 text-amber-600" />
+                                    <Clock className="h-8 w-8 text-amber-600" />
                                 </div>
                             </CardContent>
                         </Card>
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                         <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="mb-1 text-2xl font-bold text-gray-900">
-                                            {stats.approved}
-                                        </div>
+                                        <div className="mb-1 text-2xl font-bold text-gray-900">{stats.approved}</div>
                                         <p className="text-sm font-medium text-gray-600">Disetujui</p>
                                     </div>
-                                    <CheckCircle className="w-8 h-8 text-green-600" />
+                                    <CheckCircle className="h-8 w-8 text-green-600" />
                                 </div>
                             </CardContent>
                         </Card>
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
                         <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="mb-1 text-2xl font-bold text-gray-900">
-                                            {stats.total_users}
-                                        </div>
+                                        <div className="mb-1 text-2xl font-bold text-gray-900">{stats.total_users}</div>
                                         <p className="text-sm font-medium text-gray-600">Total User</p>
                                     </div>
-                                    <Users className="w-8 h-8 text-purple-600" />
+                                    <Users className="h-8 w-8 text-purple-600" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -193,81 +152,57 @@ export default function AdminDashboard({
 
                 {/* Additional Stats Row */}
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
                         <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="mb-1 text-2xl font-bold text-gray-900">
-                                            {stats.awaiting_payment}
-                                        </div>
+                                        <div className="mb-1 text-2xl font-bold text-gray-900">{stats.awaiting_payment}</div>
                                         <p className="text-sm font-medium text-gray-600">Menunggu Pembayaran</p>
                                     </div>
-                                    <CreditCard className="w-8 h-8 text-purple-600" />
+                                    <CreditCard className="h-8 w-8 text-purple-600" />
                                 </div>
                             </CardContent>
                         </Card>
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
                         <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="mb-1 text-2xl font-bold text-gray-900">
-                                            {stats.field_verification}
-                                        </div>
+                                        <div className="mb-1 text-2xl font-bold text-gray-900">{stats.field_verification}</div>
                                         <p className="text-sm font-medium text-gray-600">Verifikasi Lapangan</p>
                                     </div>
-                                    <MapPin className="w-8 h-8 text-indigo-600" />
+                                    <MapPin className="h-8 w-8 text-indigo-600" />
                                 </div>
                             </CardContent>
                         </Card>
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.7 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
                         <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="mb-1 text-2xl font-bold text-gray-900">
-                                            {stats.awaiting_issuance}
-                                        </div>
+                                        <div className="mb-1 text-2xl font-bold text-gray-900">{stats.awaiting_issuance}</div>
                                         <p className="text-sm font-medium text-gray-600">Menunggu Terbit</p>
                                     </div>
-                                    <Clock className="w-8 h-8 text-cyan-600" />
+                                    <Clock className="h-8 w-8 text-cyan-600" />
                                 </div>
                             </CardContent>
                         </Card>
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.8 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
                         <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="mb-1 text-2xl font-bold text-gray-900">
-                                            {stats.rejected}
-                                        </div>
+                                        <div className="mb-1 text-2xl font-bold text-gray-900">{stats.rejected}</div>
                                         <p className="text-sm font-medium text-gray-600">Ditolak</p>
                                     </div>
-                                    <AlertCircle className="w-8 h-8 text-red-600" />
+                                    <AlertCircle className="h-8 w-8 text-red-600" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -275,38 +210,33 @@ export default function AdminDashboard({
                 </div>
 
                 {/* Recent Applications */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.9 }}
-                >
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}>
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5" />
+                                <TrendingUp className="h-5 w-5" />
                                 Aktivitas Terbaru
                             </CardTitle>
-                            <CardDescription>
-                                Permohonan terbaru yang masuk ke sistem
-                            </CardDescription>
+                            <CardDescription>Permohonan terbaru yang masuk ke sistem</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {recent_applications.length > 0 ? (
                                 <div className="space-y-4">
                                     {recent_applications.map((application) => (
-                                        <div key={`${application.type}-${application.id}`} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <div
+                                            key={`${application.type}-${application.id}`}
+                                            className="flex items-center justify-between rounded-lg bg-gray-50 p-4 transition-colors hover:bg-gray-100"
+                                        >
                                             <div className="flex items-center gap-4">
                                                 {getStatusIcon(application.status)}
                                                 <div>
-                                                    <p className="font-medium text-gray-900">
-                                                        {application.application_number}
-                                                    </p>
-                                                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                                                        <User className="w-4 h-4" />
+                                                    <p className="font-medium text-gray-900">{application.application_number}</p>
+                                                    <p className="flex items-center gap-2 text-sm text-gray-600">
+                                                        <User className="h-4 w-4" />
                                                         {application.user.name}
                                                     </p>
-                                                    <p className="text-xs text-gray-500 flex items-center gap-2">
-                                                        <Calendar className="w-3 h-3" />
+                                                    <p className="flex items-center gap-2 text-xs text-gray-500">
+                                                        <Calendar className="h-3 w-3" />
                                                         {new Date(application.created_at).toLocaleDateString('id-ID')}
                                                     </p>
                                                 </div>
@@ -319,13 +249,14 @@ export default function AdminDashboard({
                                                     {application.type === 'nasional' ? 'IIN Nasional' : 'Single Blockholder'}
                                                 </Badge>
                                                 <Link
-                                                    href={application.type === 'nasional' 
-                                                        ? route('admin.iin-nasional.show', application.id)
-                                                        : route('admin.iin-single-blockholder.show', application.id)
+                                                    href={
+                                                        application.type === 'nasional'
+                                                            ? route('admin.iin-nasional.show', application.id)
+                                                            : route('admin.iin-single-blockholder.show', application.id)
                                                     }
                                                 >
                                                     <Button size="sm" variant="outline">
-                                                        <Eye className="w-4 h-4 mr-2" />
+                                                        <Eye className="mr-2 h-4 w-4" />
                                                         Lihat
                                                     </Button>
                                                 </Link>
@@ -334,18 +265,12 @@ export default function AdminDashboard({
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-8">
-                                    <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                        Belum Ada Aktivitas
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        Belum ada permohonan yang masuk ke sistem.
-                                    </p>
+                                <div className="py-8 text-center">
+                                    <FileText className="mx-auto mb-4 h-16 w-16 text-gray-400" />
+                                    <h3 className="mb-2 text-lg font-semibold text-gray-900">Belum Ada Aktivitas</h3>
+                                    <p className="text-gray-600">Belum ada permohonan yang masuk ke sistem.</p>
                                 </div>
                             )}
-                            
-
                         </CardContent>
                     </Card>
                 </motion.div>

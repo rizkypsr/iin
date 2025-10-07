@@ -1,11 +1,11 @@
-import { Building2, Calendar, FileText, Mail, MapPin, Phone, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Building2, Calendar, FileText, Mail, MapPin, Phone, User } from 'lucide-react';
 
+import InputError from '@/components/input-error';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import InputError from '@/components/input-error';
 
 interface IinNasionalProfileData {
     details?: string;
@@ -102,7 +102,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Assignment Year */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_assignment_year" className="text-sm font-medium text-gray-700">
-                            <Calendar className="inline h-4 w-4 mr-1" />
+                            <Calendar className="mr-1 inline h-4 w-4" />
                             Tahun Assignment <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -120,7 +120,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Regional */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_regional" className="text-sm font-medium text-gray-700">
-                            <MapPin className="inline h-4 w-4 mr-1" />
+                            <MapPin className="mr-1 inline h-4 w-4" />
                             Regional <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -138,7 +138,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* ASPI Recommendation Letter */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_aspi_recommendation_letter" className="text-sm font-medium text-gray-700">
-                            <FileText className="inline h-4 w-4 mr-1" />
+                            <FileText className="mr-1 inline h-4 w-4" />
                             ASPI Recommendation Letter <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -156,7 +156,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Phone/Fax */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_phone_fax" className="text-sm font-medium text-gray-700">
-                            <Phone className="inline h-4 w-4 mr-1" />
+                            <Phone className="mr-1 inline h-4 w-4" />
                             Telepon/Fax <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -174,7 +174,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Email Office */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_email_office" className="text-sm font-medium text-gray-700">
-                            <Mail className="inline h-4 w-4 mr-1" />
+                            <Mail className="mr-1 inline h-4 w-4" />
                             Email Kantor <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -192,7 +192,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Contact Person Name */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_contact_person_name" className="text-sm font-medium text-gray-700">
-                            <User className="inline h-4 w-4 mr-1" />
+                            <User className="mr-1 inline h-4 w-4" />
                             Nama Contact Person <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -210,7 +210,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Contact Person Email */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_contact_person_email" className="text-sm font-medium text-gray-700">
-                            <Mail className="inline h-4 w-4 mr-1" />
+                            <Mail className="mr-1 inline h-4 w-4" />
                             Email Contact Person <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -228,7 +228,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Contact Person Phone */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_contact_person_phone" className="text-sm font-medium text-gray-700">
-                            <Phone className="inline h-4 w-4 mr-1" />
+                            <Phone className="mr-1 inline h-4 w-4" />
                             Telepon Contact Person <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -298,7 +298,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Address */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_address" className="text-sm font-medium text-gray-700">
-                            <MapPin className="inline h-4 w-4 mr-1" />
+                            <MapPin className="mr-1 inline h-4 w-4" />
                             Alamat <span className="text-red-500">*</span>
                         </Label>
                         <Textarea

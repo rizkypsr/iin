@@ -37,7 +37,7 @@ export default function JenisLayanan() {
             <Head title="Jenis Layanan" />
 
             {/* Hero Section with Primary Gradient */}
-            <div className="bg-gradient-primary relative overflow-hidden pb-20 pt-40">
+            <div className="bg-gradient-primary relative overflow-hidden pt-40 pb-20">
                 {/* Subtle line pattern overlay */}
                 <div className="absolute inset-0 opacity-10">
                     <div

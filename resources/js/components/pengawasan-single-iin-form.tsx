@@ -1,11 +1,11 @@
-import { Building2, Calendar, FileText, Mail, MapPin, Phone, User, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Building2, Calendar, FileText, Mail, MapPin, Phone, Shield, User } from 'lucide-react';
 
+import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import InputError from '@/components/input-error';
+import { Textarea } from '@/components/ui/textarea';
 
 interface PengawasanSingleIinData {
     company_name?: string;
@@ -53,11 +53,11 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
 
                 {/* Company Information Section */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-gray-800 flex items-center gap-2">
+                    <h3 className="flex items-center gap-2 text-lg font-medium text-gray-800">
                         <Building2 className="h-4 w-4 text-purple-600" />
                         Informasi Perusahaan
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* Company Name */}
                         <div className="space-y-2">
@@ -79,7 +79,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                         {/* Company Phone */}
                         <div className="space-y-2">
                             <Label htmlFor="company_phone" className="text-sm font-medium text-gray-700">
-                                <Phone className="inline h-4 w-4 mr-1" />
+                                <Phone className="mr-1 inline h-4 w-4" />
                                 Telepon Perusahaan <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -97,7 +97,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                         {/* Company Email */}
                         <div className="space-y-2">
                             <Label htmlFor="company_email" className="text-sm font-medium text-gray-700">
-                                <Mail className="inline h-4 w-4 mr-1" />
+                                <Mail className="mr-1 inline h-4 w-4" />
                                 Email Perusahaan <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -116,7 +116,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                     {/* Company Address */}
                     <div className="space-y-2">
                         <Label htmlFor="company_address" className="text-sm font-medium text-gray-700">
-                            <MapPin className="inline h-4 w-4 mr-1" />
+                            <MapPin className="mr-1 inline h-4 w-4" />
                             Alamat Perusahaan <span className="text-red-500">*</span>
                         </Label>
                         <Textarea
@@ -133,11 +133,11 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
 
                 {/* Contact Person Section */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-gray-800 flex items-center gap-2">
+                    <h3 className="flex items-center gap-2 text-lg font-medium text-gray-800">
                         <User className="h-4 w-4 text-purple-600" />
                         Informasi Penanggung Jawab
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* Contact Person Name */}
                         <div className="space-y-2">
@@ -176,7 +176,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                         {/* Contact Person Phone */}
                         <div className="space-y-2">
                             <Label htmlFor="contact_person_phone" className="text-sm font-medium text-gray-700">
-                                <Phone className="inline h-4 w-4 mr-1" />
+                                <Phone className="mr-1 inline h-4 w-4" />
                                 Telepon Penanggung Jawab <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -194,7 +194,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                         {/* Contact Person Email */}
                         <div className="space-y-2">
                             <Label htmlFor="contact_person_email" className="text-sm font-medium text-gray-700">
-                                <Mail className="inline h-4 w-4 mr-1" />
+                                <Mail className="mr-1 inline h-4 w-4" />
                                 Email Penanggung Jawab <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -213,11 +213,11 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
 
                 {/* IIN Information Section */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-gray-800 flex items-center gap-2">
+                    <h3 className="flex items-center gap-2 text-lg font-medium text-gray-800">
                         <FileText className="h-4 w-4 text-purple-600" />
                         Informasi IIN
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* IIN Number */}
                         <div className="space-y-2">
@@ -239,7 +239,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                         {/* IIN Issued Date */}
                         <div className="space-y-2">
                             <Label htmlFor="iin_issued_date" className="text-sm font-medium text-gray-700">
-                                <Calendar className="inline h-4 w-4 mr-1" />
+                                <Calendar className="mr-1 inline h-4 w-4" />
                                 Tanggal Terbit IIN <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -258,10 +258,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                             <Label htmlFor="institution_type" className="text-sm font-medium text-gray-700">
                                 Jenis Lembaga <span className="text-red-500">*</span>
                             </Label>
-                            <Select 
-                                value={data.institution_type || ''} 
-                                onValueChange={(value) => setData('institution_type', value)}
-                            >
+                            <Select value={data.institution_type || ''} onValueChange={(value) => setData('institution_type', value)}>
                                 <SelectTrigger className="h-11 w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
                                     <SelectValue placeholder="Pilih jenis lembaga" />
                                 </SelectTrigger>
@@ -282,21 +279,18 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
 
                 {/* Supervision Information Section */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-gray-800 flex items-center gap-2">
+                    <h3 className="flex items-center gap-2 text-lg font-medium text-gray-800">
                         <Shield className="h-4 w-4 text-purple-600" />
                         Informasi Pengawasan
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* Supervision Type */}
                         <div className="space-y-2">
                             <Label htmlFor="supervision_type" className="text-sm font-medium text-gray-700">
                                 Jenis Pengawasan <span className="text-red-500">*</span>
                             </Label>
-                            <Select 
-                                value={data.supervision_type || ''} 
-                                onValueChange={(value) => setData('supervision_type', value)}
-                            >
+                            <Select value={data.supervision_type || ''} onValueChange={(value) => setData('supervision_type', value)}>
                                 <SelectTrigger className="h-11 w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
                                     <SelectValue placeholder="Pilih jenis pengawasan" />
                                 </SelectTrigger>
@@ -315,10 +309,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                             <Label htmlFor="supervision_scope" className="text-sm font-medium text-gray-700">
                                 Ruang Lingkup Pengawasan <span className="text-red-500">*</span>
                             </Label>
-                            <Select 
-                                value={data.supervision_scope || ''} 
-                                onValueChange={(value) => setData('supervision_scope', value)}
-                            >
+                            <Select value={data.supervision_scope || ''} onValueChange={(value) => setData('supervision_scope', value)}>
                                 <SelectTrigger className="h-11 w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">
                                     <SelectValue placeholder="Pilih ruang lingkup pengawasan" />
                                 </SelectTrigger>
@@ -337,7 +328,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                         {/* Supervision Period Start */}
                         <div className="space-y-2">
                             <Label htmlFor="supervision_period_start" className="text-sm font-medium text-gray-700">
-                                <Calendar className="inline h-4 w-4 mr-1" />
+                                <Calendar className="mr-1 inline h-4 w-4" />
                                 Periode Pengawasan Mulai <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -354,7 +345,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                         {/* Supervision Period End */}
                         <div className="space-y-2">
                             <Label htmlFor="supervision_period_end" className="text-sm font-medium text-gray-700">
-                                <Calendar className="inline h-4 w-4 mr-1" />
+                                <Calendar className="mr-1 inline h-4 w-4" />
                                 Periode Pengawasan Selesai <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -389,7 +380,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                 {/* Previous Supervision Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-medium text-gray-800">Pengawasan Sebelumnya (Opsional)</h3>
-                    
+
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* Previous Supervision */}
                         <div className="space-y-2">
@@ -411,7 +402,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                         {/* Previous Supervision Date */}
                         <div className="space-y-2">
                             <Label htmlFor="previous_supervision_date" className="text-sm font-medium text-gray-700">
-                                <Calendar className="inline h-4 w-4 mr-1" />
+                                <Calendar className="mr-1 inline h-4 w-4" />
                                 Tanggal Pengawasan Sebelumnya
                             </Label>
                             <Input
@@ -430,7 +421,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                 {/* Additional Information Section */}
                 <div className="space-y-4">
                     <h3 className="text-lg font-medium text-gray-800">Informasi Tambahan</h3>
-                    
+
                     {/* Compliance Issues */}
                     <div className="space-y-2">
                         <Label htmlFor="compliance_issues" className="text-sm font-medium text-gray-700">

@@ -16,8 +16,8 @@ export default function Welcome() {
                 <div className="py-12 text-center">
                     <h1 className="mb-6 text-5xl font-bold tracking-tight text-gray-900">Selamat datang di Portal Layanan Otoritas Sponsor</h1>
                     <p className="mx-auto mb-8 max-w-3xl text-xl text-gray-600">
-                        Layanan Otoritas Sponsor adalah Layanan yang diberikan BSN untuk  menerima, memproses dan meninjau / menyetujui
-                        permohonan untuk IIN (Issuer Identification Number)
+                        Layanan Otoritas Sponsor adalah Layanan yang diberikan BSN untuk menerima, memproses dan meninjau / menyetujui permohonan
+                        untuk IIN (Issuer Identification Number)
                     </p>
                     <div className="flex justify-center gap-4">
                         <Link href={route('jenis-layanan')}>

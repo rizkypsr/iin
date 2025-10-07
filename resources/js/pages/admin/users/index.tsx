@@ -146,7 +146,7 @@ export default function UsersIndex({ users, filters, flash, application_counts }
         email_verified_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        roles: [{ id: 1, name: 'admin', guard_name: 'web', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }]
+        roles: [{ id: 1, name: 'admin', guard_name: 'web', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }],
     };
 
     return (
@@ -178,7 +178,6 @@ export default function UsersIndex({ users, filters, flash, application_counts }
                 <UserStats
                     totalUsers={users.total}
                     adminCount={users.data.filter((u) => u.roles.some((r) => r.name === 'admin')).length}
-        
                     userCount={users.data.filter((u) => u.roles.some((r) => r.name === 'user')).length}
                 />
 
