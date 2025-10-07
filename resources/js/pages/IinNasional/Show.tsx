@@ -154,7 +154,6 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
             route('iin-nasional.upload-additional-documents', selectedApplication?.id),
             formData,
             {
-                onBefore: () => console.log('Uploading...', file),
                 onSuccess: () => {
                     showSuccessToast('File QRIS berhasil diupload!');
                     setIsQrisModalOpen(false);

@@ -260,8 +260,6 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
     const canChangeToSecondPayment = application.status === 'verifikasi_lapangan';
     const canIssuePengawasan = application.status === 'pembayaran-tahap-2';
 
-    console.log(application.issuance_documents);
-
     const getStatusLabel = (status: string) => {
         const statusMap: { [key: string]: string } = {
             'pengajuan': 'Diajukan',

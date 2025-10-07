@@ -94,8 +94,6 @@ const getStatusLabel = (status: string) => {
 };
 
 export default function Index({ auth, applications, application_counts }: Props) {
-    console.log(applications);
-
     return (
         <DashboardLayout
             user={auth.user}

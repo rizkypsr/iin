@@ -79,8 +79,6 @@ interface Props {
 }
 
 export default function PengawasanSingleIinShow({ application, statusLogs, auth }: Props) {
-    console.log(application);
-
     const [activeTab, setActiveTab] = useState('detail');
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -99,7 +97,6 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
             route('pengawasan-single-iin.upload-additional-documents', selectedApplication?.id),
             formData,
             {
-                onBefore: () => console.log('Uploading...', file),
                 onSuccess: () => {
                     showSuccessToast('File QRIS berhasil diupload!');
                     setIsQrisModalOpen(false);

@@ -123,7 +123,6 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
             route('pengawasan-iin-nasional.upload-additional-documents', selectedApplication?.id),
             formData,
             {
-                onBefore: () => console.log('Uploading...', file),
                 onSuccess: () => {
                     showSuccessToast('File QRIS berhasil diupload!');
                     setIsQrisModalOpen(false);

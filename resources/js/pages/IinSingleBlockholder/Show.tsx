@@ -108,13 +108,10 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
         const formData = new FormData();
         formData.append('file', file);
 
-        console.log(selectedApplication);
-
         router.post(
             route('iin-single-blockholder.upload-additional-documents', selectedApplication?.id),
             formData,
             {
-                onBefore: () => console.log('Uploading...', file),
                 onSuccess: () => {
                     showSuccessToast('File QRIS berhasil diupload!');
                     setIsQrisModalOpen(false);

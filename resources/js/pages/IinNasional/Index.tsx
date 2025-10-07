@@ -128,8 +128,6 @@ const containerAnimation = {
 };
 
 export default function IinNasionalIndex({ applications, auth }: Props) {
-    console.log(applications);
-
     const { flash } = usePage().props as any;
     const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
     const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
@@ -166,8 +164,6 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
 
     const expenseReimSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        console.log(data);
     }
 
     const handleQrisFileUpload = (file: File) => {
@@ -178,7 +174,6 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
             route('iin-nasional.upload-additional-documents', selectedApplication?.id),
             formData,
             {
-                onBefore: () => console.log('Uploading...', file),
                 onSuccess: () => {
                     showSuccessToast('File QRIS berhasil diupload!');
                     setIsQrisModalOpen(false);

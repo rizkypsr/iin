@@ -136,7 +136,6 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
             route('iin-single-blockholder.upload-additional-documents', selectedApplication?.id),
             formData,
             {
-                onBefore: () => console.log('Uploading...', file),
                 onSuccess: () => {
                     showSuccessToast('File QRIS berhasil diupload!');
                     setIsQrisModalOpen(false);
