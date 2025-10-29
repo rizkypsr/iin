@@ -40,6 +40,7 @@ class PengawasanSingleIin extends Model
         'issued_at',
         'admin_id',
         'additional_documents',
+        'expense_reim_id',
     ];
 
     protected $casts = [

@@ -27,6 +27,7 @@ interface IinNasionalApplication {
     additional_documents?: string;
     can_upload_payment_proof: boolean;
     can_download_certificate: boolean;
+    expense_reim_id?: number;
     user: {
         name: string;
         email: string;
@@ -133,6 +134,8 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
     const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [selectedApplication, setSelectedApplication] = useState<IinNasionalApplication | null>(null);
 
+    console.log(applications.data);
+
     const { data, setData, post, processing, errors } = useForm<{
         company_name: string;
         pic_name: string;
@@ -164,6 +167,85 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
 
     const expenseReimSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validate required fields
+        if (!data.company_name.trim()) {
+            showErrorToast('Nama perusahaan harus diisi');
+            return;
+        }
+
+        if (!data.pic_name.trim()) {
+            showErrorToast('Nama PIC harus diisi');
+            return;
+        }
+
+        if (!data.pic_contact.trim()) {
+            showErrorToast('Kontak PIC harus diisi');
+            return;
+        }
+
+        if (!data.verification_date) {
+            showErrorToast('Tanggal verifikasi harus diisi');
+            return;
+        }
+
+        if (!data.is_acknowledged) {
+            showErrorToast('Persetujuan harus dicentang');
+            return;
+        }
+
+        if (data.chief_verificator_amount <= 0) {
+            showErrorToast('Jumlah verificator utama harus lebih dari 0');
+            return;
+        }
+
+        if (data.member_verificator_amount <= 0) {
+            showErrorToast('Jumlah verificator anggota harus lebih dari 0');
+            return;
+        }
+
+        if (!data.payment_proof_path) {
+            showErrorToast('Bukti pembayaran harus diupload');
+            return;
+        }
+
+        if (!selectedApplication) {
+            showErrorToast('Aplikasi tidak ditemukan');
+            return;
+        }
+
+        // Submit form using Inertia's useForm
+        post(route('iin-nasional.store-expense-reimbursement', selectedApplication.id), {
+            onSuccess: () => {
+                setData({
+                    company_name: '',
+                    pic_name: '',
+                    pic_contact: '',
+                    verification_date: '',
+                    is_acknowledged: false,
+                    chief_verificator_amount: 0,
+                    member_verificator_amount: 0,
+                    payment_proof_path: '',
+                });
+                setSelectedApplication(null);
+            },
+            onError: (errors) => {
+                console.error('Form submission errors:', errors);
+                if (typeof errors === 'object' && errors !== null) {
+                    // Display first error message
+                    const firstError = Object.values(errors)[0];
+                    if (typeof firstError === 'string') {
+                        showErrorToast(firstError);
+                    } else if (Array.isArray(firstError) && firstError.length > 0) {
+                        showErrorToast(firstError[0] as string);
+                    } else {
+                        showErrorToast('Terjadi kesalahan saat menyimpan data');
+                    }
+                } else {
+                    showErrorToast('Terjadi kesalahan saat menyimpan data');
+                }
+            }
+        });
     };
 
     const handleQrisFileUpload = (file: File) => {
@@ -278,11 +360,10 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                 {applications.data.map((application) => (
                                     <motion.div
                                         key={application.id}
-                                        className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${
-                                            application.status === 'perbaikan' && auth.user.role === 'user'
-                                                ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
-                                                : ''
-                                        }`}
+                                        className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${application.status === 'perbaikan' && auth.user.role === 'user'
+                                            ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
+                                            : ''
+                                            }`}
                                         variants={itemAnimation}
                                     >
                                         {/* Alert notification removed as requested */}
@@ -315,16 +396,16 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                             application.status === 'pengajuan'
                                                                 ? '40%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                 : application.status === 'perbaikan'
-                                                                  ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
-                                                                  : application.status === 'pembayaran'
-                                                                    ? '60%'
-                                                                    : application.status === 'verifikasi-lapangan'
-                                                                      ? '80%'
-                                                                      : application.status === 'menunggu-terbit'
-                                                                        ? '80%'
-                                                                        : application.status === 'terbit'
-                                                                          ? '100%'
-                                                                          : '0%',
+                                                                    ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
+                                                                    : application.status === 'pembayaran'
+                                                                        ? '60%'
+                                                                        : application.status === 'verifikasi-lapangan'
+                                                                            ? '80%'
+                                                                            : application.status === 'menunggu-terbit'
+                                                                                ? '80%'
+                                                                                : application.status === 'terbit'
+                                                                                    ? '100%'
+                                                                                    : '0%',
                                                     }}
                                                 ></div>
                                             </div>
@@ -430,19 +511,20 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                         </Link>
                                                     )}
 
-                                                    {application.status === 'verifikasi-lapangan' && (
+                                                    {(application.status === 'verifikasi-lapangan' || application.status === 'terbit') && application.expense_reim_id == null && (
                                                         <Dialog>
                                                             <DialogTrigger asChild>
                                                                 <Button
                                                                     variant="outline"
                                                                     size="sm"
                                                                     className="border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-500"
+                                                                    onClick={() => setSelectedApplication(application)}
                                                                 >
                                                                     <TriangleAlert className="mr-2 h-4 w-4 text-red-500" />
                                                                     Silahkan isi Form Bukti Penggantian Transport dan Uang Harian
                                                                 </Button>
                                                             </DialogTrigger>
-                                                            <DialogContent>
+                                                            <DialogContent className="max-h-[90vh] max-w-2xl">
                                                                 <DialogHeader>
                                                                     <DialogTitle>Form Bukti Penggantian Transport dan Uang Harian</DialogTitle>
                                                                     <DialogDescription>
@@ -450,148 +532,171 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                                                         harian.
                                                                     </DialogDescription>
                                                                 </DialogHeader>
-                                                                <form
-                                                                    id="expense-reim-form"
-                                                                    className="flex flex-col gap-4"
-                                                                    onSubmit={expenseReimSubmit}
-                                                                >
-                                                                    <div>
-                                                                        <Label
-                                                                            htmlFor="company_name"
-                                                                            className="mb-1 text-sm font-medium text-gray-700"
-                                                                        >
-                                                                            Nama Perusahaan
-                                                                        </Label>
-                                                                        <Input
-                                                                            required
-                                                                            type="text"
-                                                                            placeholder="Nama Perusahaan"
-                                                                            value={data.company_name}
-                                                                            onChange={(e) => setData('company_name', e.target.value)}
-                                                                        />
-                                                                        {errors.company_name && (
-                                                                            <p className="mt-1 text-xs text-red-600">{errors.company_name}</p>
-                                                                        )}
-                                                                    </div>
+                                                                <div className="max-h-[60vh] overflow-y-auto pr-2">
+                                                                    <form
+                                                                        id="expense-reim-form"
+                                                                        className="flex flex-col gap-4"
+                                                                        onSubmit={expenseReimSubmit}
+                                                                    >
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="company_name"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Nama Perusahaan
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="text"
+                                                                                placeholder="Nama Perusahaan"
+                                                                                value={data.company_name}
+                                                                                onChange={(e) => setData('company_name', e.target.value)}
+                                                                            />
+                                                                            {errors.company_name && (
+                                                                                <p className="mt-1 text-xs text-red-600">{errors.company_name}</p>
+                                                                            )}
+                                                                        </div>
 
-                                                                    <div>
-                                                                        <Label htmlFor="pic_name" className="mb-1 text-sm font-medium text-gray-700">
-                                                                            Nama PIC
-                                                                        </Label>
-                                                                        <Input
-                                                                            required
-                                                                            type="text"
-                                                                            placeholder="Nama PIC"
-                                                                            value={data.pic_name}
-                                                                            onChange={(e) => setData('pic_name', e.target.value)}
-                                                                        />
-                                                                    </div>
+                                                                        <div>
+                                                                            <Label htmlFor="pic_name" className="mb-1 text-sm font-medium text-gray-700">
+                                                                                Nama PIC
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="text"
+                                                                                placeholder="Nama PIC"
+                                                                                value={data.pic_name}
+                                                                                onChange={(e) => setData('pic_name', e.target.value)}
+                                                                            />
+                                                                            {errors.pic_name && (
+                                                                                <p className="mt-1 text-xs text-red-600">{errors.pic_name}</p>
+                                                                            )}
+                                                                        </div>
 
-                                                                    <div>
-                                                                        <Label
-                                                                            htmlFor="pic_contact"
-                                                                            className="mb-1 text-sm font-medium text-gray-700"
-                                                                        >
-                                                                            Kontak PIC
-                                                                        </Label>
-                                                                        <Input
-                                                                            required
-                                                                            type="text"
-                                                                            placeholder="Kontak PIC"
-                                                                            value={data.pic_contact}
-                                                                            onChange={(e) => setData('pic_contact', e.target.value)}
-                                                                        />
-                                                                    </div>
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="pic_contact"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Kontak PIC
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="text"
+                                                                                placeholder="Kontak PIC"
+                                                                                value={data.pic_contact}
+                                                                                onChange={(e) => setData('pic_contact', e.target.value)}
+                                                                            />
+                                                                            {errors.pic_contact && (
+                                                                                <p className="mt-1 text-xs text-red-600">{errors.pic_contact}</p>
+                                                                            )}
+                                                                        </div>
 
-                                                                    <div>
-                                                                        <Label
-                                                                            htmlFor="verification_date"
-                                                                            className="mb-1 text-sm font-medium text-gray-700"
-                                                                        >
-                                                                            Tanggal Verifikasi
-                                                                        </Label>
-                                                                        <Input
-                                                                            required
-                                                                            type="date"
-                                                                            placeholder="Tanggal Verifikasi"
-                                                                            value={data.verification_date}
-                                                                            onChange={(e) => setData('verification_date', e.target.value)}
-                                                                        />
-                                                                    </div>
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="verification_date"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Tanggal Verifikasi
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="date"
+                                                                                placeholder="Tanggal Verifikasi"
+                                                                                value={data.verification_date}
+                                                                                onChange={(e) => setData('verification_date', e.target.value)}
+                                                                            />
+                                                                            {errors.verification_date && (
+                                                                                <p className="mt-1 text-xs text-red-600">{errors.verification_date}</p>
+                                                                            )}
+                                                                        </div>
 
-                                                                    <div>
-                                                                        <Label
-                                                                            htmlFor="is_acknowledged"
-                                                                            className="mb-1 text-sm font-medium text-gray-700"
-                                                                        >
-                                                                            Dengan ini saya menyatakan bahwa penggantian transport dan uang harian
-                                                                            yang diberikan kepada tim verifikator sudah sesuai dengan ketentuan surat
-                                                                            informasi pembebanan biaya dari sekretariat Layanan Otoritas Sponsor
-                                                                        </Label>
-                                                                        <Checkbox
-                                                                            checked={data.is_acknowledged}
-                                                                            onCheckedChange={(checked) =>
-                                                                                setData('is_acknowledged', Boolean(checked))
-                                                                            }
-                                                                        />
-                                                                    </div>
-
-                                                                    <div>
-                                                                        <Label
-                                                                            htmlFor="chief_verificator_amount"
-                                                                            className="mb-1 text-sm font-medium text-gray-700"
-                                                                        >
-                                                                            Nominal yang di berikan kepada Verifikator Kepala
-                                                                        </Label>
-                                                                        <Input
-                                                                            required
-                                                                            type="number"
-                                                                            placeholder="Nominal yang di berikan kepada Verifikator Kepala"
-                                                                            value={data.chief_verificator_amount}
-                                                                            onChange={(e) =>
-                                                                                setData('chief_verificator_amount', parseInt(e.target.value))
-                                                                            }
-                                                                        />
-                                                                    </div>
-
-                                                                    <div>
-                                                                        <Label
-                                                                            htmlFor="member_verificator_amount"
-                                                                            className="mb-1 text-sm font-medium text-gray-700"
-                                                                        >
-                                                                            Nominal yang diberikan kepada Verifikator Anggota
-                                                                        </Label>
-                                                                        <Input
-                                                                            required
-                                                                            type="number"
-                                                                            placeholder="Nominal yang diberikan kepada Verifikator Anggota"
-                                                                            value={data.member_verificator_amount}
-                                                                            onChange={(e) =>
-                                                                                setData('member_verificator_amount', parseInt(e.target.value))
-                                                                            }
-                                                                        />
-                                                                    </div>
-
-                                                                    <div>
-                                                                        <Label
-                                                                            htmlFor="payment_proof_path"
-                                                                            className="mb-1 text-sm font-medium text-gray-700"
-                                                                        >
-                                                                            Upload bukti transfer penggantian transport dan uang harian tim
-                                                                            verifikator
-                                                                        </Label>
-                                                                        <Input
-                                                                            required
-                                                                            type="file"
-                                                                            accept=".jpg,.jpeg,.png,.pdf"
-                                                                            onChange={(e) => {
-                                                                                if (e.target.files && e.target.files.length > 0) {
-                                                                                    setData('payment_proof_path', e.target.files[0]);
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="is_acknowledged"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Dengan ini saya menyatakan bahwa penggantian transport dan uang harian
+                                                                                yang diberikan kepada tim verifikator sudah sesuai dengan ketentuan surat
+                                                                                informasi pembebanan biaya dari sekretariat Layanan Otoritas Sponsor
+                                                                            </Label>
+                                                                            <Checkbox
+                                                                                checked={data.is_acknowledged}
+                                                                                onCheckedChange={(checked) =>
+                                                                                    setData('is_acknowledged', Boolean(checked))
                                                                                 }
-                                                                            }}
-                                                                        />
-                                                                    </div>
-                                                                </form>
+                                                                            />
+                                                                            {errors.is_acknowledged && (
+                                                                                <p className="mt-1 text-xs text-red-600">{errors.is_acknowledged}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="chief_verificator_amount"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Nominal yang di berikan kepada Verifikator Kepala
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="number"
+                                                                                placeholder="Nominal yang di berikan kepada Verifikator Kepala"
+                                                                                value={data.chief_verificator_amount}
+                                                                                onChange={(e) =>
+                                                                                    setData('chief_verificator_amount', parseInt(e.target.value))
+                                                                                }
+                                                                            />
+                                                                            {errors.chief_verificator_amount && (
+                                                                                <p className="mt-1 text-xs text-red-600">{errors.chief_verificator_amount}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="member_verificator_amount"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Nominal yang diberikan kepada Verifikator Anggota
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="number"
+                                                                                placeholder="Nominal yang diberikan kepada Verifikator Anggota"
+                                                                                value={data.member_verificator_amount}
+                                                                                onChange={(e) =>
+                                                                                    setData('member_verificator_amount', parseInt(e.target.value))
+                                                                                }
+                                                                            />
+                                                                            {errors.member_verificator_amount && (
+                                                                                <p className="mt-1 text-xs text-red-600">{errors.member_verificator_amount}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="payment_proof_path"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Upload bukti transfer penggantian transport dan uang harian tim
+                                                                                verifikator
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="file"
+                                                                                accept=".jpg,.jpeg,.png,.pdf"
+                                                                                onChange={(e) => {
+                                                                                    if (e.target.files && e.target.files.length > 0) {
+                                                                                        setData('payment_proof_path', e.target.files[0]);
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                            {errors.payment_proof_path && (
+                                                                                <p className="mt-1 text-xs text-red-600">{errors.payment_proof_path}</p>
+                                                                            )}
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
                                                                 <DialogFooter>
                                                                     <Button variant="outline" onClick={() => setIsSurveyModalOpen(false)}>
                                                                         Batal
@@ -621,7 +726,7 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
 
                                                     {application.status === 'terbit' &&
                                                         application.iin_number &&
-                                                        application.additional_documents && (
+                                                        application.additional_documents && application.expense_reim_id != null && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
@@ -650,13 +755,12 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`rounded px-3 py-1 ${
-                                            link.active
-                                                ? 'bg-blue-100 text-blue-700'
-                                                : link.url
-                                                  ? 'text-gray-600 hover:bg-gray-100'
-                                                  : 'cursor-not-allowed text-gray-300'
-                                        }`}
+                                        className={`rounded px-3 py-1 ${link.active
+                                            ? 'bg-blue-100 text-blue-700'
+                                            : link.url
+                                                ? 'text-gray-600 hover:bg-gray-100'
+                                                : 'cursor-not-allowed text-gray-300'
+                                            }`}
                                         disabled={!link.url}
                                     >
                                         {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}

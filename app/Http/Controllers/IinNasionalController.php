@@ -772,6 +772,66 @@ class IinNasionalController extends Controller
         return back()->with('success', $message);
     }
 
+    public function storeExpenseReimbursement(Request $request, IinNasionalApplication $iinNasional)
+    {
+        $this->authorize('view', $iinNasional);
+
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'pic_name' => 'required|string|max:255',
+            'pic_contact' => 'required|string|max:255',
+            'verification_date' => 'required|date',
+            'is_acknowledged' => 'required|boolean',
+            'chief_verificator_amount' => 'required|integer|min:0',
+            'member_verificator_amount' => 'required|integer|min:0',
+            'payment_proof_path' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        try {
+            return DB::transaction(function () use ($request, $iinNasional) {
+                // Handle file upload
+                $paymentProofPath = null;
+                if ($request->hasFile('payment_proof_path')) {
+                    $file = $request->file('payment_proof_path');
+                    $filename = $iinNasional->application_number . '_' . time() . '_expense_proof.' . $file->getClientOriginalExtension();
+                    $paymentProofPath = $file->storeAs('iin-nasional/expense-reimbursement', $filename, 'public');
+                }
+
+                // Create expense reimbursement record
+                $expenseReimbursement = \App\Models\ExpenseReimbursements::create([
+                    'company_name' => $request->company_name,
+                    'pic_name' => $request->pic_name,
+                    'pic_contact' => $request->pic_contact,
+                    'verification_date' => $request->verification_date,
+                    'is_acknowledged' => $request->is_acknowledged,
+                    'chief_verificator_amount' => $request->chief_verificator_amount,
+                    'member_verificator_amount' => $request->member_verificator_amount,
+                    'payment_proof_path' => $paymentProofPath,
+                ]);
+
+                // Link expense reimbursement to IIN application
+                $iinNasional->update([
+                    'expense_reim_id' => $expenseReimbursement->id
+                ]);
+
+                // Log activity
+                IinStatusLog::create([
+                    'application_type' => 'nasional',
+                    'application_id' => $iinNasional->id,
+                    'user_id' => Auth::id(),
+                    'status_from' => $iinNasional->status,
+                    'status_to' => $iinNasional->status,
+                    'notes' => 'Form bukti penggantian transport dan uang harian disubmit'
+                ]);
+
+                return back()->with('success', 'Form bukti penggantian transport dan uang harian berhasil disubmit');
+            });
+        } catch (\Exception $e) {
+            Log::error('Error submitting expense reimbursement: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.']);
+        }
+    }
+
     public function destroy(IinNasionalApplication $iinNasional)
     {
         $this->authorize('delete', $iinNasional);

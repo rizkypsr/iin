@@ -127,8 +127,8 @@ class PengawasanIinNasionalController extends Controller
         // Log the upload
         PengawasanIinNasionalStatusLog::create([
             'pengawasan_iin_nasional_id' => $pengawasanIinNasional->id,
-            'status_from' => null,
-            'status_to' => null,
+            'status_from' => $pengawasanIinNasional->status,
+            'status_to' => $pengawasanIinNasional->status,
             'notes' => 'User mengupload bukti pembayaran (' . count($uploadedFiles) . ' file)',
             'changed_by' => Auth::id(),
         ]);
@@ -331,5 +331,64 @@ class PengawasanIinNasionalController extends Controller
             'notes' => $notes,
             'changed_by' => Auth::id(),
         ]);
+    }
+
+    public function storeExpenseReimbursement(Request $request, PengawasanIinNasional $pengawasanIinNasional)
+    {
+        $this->authorize('view', $pengawasanIinNasional);
+
+        $request->validate([
+            'company_name' => 'required|string|max:255',
+            'pic_name' => 'required|string|max:255',
+            'pic_contact' => 'required|string|max:255',
+            'verification_date' => 'required|date',
+            'is_acknowledged' => 'required|boolean',
+            'chief_verificator_amount' => 'required|integer|min:0',
+            'member_verificator_amount' => 'required|integer|min:0',
+            'payment_proof_path' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        try {
+            return DB::transaction(function () use ($request, $pengawasanIinNasional) {
+                // Handle file upload
+                $paymentProofPath = null;
+                if ($request->hasFile('payment_proof_path')) {
+                    $file = $request->file('payment_proof_path');
+                    $filename = 'pengawasan_nasional_' . time() . '_expense_proof.' . $file->getClientOriginalExtension();
+                    $paymentProofPath = $file->storeAs('pengawasan-iin-nasional/expense-reimbursement', $filename, 'public');
+                }
+
+                // Create expense reimbursement record
+                $expenseReimbursement = \App\Models\ExpenseReimbursements::create([
+                    'company_name' => $request->company_name,
+                    'pic_name' => $request->pic_name,
+                    'pic_contact' => $request->pic_contact,
+                    'verification_date' => $request->verification_date,
+                    'is_acknowledged' => $request->is_acknowledged,
+                    'chief_verificator_amount' => $request->chief_verificator_amount,
+                    'member_verificator_amount' => $request->member_verificator_amount,
+                    'payment_proof_path' => $paymentProofPath,
+                ]);
+
+                // Link expense reimbursement to the application
+                $pengawasanIinNasional->update([
+                    'expense_reim_id' => $expenseReimbursement->id,
+                ]);
+
+                // Log activity
+                PengawasanIinNasionalStatusLog::create([
+                    'pengawasan_iin_nasional_id' => $pengawasanIinNasional->id,
+                    'status_from' => null,
+                    'status_to' => null,
+                    'notes' => 'Form bukti penggantian transport dan uang harian disubmit',
+                    'changed_by' => Auth::id(),
+                ]);
+
+                return back()->with('success', 'Form bukti penggantian transport dan uang harian berhasil disubmit');
+            });
+        } catch (\Exception $e) {
+            Log::error('Error submitting expense reimbursement: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.']);
+        }
     }
 }

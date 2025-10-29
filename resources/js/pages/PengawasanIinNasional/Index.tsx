@@ -2,10 +2,15 @@ import QrisModal from '@/components/QrisModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import {
     AlertCircle,
@@ -20,6 +25,7 @@ import {
     MapPin,
     Plus,
     Shield,
+    TriangleAlert,
     Upload,
     User,
 } from 'lucide-react';
@@ -37,6 +43,7 @@ interface PengawasanIinNasionalApplication {
     additional_documents?: string;
     can_upload_payment_proof: boolean;
     can_download_certificate: boolean;
+    expense_reim_id?: number | null;
     user: {
         name: string;
         email: string;
@@ -55,6 +62,10 @@ interface Props extends PageProps {
     errors?: {
         profile?: string;
         [key: string]: any;
+    };
+    flash?: {
+        success?: string;
+        error?: string;
     };
 }
 
@@ -124,11 +135,128 @@ const containerAnimation = {
     },
 };
 
-export default function PengawasanIinNasionalIndex({ applications, auth, errors }: Props) {
+export default function PengawasanIinNasionalIndex({ applications, auth, errors, flash }: Props) {
     const [showSurvey, setShowSurvey] = useState(false);
     const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [selectedApplication, setSelectedApplication] = useState<PengawasanIinNasionalApplication | null>(null);
-    const { flash } = usePage<PageProps>().props;
+
+    // Expense reimbursement form
+    const { data: expenseReimData, setData: setExpenseReimData, post: postExpenseReim, processing: expenseReimProcessing, errors: expenseReimErrors, reset: resetExpenseReim } = useForm({
+        company_name: '',
+        pic_name: '',
+        pic_contact: '',
+        verification_date: '',
+        is_acknowledged: false as boolean,
+        chief_verificator_amount: '',
+        member_verificator_amount: '',
+        payment_proof_path: null as File | null,
+    });
+
+    // Handle flash messages
+    useEffect(() => {
+        if (flash?.success) {
+            showSuccessToast(flash.success);
+        }
+        if (flash?.error) {
+            showErrorToast(flash.error);
+        }
+    }, [flash]);
+
+    const expenseReimSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!selectedApplication) {
+            showErrorToast('Aplikasi tidak ditemukan');
+            return;
+        }
+
+        // Validate required fields
+        if (!expenseReimData.company_name.trim()) {
+            showErrorToast('Nama perusahaan harus diisi');
+            return;
+        }
+        if (!expenseReimData.pic_name.trim()) {
+            showErrorToast('Nama PIC harus diisi');
+            return;
+        }
+        if (!expenseReimData.pic_contact.trim()) {
+            showErrorToast('Kontak PIC harus diisi');
+            return;
+        }
+        if (!expenseReimData.verification_date) {
+            showErrorToast('Tanggal verifikasi harus diisi');
+            return;
+        }
+        if (!expenseReimData.chief_verificator_amount) {
+            showErrorToast('Jumlah ketua verifikator harus diisi');
+            return;
+        }
+        if (!expenseReimData.member_verificator_amount) {
+            showErrorToast('Jumlah anggota verifikator harus diisi');
+            return;
+        }
+        if (!expenseReimData.payment_proof_path) {
+            showErrorToast('Bukti pembayaran harus diupload');
+            return;
+        }
+        if (!expenseReimData.is_acknowledged) {
+            showErrorToast('Anda harus menyetujui pernyataan');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('company_name', expenseReimData.company_name);
+        formData.append('pic_name', expenseReimData.pic_name);
+        formData.append('pic_contact', expenseReimData.pic_contact);
+        formData.append('verification_date', expenseReimData.verification_date);
+        formData.append('chief_verificator_amount', expenseReimData.chief_verificator_amount);
+        formData.append('member_verificator_amount', expenseReimData.member_verificator_amount);
+        formData.append('is_acknowledged', expenseReimData.is_acknowledged ? '1' : '0');
+        if (expenseReimData.payment_proof_path) {
+            formData.append('payment_proof_path', expenseReimData.payment_proof_path);
+        }
+
+        router.post(route('pengawasan-iin-nasional.store-expense-reimbursement', selectedApplication.id), formData, {
+            onSuccess: () => {
+                resetExpenseReim();
+            },
+            onError: (errors) => {
+                console.error('Expense reimbursement errors:', errors);
+                if (typeof errors === 'object' && errors !== null) {
+                    const errorMessages = Object.values(errors).flat();
+                    if (errorMessages.length > 0) {
+                        showErrorToast(errorMessages[0] as string);
+                    } else {
+                        showErrorToast('Terjadi kesalahan saat mengirim pengajuan');
+                    }
+                } else {
+                    showErrorToast('Terjadi kesalahan saat mengirim pengajuan');
+                }
+            },
+        });
+    };
+
+    const handleExpenseReimFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                showErrorToast('Ukuran file tidak boleh lebih dari 5MB');
+                e.target.value = '';
+                return;
+            }
+
+            // Validate file type
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                showErrorToast('Format file harus PDF, JPG, JPEG, atau PNG');
+                e.target.value = '';
+                return;
+            }
+
+            setExpenseReimData('payment_proof_path', file);
+        }
+    };
 
     const handleQrisFileUpload = (file: File) => {
         const formData = new FormData();
@@ -282,11 +410,10 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                     {applications.data.map((application) => (
                                         <motion.div
                                             key={application.id}
-                                            className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${
-                                                application.status === 'perbaikan' && auth.user.role === 'user'
-                                                    ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
-                                                    : ''
-                                            }`}
+                                            className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${application.status === 'perbaikan' && auth.user.role === 'user'
+                                                ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
+                                                : ''
+                                                }`}
                                             variants={itemAnimation}
                                         >
                                             <div className="mb-3 flex items-start justify-between">
@@ -317,16 +444,16 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                                                 application.status === 'pengajuan'
                                                                     ? '40%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                     : application.status === 'perbaikan'
-                                                                      ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
-                                                                      : application.status === 'pembayaran'
-                                                                        ? '60%'
-                                                                        : application.status === 'verifikasi-lapangan'
-                                                                          ? '80%'
-                                                                          : application.status === 'menunggu-terbit'
-                                                                            ? '80%'
-                                                                            : application.status === 'terbit'
-                                                                              ? '100%'
-                                                                              : '0%',
+                                                                        ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
+                                                                        : application.status === 'pembayaran'
+                                                                            ? '60%'
+                                                                            : application.status === 'verifikasi-lapangan'
+                                                                                ? '80%'
+                                                                                : application.status === 'menunggu-terbit'
+                                                                                    ? '80%'
+                                                                                    : application.status === 'terbit'
+                                                                                        ? '100%'
+                                                                                        : '0%',
                                                         }}
                                                     ></div>
                                                 </div>
@@ -419,7 +546,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                                             </Button>
                                                         )}
 
-                                                        {application.can_download_certificate && application.additional_documents && (
+                                                        {application.can_download_certificate && application.additional_documents && application.expense_reim_id != null && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
@@ -435,6 +562,209 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                                                 Download Sertifikat
                                                             </Button>
                                                         )}
+
+                                                        {/* Expense Reimbursement Dialog */}
+                                                        {(application.status === 'verifikasi-lapangan' || application.status === 'terbit') && application.expense_reim_id == null && (
+                                                            <Dialog>
+                                                                <DialogTrigger asChild>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        className="border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-500"
+                                                                        onClick={() => setSelectedApplication(application)}
+                                                                    >
+                                                                        <TriangleAlert className="mr-2 h-4 w-4 text-red-500" />
+                                                                        Silahkan isi Form Bukti Penggantian Transport dan Uang Harian
+                                                                    </Button>
+                                                                </DialogTrigger>
+                                                                <DialogContent className="max-h-[90vh] max-w-2xl">
+                                                                    <DialogHeader>
+                                                                        <DialogTitle>Form Bukti Penggantian Transport dan Uang Harian</DialogTitle>
+                                                                        <DialogDescription>
+                                                                            Silahkan isi form berikut untuk mengajukan penggantian transport dan uang
+                                                                            harian.
+                                                                        </DialogDescription>
+                                                                    </DialogHeader>
+                                                                    <div className="max-h-[60vh] overflow-y-auto pr-2">
+                                                                        <form
+                                                                            id="expense-reim-form"
+                                                                            className="flex flex-col gap-4"
+                                                                            onSubmit={expenseReimSubmit}
+                                                                        >
+                                                                            <div>
+                                                                                <Label
+                                                                                    htmlFor="company_name"
+                                                                                    className="mb-1 text-sm font-medium text-gray-700"
+                                                                                >
+                                                                                    Nama Perusahaan
+                                                                                </Label>
+                                                                                <Input
+                                                                                    required
+                                                                                    type="text"
+                                                                                    placeholder="Nama Perusahaan"
+                                                                                    value={expenseReimData.company_name}
+                                                                                    onChange={(e) => setExpenseReimData('company_name', e.target.value)}
+                                                                                />
+                                                                                {expenseReimErrors.company_name && (
+                                                                                    <p className="mt-1 text-xs text-red-600">{expenseReimErrors.company_name}</p>
+                                                                                )}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <Label htmlFor="pic_name" className="mb-1 text-sm font-medium text-gray-700">
+                                                                                    Nama PIC
+                                                                                </Label>
+                                                                                <Input
+                                                                                    required
+                                                                                    type="text"
+                                                                                    placeholder="Nama PIC"
+                                                                                    value={expenseReimData.pic_name}
+                                                                                    onChange={(e) => setExpenseReimData('pic_name', e.target.value)}
+                                                                                />
+                                                                                {expenseReimErrors.pic_name && (
+                                                                                    <p className="mt-1 text-xs text-red-600">{expenseReimErrors.pic_name}</p>
+                                                                                )}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <Label
+                                                                                    htmlFor="pic_contact"
+                                                                                    className="mb-1 text-sm font-medium text-gray-700"
+                                                                                >
+                                                                                    Kontak PIC
+                                                                                </Label>
+                                                                                <Input
+                                                                                    required
+                                                                                    type="text"
+                                                                                    placeholder="Kontak PIC"
+                                                                                    value={expenseReimData.pic_contact}
+                                                                                    onChange={(e) => setExpenseReimData('pic_contact', e.target.value)}
+                                                                                />
+                                                                                {expenseReimErrors.pic_contact && (
+                                                                                    <p className="mt-1 text-xs text-red-600">{expenseReimErrors.pic_contact}</p>
+                                                                                )}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <Label
+                                                                                    htmlFor="verification_date"
+                                                                                    className="mb-1 text-sm font-medium text-gray-700"
+                                                                                >
+                                                                                    Tanggal Verifikasi
+                                                                                </Label>
+                                                                                <Input
+                                                                                    required
+                                                                                    type="date"
+                                                                                    placeholder="Tanggal Verifikasi"
+                                                                                    value={expenseReimData.verification_date}
+                                                                                    onChange={(e) => setExpenseReimData('verification_date', e.target.value)}
+                                                                                />
+                                                                                {expenseReimErrors.verification_date && (
+                                                                                    <p className="mt-1 text-xs text-red-600">{expenseReimErrors.verification_date}</p>
+                                                                                )}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <Label
+                                                                                    htmlFor="is_acknowledged"
+                                                                                    className="mb-1 text-sm font-medium text-gray-700"
+                                                                                >
+                                                                                    Dengan ini saya menyatakan bahwa penggantian transport dan uang harian
+                                                                                    yang diberikan kepada tim verifikator sudah sesuai dengan ketentuan surat
+                                                                                    informasi pembebanan biaya dari sekretariat Layanan Otoritas Sponsor
+                                                                                </Label>
+                                                                                <Checkbox
+                                                                                    checked={expenseReimData.is_acknowledged}
+                                                                                    onCheckedChange={(checked) =>
+                                                                                        setExpenseReimData('is_acknowledged', Boolean(checked))
+                                                                                    }
+                                                                                />
+                                                                                {expenseReimErrors.is_acknowledged && (
+                                                                                    <p className="mt-1 text-xs text-red-600">{expenseReimErrors.is_acknowledged}</p>
+                                                                                )}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <Label
+                                                                                    htmlFor="chief_verificator_amount"
+                                                                                    className="mb-1 text-sm font-medium text-gray-700"
+                                                                                >
+                                                                                    Nominal yang di berikan kepada Verifikator Kepala
+                                                                                </Label>
+                                                                                <Input
+                                                                                    required
+                                                                                    type="number"
+                                                                                    placeholder="Nominal yang di berikan kepada Verifikator Kepala"
+                                                                                    value={expenseReimData.chief_verificator_amount}
+                                                                                    onChange={(e) =>
+                                                                                        setExpenseReimData('chief_verificator_amount', e.target.value)
+                                                                                    }
+                                                                                />
+                                                                                {expenseReimErrors.chief_verificator_amount && (
+                                                                                    <p className="mt-1 text-xs text-red-600">{expenseReimErrors.chief_verificator_amount}</p>
+                                                                                )}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <Label
+                                                                                    htmlFor="member_verificator_amount"
+                                                                                    className="mb-1 text-sm font-medium text-gray-700"
+                                                                                >
+                                                                                    Nominal yang diberikan kepada Verifikator Anggota
+                                                                                </Label>
+                                                                                <Input
+                                                                                    required
+                                                                                    type="number"
+                                                                                    placeholder="Nominal yang diberikan kepada Verifikator Anggota"
+                                                                                    value={expenseReimData.member_verificator_amount}
+                                                                                    onChange={(e) =>
+                                                                                        setExpenseReimData('member_verificator_amount', e.target.value)
+                                                                                    }
+                                                                                />
+                                                                                {expenseReimErrors.member_verificator_amount && (
+                                                                                    <p className="mt-1 text-xs text-red-600">{expenseReimErrors.member_verificator_amount}</p>
+                                                                                )}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <Label
+                                                                                    htmlFor="payment_proof_path"
+                                                                                    className="mb-1 text-sm font-medium text-gray-700"
+                                                                                >
+                                                                                    Upload bukti transfer penggantian transport dan uang harian tim
+                                                                                    verifikator
+                                                                                </Label>
+                                                                                <Input
+                                                                                    required
+                                                                                    type="file"
+                                                                                    accept=".jpg,.jpeg,.png,.pdf"
+                                                                                    onChange={handleExpenseReimFileUpload}
+                                                                                />
+                                                                                {expenseReimErrors.payment_proof_path && (
+                                                                                    <p className="mt-1 text-xs text-red-600">{expenseReimErrors.payment_proof_path}</p>
+                                                                                )}
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <DialogFooter>
+                                                                        <DialogTrigger asChild>
+                                                                            <Button variant="outline">
+                                                                                Batal
+                                                                            </Button>
+                                                                        </DialogTrigger>
+                                                                        <Button 
+                                                                            type="button" 
+                                                                            onClick={expenseReimSubmit}
+                                                                            disabled={expenseReimProcessing}
+                                                                        >
+                                                                            {expenseReimProcessing ? 'Mengirim...' : 'Kirim'}
+                                                                        </Button>
+                                                                    </DialogFooter>
+                                                                </DialogContent>
+                                                            </Dialog>
+                                                        )}
+
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -454,9 +784,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors 
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    className={`rounded-md px-3 py-2 text-sm ${
-                                        link.active ? 'bg-blue-600 text-white' : 'border bg-white text-gray-700 hover:bg-gray-50'
-                                    } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
+                                    className={`rounded-md px-3 py-2 text-sm ${link.active ? 'bg-blue-600 text-white' : 'border bg-white text-gray-700 hover:bg-gray-50'
+                                        } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                 />
                             ))}

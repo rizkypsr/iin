@@ -3,13 +3,18 @@ import SurveyModal from '@/components/SurveyModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, Upload, User } from 'lucide-react';
-import { useState } from 'react';
+import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, TriangleAlert, Upload, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface IinSingleBlockholderApplication {
     id: number;
@@ -21,6 +26,7 @@ interface IinSingleBlockholderApplication {
     submitted_at: string;
     iin_number?: string;
     additional_documents?: string;
+    expense_reim_id?: number | null;
     can_upload_payment_proof: boolean;
     can_download_certificate: boolean;
     user: {
@@ -38,6 +44,10 @@ interface Props extends PageProps {
         data: IinSingleBlockholderApplication[];
         links: any[];
         meta: any;
+    };
+    flash?: {
+        success?: string;
+        error?: string;
     };
 }
 
@@ -123,10 +133,109 @@ const containerAnimation = {
     },
 };
 
-export default function IinSingleBlockholderIndex({ applications, auth }: Props) {
+export default function IinSingleBlockholderIndex({ applications, auth, flash }: Props) {
     const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
     const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [selectedApplication, setSelectedApplication] = useState<IinSingleBlockholderApplication | null>(null);
+
+    // Expense reimbursement form
+    const { data: expenseReimData, setData: setExpenseReimData, post: postExpenseReim, processing: expenseReimProcessing, errors: expenseReimErrors, reset: resetExpenseReim } = useForm({
+        company_name: '',
+        pic_name: '',
+        pic_contact: '',
+        verification_date: '',
+        is_acknowledged: false as boolean,
+        chief_verificator_amount: '',
+        member_verificator_amount: '',
+        payment_proof_path: null as File | null,
+    });
+
+    // Handle flash messages
+    useEffect(() => {
+        if (flash?.success) {
+            showSuccessToast(flash.success);
+        }
+        if (flash?.error) {
+            showErrorToast(flash.error);
+        }
+    }, [flash]);
+
+    const expenseReimSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!selectedApplication) {
+            showErrorToast('Aplikasi tidak ditemukan');
+            return;
+        }
+
+        // Validate required fields
+        if (!expenseReimData.company_name.trim()) {
+            showErrorToast('Nama perusahaan harus diisi');
+            return;
+        }
+        if (!expenseReimData.pic_name.trim()) {
+            showErrorToast('Nama PIC harus diisi');
+            return;
+        }
+        if (!expenseReimData.pic_contact.trim()) {
+            showErrorToast('Kontak PIC harus diisi');
+            return;
+        }
+        if (!expenseReimData.verification_date) {
+            showErrorToast('Tanggal verifikasi harus diisi');
+            return;
+        }
+        if (!expenseReimData.is_acknowledged) {
+            showErrorToast('Pernyataan harus disetujui');
+            return;
+        }
+        if (!expenseReimData.chief_verificator_amount.trim()) {
+            showErrorToast('Jumlah ketua verifikator harus diisi');
+            return;
+        }
+        if (!expenseReimData.member_verificator_amount.trim()) {
+            showErrorToast('Jumlah anggota verifikator harus diisi');
+            return;
+        }
+        if (!expenseReimData.payment_proof_path) {
+            showErrorToast('Bukti pembayaran harus diupload');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('company_name', expenseReimData.company_name);
+        formData.append('pic_name', expenseReimData.pic_name);
+        formData.append('pic_contact', expenseReimData.pic_contact);
+        formData.append('verification_date', expenseReimData.verification_date);
+        formData.append('is_acknowledged', expenseReimData.is_acknowledged ? '1' : '0');
+        formData.append('chief_verificator_amount', expenseReimData.chief_verificator_amount);
+        formData.append('member_verificator_amount', expenseReimData.member_verificator_amount);
+        if (expenseReimData.payment_proof_path) {
+            formData.append('payment_proof_path', expenseReimData.payment_proof_path);
+        }
+
+        postExpenseReim(route('iin-single-blockholder.store-expense-reimbursement', selectedApplication.id), {
+            forceFormData: true,
+            onSuccess: () => {
+                resetExpenseReim();
+            },
+            onError: (errors) => {
+                const firstError = Object.values(errors);
+                if (firstError.length > 0) {
+                    showErrorToast((firstError[0] as string));
+                } else {
+                    showErrorToast('Terjadi kesalahan saat mengajukan form penggantian');
+                }
+            },
+        });
+    };
+
+    const handleExpenseReimFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setExpenseReimData('payment_proof_path', file);
+        }
+    };
 
     const handleQrisFileUpload = (file: File) => {
         const formData = new FormData();
@@ -245,11 +354,10 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                 {applications.data.map((application) => (
                                     <motion.div
                                         key={application.id}
-                                        className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${
-                                            application.status === 'perbaikan' && auth.user.role === 'user'
+                                        className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${application.status === 'perbaikan' && auth.user.role === 'user'
                                                 ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
                                                 : ''
-                                        }`}
+                                            }`}
                                         variants={itemAnimation}
                                     >
                                         {/* Alert notification removed as requested */}
@@ -282,16 +390,16 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                                             application.status === 'pengajuan'
                                                                 ? '33%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                 : application.status === 'perbaikan'
-                                                                  ? '33%' // Perbaikan also means user is in Verifikasi Dokumen phase
-                                                                  : application.status === 'pembayaran'
-                                                                    ? '50%'
-                                                                    : application.status === 'verifikasi-lapangan'
-                                                                      ? '67%'
-                                                                      : application.status === 'pembayaran-tahap-2'
-                                                                        ? '83%'
-                                                                        : application.status === 'terbit'
-                                                                          ? '100%'
-                                                                          : '0%',
+                                                                    ? '33%' // Perbaikan also means user is in Verifikasi Dokumen phase
+                                                                    : application.status === 'pembayaran'
+                                                                        ? '50%'
+                                                                        : application.status === 'verifikasi-lapangan'
+                                                                            ? '67%'
+                                                                            : application.status === 'pembayaran-tahap-2'
+                                                                                ? '83%'
+                                                                                : application.status === 'terbit'
+                                                                                    ? '100%'
+                                                                                    : '0%',
                                                     }}
                                                 ></div>
                                             </div>
@@ -389,7 +497,7 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
 
                                                     {application.status === 'terbit' &&
                                                         application.iin_number &&
-                                                        application.additional_documents && (
+                                                        application.additional_documents && application.expense_reim_id != null && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
@@ -403,6 +511,211 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                                                 Download Sertifikat
                                                             </Button>
                                                         )}
+
+                                                    {/* Expense Reimbursement Button */}
+                                                    {(application.status === 'verifikasi-lapangan' || application.status === 'terbit') && application.expense_reim_id == null && (
+                                                        <Dialog>
+                                                            <DialogTrigger asChild>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-500"
+                                                                    onClick={() => setSelectedApplication(application)}
+                                                                >
+                                                                    <TriangleAlert className="mr-2 h-4 w-4 text-red-500" />
+                                                                    Silahkan isi Form Bukti Penggantian Transport dan Uang Harian
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="max-h-[90vh] max-w-2xl">
+                                                                <DialogHeader>
+                                                                    <DialogTitle>Form Bukti Penggantian Transport dan Uang Harian</DialogTitle>
+                                                                    <DialogDescription>
+                                                                        Silahkan isi form berikut untuk mengajukan penggantian transport dan uang
+                                                                        harian.
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+                                                                <div className="max-h-[60vh] overflow-y-auto pr-2">
+                                                                    <form
+                                                                        id="expense-reim-form"
+                                                                        className="flex flex-col gap-4"
+                                                                        onSubmit={expenseReimSubmit}
+                                                                    >
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="company_name"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Nama Perusahaan
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="text"
+                                                                                placeholder="Nama Perusahaan"
+                                                                                value={expenseReimData.company_name}
+                                                                                onChange={(e) => setExpenseReimData('company_name', e.target.value)}
+                                                                            />
+                                                                            {expenseReimErrors.company_name && (
+                                                                                <p className="mt-1 text-xs text-red-600">{expenseReimErrors.company_name}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label htmlFor="pic_name" className="mb-1 text-sm font-medium text-gray-700">
+                                                                                Nama PIC
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="text"
+                                                                                placeholder="Nama PIC"
+                                                                                value={expenseReimData.pic_name}
+                                                                                onChange={(e) => setExpenseReimData('pic_name', e.target.value)}
+                                                                            />
+                                                                            {expenseReimErrors.pic_name && (
+                                                                                <p className="mt-1 text-xs text-red-600">{expenseReimErrors.pic_name}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="pic_contact"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Kontak PIC
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="text"
+                                                                                placeholder="Kontak PIC"
+                                                                                value={expenseReimData.pic_contact}
+                                                                                onChange={(e) => setExpenseReimData('pic_contact', e.target.value)}
+                                                                            />
+                                                                            {expenseReimErrors.pic_contact && (
+                                                                                <p className="mt-1 text-xs text-red-600">{expenseReimErrors.pic_contact}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="verification_date"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Tanggal Verifikasi
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="date"
+                                                                                placeholder="Tanggal Verifikasi"
+                                                                                value={expenseReimData.verification_date}
+                                                                                onChange={(e) => setExpenseReimData('verification_date', e.target.value)}
+                                                                            />
+                                                                            {expenseReimErrors.verification_date && (
+                                                                                <p className="mt-1 text-xs text-red-600">{expenseReimErrors.verification_date}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="is_acknowledged"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Dengan ini saya menyatakan bahwa penggantian transport dan uang harian
+                                                                                yang diberikan kepada tim verifikator sudah sesuai dengan ketentuan surat
+                                                                                informasi pembebanan biaya dari sekretariat Layanan Otoritas Sponsor
+                                                                            </Label>
+                                                                            <Checkbox
+                                                                                checked={expenseReimData.is_acknowledged}
+                                                                                onCheckedChange={(checked) =>
+                                                                                    setExpenseReimData('is_acknowledged', Boolean(checked))
+                                                                                }
+                                                                            />
+                                                                            {expenseReimErrors.is_acknowledged && (
+                                                                                <p className="mt-1 text-xs text-red-600">{expenseReimErrors.is_acknowledged}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="chief_verificator_amount"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Nominal yang di berikan kepada Verifikator Kepala
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="number"
+                                                                                placeholder="Nominal yang di berikan kepada Verifikator Kepala"
+                                                                                value={expenseReimData.chief_verificator_amount}
+                                                                                onChange={(e) =>
+                                                                                    setExpenseReimData('chief_verificator_amount', e.target.value)
+                                                                                }
+                                                                            />
+                                                                            {expenseReimErrors.chief_verificator_amount && (
+                                                                                <p className="mt-1 text-xs text-red-600">{expenseReimErrors.chief_verificator_amount}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="member_verificator_amount"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Nominal yang diberikan kepada Verifikator Anggota
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="number"
+                                                                                placeholder="Nominal yang diberikan kepada Verifikator Anggota"
+                                                                                value={expenseReimData.member_verificator_amount}
+                                                                                onChange={(e) =>
+                                                                                    setExpenseReimData('member_verificator_amount', e.target.value)
+                                                                                }
+                                                                            />
+                                                                            {expenseReimErrors.member_verificator_amount && (
+                                                                                <p className="mt-1 text-xs text-red-600">{expenseReimErrors.member_verificator_amount}</p>
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <Label
+                                                                                htmlFor="payment_proof_path"
+                                                                                className="mb-1 text-sm font-medium text-gray-700"
+                                                                            >
+                                                                                Upload bukti transfer penggantian transport dan uang harian tim
+                                                                                verifikator
+                                                                            </Label>
+                                                                            <Input
+                                                                                required
+                                                                                type="file"
+                                                                                accept=".jpg,.jpeg,.png,.pdf"
+                                                                                onChange={(e) => {
+                                                                                    if (e.target.files && e.target.files.length > 0) {
+                                                                                        setExpenseReimData('payment_proof_path', e.target.files[0]);
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                            {expenseReimErrors.payment_proof_path && (
+                                                                                <p className="mt-1 text-xs text-red-600">{expenseReimErrors.payment_proof_path}</p>
+                                                                            )}
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                                <DialogFooter>
+                                                                    <DialogTrigger asChild>
+                                                                        <Button variant="outline">
+                                                                            Batal
+                                                                        </Button>
+                                                                    </DialogTrigger>
+                                                                    <Button 
+                                                                        type="button" 
+                                                                        onClick={expenseReimSubmit}
+                                                                        disabled={expenseReimProcessing}
+                                                                    >
+                                                                        {expenseReimProcessing ? 'Mengirim...' : 'Kirim'}
+                                                                    </Button>
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
+                                                    )}
                                                 </div>
 
                                                 <div className="flex items-center text-sm text-gray-500">
@@ -451,13 +764,12 @@ export default function IinSingleBlockholderIndex({ applications, auth }: Props)
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`rounded px-3 py-1 ${
-                                            link.active
+                                        className={`rounded px-3 py-1 ${link.active
                                                 ? 'bg-blue-100 text-blue-700'
                                                 : link.url
-                                                  ? 'text-gray-600 hover:bg-gray-100'
-                                                  : 'cursor-not-allowed text-gray-300'
-                                        }`}
+                                                    ? 'text-gray-600 hover:bg-gray-100'
+                                                    : 'cursor-not-allowed text-gray-300'
+                                            }`}
                                         disabled={!link.url}
                                     >
                                         {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}

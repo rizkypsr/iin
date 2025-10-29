@@ -40,6 +40,7 @@ class IinSingleBlockholderApplication extends Model
         'issued_at',
         'viewed_at',
         'admin_id',
+        'expense_reim_id',
     ];
 
     protected $casts = [
