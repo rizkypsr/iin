@@ -44,8 +44,8 @@ class IinNasionalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'application_form' => 'required|file|max:10240',
-            'requirements_archive' => 'nullable|file|mimes:zip,rar|max:51200', // 50MB max for ZIP/RAR
+            'application_form' => 'required|file|max:20480|mimes:pdf',
+            'requirements_archive' => 'required|file|mimes:zip,rar|max:51200', // 50MB max for ZIP/RAR
         ]);
 
         $application = new IinNasionalApplication();

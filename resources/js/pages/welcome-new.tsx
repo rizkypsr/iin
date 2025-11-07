@@ -16,8 +16,8 @@ export default function Welcome() {
                 <div className="py-12 text-center">
                     <h1 className="mb-6 text-5xl font-bold tracking-tight text-gray-900">Selamat datang di Portal Layanan Otoritas Sponsor</h1>
                     <p className="mx-auto mb-8 max-w-3xl text-xl text-gray-600">
-                        Layanan Otoritas Sponsor adalah Layanan yang diberikan BSN untuk menerima, memproses dan meninjau / menyetujui permohonan
-                        untuk IIN (Issuer Identification Number)
+                        Layanan Otoritas Sponsor diselenggarakan BSN untuk menerbitkan Identification Issuer Number (IIN) yaitu nomor identifikasi yang diperlukan untuk keperluan transaksi data secara elektronik dalam lingkungan interchange internasional dan/atau antar-industry. Perkembangan teknologi memungkinkan IIN digunakan pada virtual card. IIN juga dikenal sebagai Bank Identification Number (BIN)
+                        BSN sebagai anggota ISO merupakan NSB (National Standard Body) di Indonesia yang bertindak sebagai otoritas sponsor/sponsoring authority (SA) yang bertanggung jawab untuk menerima, memproses dan meninjau/menyetujui permohonan untuk IIN (SNI ISO/IEC 7812-2:2017 Pasal 7.1) ."
                     </p>
                     <div className="flex justify-center gap-4">
                         <Link href={route('jenis-layanan')}>

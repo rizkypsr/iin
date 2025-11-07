@@ -106,7 +106,7 @@ export default function IinNasionalEdit({ application, auth }: Props) {
                                         <Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
                                         <div className="space-y-2">
                                             <p className="text-sm font-medium text-gray-900">Klik untuk upload formulir baru atau drag and drop</p>
-                                            <p className="text-xs text-gray-500">Format: PDF, DOC, DOCX (Maksimal 10MB)</p>
+                                            <p className="text-xs text-gray-500">Format: PDF, DOC, DOCX (Maksimal 20MB)</p>
                                             {data.application_form && (
                                                 <p className="mt-2 text-sm font-medium text-purple-600">{data.application_form.name}</p>
                                             )}

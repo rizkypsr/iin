@@ -139,8 +139,16 @@ export default function Welcome() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.8, ease: 'easeOut' }}
                             >
-                                Layanan Otoritas Sponsor adalah Layanan yang diberikan BSN untuk menerima, memproses dan meninjau / menyetujui
-                                permohonan untuk IIN (Issuer Identification Number)
+                                Layanan Otoritas Sponsor diselenggarakan BSN untuk menerbitkan Identification Issuer Number (IIN) yaitu nomor identifikasi yang diperlukan untuk keperluan transaksi data secara elektronik dalam lingkungan interchange internasional dan/atau antar-industry.
+                            </motion.p>
+                            <motion.p
+                                className="mx-auto text-xl leading-relaxed font-medium text-white/90 lg:text-2xl"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.8, ease: 'easeOut' }}
+                            >
+                                Perkembangan teknologi memungkinkan IIN digunakan pada virtual card. IIN juga dikenal sebagai Bank Identification Number (BIN)
+                                BSN sebagai anggota ISO merupakan NSB (National Standard Body) di Indonesia yang bertindak sebagai otoritas sponsor/sponsoring authority (SA) yang bertanggung jawab untuk menerima, memproses dan meninjau/menyetujui permohonan untuk IIN (SNI ISO/IEC 7812-2:2017 Pasal 7.1) ."
                             </motion.p>
                         </motion.div>
 

@@ -8,26 +8,26 @@ const layananList = [
     {
         id: 1,
         name: 'IIN Nasional',
-        description: 'Layanan identifikasi investasi nasional untuk perusahaan domestik',
-        features: ['Registrasi perusahaan', 'Validasi investasi', 'Sertifikat IIN'],
+        description: 'Nomor yang diterbitkan oleh BSN selaku otoritas sponsor/sponsoring authority (SA). IIN Nasional menjadi milik pemohon, berlaku selama institusi pemohon berdiri dan memiliki status hukum dan berlaku hanya di Indonesia (selama cross border antar negara lain belum dibuka).',
+        features: ['Penjelasan dan Kriteria layanan', 'Persyaratan Pemohon', 'Formulir Permohonan'],
     },
     {
         id: 2,
         name: 'Single IIN',
-        description: 'Layanan IIN untuk investasi tunggal atau proyek spesifik',
-        features: ['Satu proyek investasi', 'Proses cepat', 'Dokumentasi lengkap'],
+        description: 'Nomor*) yang diterbitkan oleh American Bankers Association (ABA) sebagai Registration Authority (RA) dengan pengesahan dari BSN sebagai otoritas sponsor/sponsoring authority (SA) di Indonesia. IIN menjadi milik penerbit kartu dan berlaku selama institusi penerbit kartu berdiri dan memiliki status hukum.',
+        features: ['Penjelasan dan Kriteria layanan', 'Persyaratan Pemohon', 'Formulir Permohonan'],
     },
     {
         id: 3,
         name: 'Blockholder',
-        description: 'Layanan untuk pemegang saham mayoritas dalam investasi',
-        features: ['Manajemen kepemilikan', 'Kontrol investasi', 'Laporan berkala'],
+        description: 'Serangkaian nomor yang diterbitkan oleh American Bankers Association (ABBA) sebagai Registration Authority yang ditunjuk ISO kepada sebuah institusi, umumnya lembaga switching/ sejenisnya yang memiliki kewenangan untuk mempergunakan nomor tersebut untuk mengidentifikasi anggota yang tergabung dalam jaringannya. Status nomor bukan merupakan milik penerbit kartu, namun milik institusi pemegang blockholder.',
+        features: ['Penjelasan dan Kriteria layanan', 'Persyaratan Pemohon', 'Formulir Permohonan'],
     },
     {
         id: 4,
-        name: 'Pengawasan',
-        description: 'Layanan pengawasan dan monitoring investasi berkelanjutan',
-        features: ['Monitoring real-time', 'Audit berkala', 'Compliance checking'],
+        name: 'Pemantauan',
+        description: 'Pemutakhiran dan pemastian penggunaan IIN sesuai SNI ISO/IEC 7812 series oleh entitas yang berhak. Status entitas dan pemanfaatan IIN dapat berimpplikasi pada kepemilikan IIN.',
+        features: ['Penjelasan dan Kriteria layanan', 'Persyaratan Pemohon', 'Formulir Permohonan'],
     },
 ];
 
@@ -53,9 +53,10 @@ export default function JenisLayanan() {
                 </div>
 
                 <div className="relative z-10 mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
-                    <h1 className="mb-6 text-6xl font-bold tracking-tight text-white drop-shadow-lg">Jenis Layanan IIN</h1>
+                    <h1 className="mb-6 text-6xl font-bold tracking-tight text-white drop-shadow-lg">Jenis Layanan Otoritas</h1>
                     <p className="mx-auto max-w-3xl text-xl leading-relaxed text-white/90">
-                        Kami menyediakan berbagai jenis layanan IIN untuk memenuhi kebutuhan investasi Anda
+                        Layanan Otoritas Sponsor dibedakan menjadi Penerbitan Nomor Identifikasi, dan Pemantauan Pemanfaatan Nomor Identifikasi.
+                        Nomor Identifikasi yang diterbitkan dibedakan menjadi beberapa jenis yaitu IIN Nasional, Single IIN dan Block Holder
                     </p>
                 </div>
             </div>
@@ -88,16 +89,6 @@ export default function JenisLayanan() {
                                             </li>
                                         ))}
                                     </ul>
-                                    <div className="pt-4">
-                                        <Button
-                                            variant={index % 2 === 0 ? 'outline' : 'accent'}
-                                            className={
-                                                index % 2 === 0 ? 'border-white bg-white/10 text-white hover:bg-white hover:text-[#01AEEC]' : ''
-                                            }
-                                        >
-                                            Pelajari Lebih Lanjut
-                                        </Button>
-                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
