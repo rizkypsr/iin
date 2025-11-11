@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { User } from '@/types';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -112,30 +113,6 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
     const [notes, setNotes] = useState('');
     const [verificationCompletionFiles, setVerificationCompletionFiles] = useState<File[]>([]);
 
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'pengajuan':
-                return <Clock className="h-4 w-4" />;
-            case 'pembayaran':
-                return <CreditCard className="h-4 w-4" />;
-            case 'verifikasi-lapangan':
-                return <Shield className="h-4 w-4" />;
-            case 'menunggu-terbit':
-                return <CheckCircle className="h-4 w-4" />;
-            case 'terbit':
-                return <Award className="h-4 w-4" />;
-            default:
-                return <UserIcon className="h-4 w-4" />;
-        }
-    };
-
-    // Status conditions
-    const canChangeToPayment = application.status === 'pengajuan';
-    const canChangeToFieldVerification = application.status === 'pembayaran';
-    const canCompleteFieldVerification = application.status === 'verifikasi-lapangan';
-    const canIssuePengawasan = application.status === 'verifikasi-lapangan';
-
-    // Helper functions for payment documents
     const addPaymentDocument = (file: File) => {
         setPaymentDocuments((prev) => [...prev, file]);
     };
@@ -215,40 +192,6 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
             console.error('Error in upload and status change:', error);
             showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
             setLoading(false);
-        }
-    };
-
-    const getStatusLabel = (status: string) => {
-        switch (status) {
-            case 'pengajuan':
-                return 'Diajukan';
-            case 'pembayaran':
-                return 'Pembayaran';
-            case 'verifikasi-lapangan':
-                return 'Verifikasi Lapangan';
-            case 'menunggu-terbit':
-                return 'Menunggu Terbit';
-            case 'terbit':
-                return 'Terbit';
-            default:
-                return status.toUpperCase();
-        }
-    };
-
-    const getStatusBadgeClass = (status: string) => {
-        switch (status) {
-            case 'pengajuan':
-                return 'bg-blue-100 text-blue-800 border-blue-200';
-            case 'pembayaran':
-                return 'bg-orange-100 text-orange-800 border-orange-200';
-            case 'verifikasi-lapangan':
-                return 'bg-purple-100 text-purple-800 border-purple-200';
-            case 'menunggu-terbit':
-                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            case 'terbit':
-                return 'bg-green-100 text-green-800 border-green-200';
-            default:
-                return 'bg-gray-100 text-gray-800 border-gray-200';
         }
     };
 
@@ -383,8 +326,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                     <DialogHeader>
                                         <DialogTitle>Upload Dokumen Pembayaran</DialogTitle>
                                         <DialogDescription>
-                                            Upload dokumen pembayaran dan ubah status aplikasi ke <strong>pembayaran terverifikasi</strong>. Dokumen
-                                            ini akan tersedia untuk diunduh oleh pemohon.
+                                            Upload dokumen pembayaran. Dokumen ini akan tersedia untuk diunduh oleh pemohon.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="space-y-6 py-4">
@@ -397,7 +339,8 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                                 <Input
                                                     id="payment_documents_modal"
                                                     type="file"
-                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    accept=".pdf,.doc,.docx"
+                                                    max={20 * 1024 * 1024}
                                                     multiple
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files || []);
@@ -407,8 +350,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
-                                                    beberapa file sekaligus.
+                                                    Anda dapat memilih beberapa file sekaligus. Format yang didukung: PDF, DOC, DOCX. Maksimal 20MB per file.
                                                 </p>
                                             </div>
 
@@ -511,8 +453,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                         <DialogHeader>
                                             <DialogTitle>Upload Dokumen Verifikasi Lapangan</DialogTitle>
                                             <DialogDescription>
-                                                Upload dokumen verifikasi lapangan dan ubah status aplikasi ke <strong>verifikasi lapangan</strong>.
-                                                Dokumen ini akan tersedia untuk diunduh oleh pemohon.
+                                                Upload dokumen verifikasi lapangan. Dokumen ini akan tersedia untuk diunduh oleh pemohon.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="space-y-6 py-4">
@@ -525,14 +466,14 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                                     <Input
                                                         id="field_verification_documents_modal"
                                                         type="file"
-                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                        accept=".pdf,.doc,.docx"
+                                                        max={20 * 1024 * 1024}
                                                         multiple
                                                         onChange={handleFieldVerificationDocumentChange}
                                                         className="mt-1"
                                                     />
                                                     <p className="mt-1 text-xs text-gray-500">
-                                                        Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
-                                                        beberapa file sekaligus.
+                                                        Anda dapat memilih beberapa file sekaligus. Format yang didukung: PDF, DOC, DOCX. Maksimal 20MB per file.
                                                     </p>
                                                 </div>
 
@@ -640,7 +581,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                     <DialogHeader>
                                         <DialogTitle>Upload Dokumen Pengawasan</DialogTitle>
                                         <DialogDescription>
-                                            Upload dokumen pengawasan. Setelah upload, status aplikasi akan berubah menjadi "Terbit".
+                                            Upload dokumen pengawasan. Dokumen ini akan tersedia untuk diunduh oleh pemohon.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="space-y-6 py-4">
@@ -654,7 +595,8 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                                     id="verification_files"
                                                     type="file"
                                                     multiple
-                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    accept=".pdf,.doc,.docx"
+                                                    max={20 * 1024 * 1024}
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files || []);
                                                         setVerificationCompletionFiles(files);
@@ -662,7 +604,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Anda dapat memilih beberapa file sekaligus. Format yang didukung: PDF, DOC, DOCX, JPG, JPEG, PNG.
+                                                    Anda dapat memilih beberapa file sekaligus. Format yang didukung: PDF, DOC, DOCX. Maksimal 20MB per file.
                                                 </p>
                                                 {verificationCompletionFiles.length > 0 && (
                                                     <div className="mt-2 space-y-1">

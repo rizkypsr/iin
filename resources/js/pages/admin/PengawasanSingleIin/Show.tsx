@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { User } from '@/types';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -49,6 +50,7 @@ interface PengawasanSingleIinApplication {
     field_verification_documents_uploaded_at?: string;
     issuance_documents?: PaymentDocument[];
     issuance_documents_uploaded_at?: string;
+    additional_documents?: string;
     user: {
         id: number;
         name: string;
@@ -114,6 +116,9 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
     const [fieldVerificationDocuments, setFieldVerificationDocuments] = useState<File[]>([]);
     const [verificationNotes, setVerificationNotes] = useState('');
     const [verificationCompletionFiles, setVerificationCompletionFiles] = useState<File[]>([]);
+
+    console.log(application);
+
 
     const downloadFile = (type: string, stage?: string) => {
         const url = route('pengawasan-single-iin.download-file', {
@@ -240,33 +245,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
         setFieldVerificationDocuments((prev) => [...prev, file]);
     };
 
-    // Status conditions
-    const canChangeToPayment = application.status === 'pengajuan';
-    const canChangeToFieldVerification = application.status === 'pembayaran';
-    const canChangeToSecondPayment = application.status === 'verifikasi_lapangan';
     const canIssuePengawasan = application.status === 'pembayaran-tahap-2';
-
-    const getStatusLabel = (status: string) => {
-        const statusMap: { [key: string]: string } = {
-            pengajuan: 'Diajukan',
-            pembayaran: 'Pembayaran',
-            'verifikasi-lapangan': 'Verifikasi Lapangan',
-            'pembayaran-tahap-2': 'Pembayaran Tahap 2',
-            terbit: 'Terbit',
-        };
-        return statusMap[status] || status;
-    };
-
-    const getStatusBadgeClass = (status: string) => {
-        const statusClasses: { [key: string]: string } = {
-            pengajuan: 'bg-blue-100 text-blue-800 border-blue-200',
-            pembayaran: 'bg-orange-100 text-orange-800 border-orange-200',
-            verifikasi_lapangan: 'bg-purple-100 text-purple-800 border-purple-200',
-            'pembayaran-tahap-2': 'bg-green-100 text-green-800 border-green-200',
-            terbit: 'bg-gray-100 text-gray-800 border-gray-200',
-        };
-        return statusClasses[status] || 'bg-gray-100 text-gray-800 border-gray-200';
-    };
 
     const handleStatusChangeToPaymentVerified = async () => {
         setLoading(true);
@@ -447,7 +426,8 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                 <Input
                                                     id="payment_documents_modal"
                                                     type="file"
-                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    accept=".pdf,.doc,.docx"
+                                                    max={20 * 1024 * 1024}
                                                     multiple
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files || []);
@@ -457,8 +437,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
-                                                    beberapa file sekaligus.
+                                                    Anda dapat memilih beberapa file sekaligus. Format yang didukung: PDF, DOC, DOCX. Maksimal 20MB per file.
                                                 </p>
                                             </div>
 
@@ -551,14 +530,14 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                 <Input
                                                     id="field_verification_documents_modal"
                                                     type="file"
-                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    accept='.pdf,.doc,.docx'
+                                                    max={20 * 1024 * 1024}
                                                     multiple
                                                     onChange={handleFieldVerificationDocumentChange}
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
-                                                    beberapa file sekaligus.
+                                                    Anda dapat memilih beberapa file sekaligus. Format yang didukung: PDF, DOC, DOCX. Maksimal 20MB per file.
                                                 </p>
                                             </div>
 
@@ -640,7 +619,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                     <DialogHeader>
                                         <DialogTitle>Proses ke Pembayaran Tahap 2</DialogTitle>
                                         <DialogDescription>
-                                            Upload dokumen pembayaran tahap 2 dan ubah status aplikasi ke <strong>pembayaran tahap 2</strong>.
+                                            Upload dokumen pembayaran tahap 2. Dokumen ini akan tersedia untuk diunduh oleh pemohon.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="space-y-6 py-4">
@@ -653,7 +632,8 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                 <Input
                                                     id="payment_documents_stage2"
                                                     type="file"
-                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    accept=".pdf,.doc,.docx"
+                                                    max={20 * 1024 * 1024}
                                                     multiple
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files || []);
@@ -663,8 +643,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
-                                                    beberapa file sekaligus.
+                                                    Anda dapat memilih beberapa file sekaligus. Format yang didukung: PDF, DOC, DOCX. Maksimal 20MB per file.
                                                 </p>
                                             </div>
 
@@ -759,7 +738,8 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                 <Input
                                                     id="issuance_documents"
                                                     type="file"
-                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    accept=".pdf,.doc,.docx"
+                                                    max={20 * 1024 * 1024}
                                                     multiple
                                                     onChange={(e) => {
                                                         const files = Array.from(e.target.files || []);
@@ -769,8 +749,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                     className="mt-1"
                                                 />
                                                 <p className="mt-1 text-xs text-gray-500">
-                                                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG. Maksimal 10MB per file. Anda dapat memilih
-                                                    beberapa file sekaligus.
+                                                    Anda dapat memilih beberapa file sekaligus. Format yang didukung: PDF, DOC, DOCX. Maksimal 20MB per file.
                                                 </p>
                                             </div>
 
@@ -1167,8 +1146,8 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                         Diupload pada{' '}
                                                         {application.payment_documents_uploaded_at
                                                             ? format(new Date(application.payment_documents_uploaded_at), 'dd MMMM yyyy', {
-                                                                  locale: id,
-                                                              })
+                                                                locale: id,
+                                                            })
                                                             : '-'}
                                                     </p>
                                                 </div>
@@ -1221,8 +1200,8 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                         Diupload pada{' '}
                                                         {application.payment_proof_uploaded_at_stage_2
                                                             ? format(new Date(application.payment_proof_uploaded_at_stage_2), 'dd MMMM yyyy', {
-                                                                  locale: id,
-                                                              })
+                                                                locale: id,
+                                                            })
                                                             : '-'}
                                                     </p>
                                                 </div>
@@ -1275,8 +1254,8 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                         Diupload pada{' '}
                                                         {application.payment_documents_uploaded_at_stage_2
                                                             ? format(new Date(application.payment_documents_uploaded_at_stage_2), 'dd MMMM yyyy', {
-                                                                  locale: id,
-                                                              })
+                                                                locale: id,
+                                                            })
                                                             : '-'}
                                                     </p>
                                                 </div>
@@ -1332,8 +1311,8 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                                         Diupload pada{' '}
                                                         {application.field_verification_documents_uploaded_at
                                                             ? format(new Date(application.field_verification_documents_uploaded_at), 'dd MMMM yyyy', {
-                                                                  locale: id,
-                                                              })
+                                                                locale: id,
+                                                            })
                                                             : '-'}
                                                     </p>
                                                 </div>

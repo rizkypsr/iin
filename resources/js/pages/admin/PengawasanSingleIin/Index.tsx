@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { PageProps } from '@/types';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 import { Head, Link } from '@inertiajs/react';
 import { Eye, Shield } from 'lucide-react';
 
@@ -57,40 +58,6 @@ interface Props extends PageProps {
         pengawasan_single_iin?: number;
     };
 }
-
-const getStatusBadge = (status: string) => {
-    switch (status) {
-        case 'submitted':
-            return <Badge className="bg-blue-500 text-white hover:bg-blue-600">DIAJUKAN</Badge>;
-        case 'payment_verified':
-            return <Badge className="bg-orange-500 text-white hover:bg-orange-600">PEMBAYARAN TERVERIFIKASI</Badge>;
-        case 'field_verification':
-            return <Badge className="bg-purple-500 text-white hover:bg-purple-600">VERIFIKASI LAPANGAN</Badge>;
-        case 'issued':
-            return <Badge className="bg-green-500 text-white hover:bg-green-600">SELESAI</Badge>;
-        case 'draft':
-            return <Badge className="bg-gray-500 text-white hover:bg-gray-600">DRAFT</Badge>;
-        default:
-            return <Badge className="bg-gray-500 text-white hover:bg-gray-600">{status.toUpperCase()}</Badge>;
-    }
-};
-
-const getStatusLabel = (status: string) => {
-    switch (status) {
-        case 'submitted':
-            return 'Diajukan';
-        case 'payment_verified':
-            return 'Pembayaran Terverifikasi';
-        case 'field_verification':
-            return 'Verifikasi Lapangan';
-        case 'issued':
-            return 'Selesai';
-        case 'draft':
-            return 'Draft';
-        default:
-            return status;
-    }
-};
 
 export default function Index({ auth, applications, application_counts }: Props) {
     return (
@@ -147,7 +114,13 @@ export default function Index({ auth, applications, application_counts }: Props)
                                                         <p className="text-sm text-gray-500">{application.single_iin_profile.email}</p>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell>{getStatusBadge(application.status)}</TableCell>
+                                                <TableCell>
+                                                    <Badge
+                                                        className={`${getStatusBadgeClass(application.status, { detailed: true })} ${application.status === 'perbaikan' ? 'flex items-center gap-1' : ''}`}
+                                                    >
+                                                        {getStatusLabel(application.status, { detailed: true })}
+                                                    </Badge>
+                                                </TableCell>
                                                 <TableCell>
                                                     {application.submitted_at ? new Date(application.submitted_at).toLocaleDateString('id-ID') : '-'}
                                                 </TableCell>

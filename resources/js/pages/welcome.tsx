@@ -25,10 +25,10 @@ const layananFitur = [
         status: 'Tersedia',
     },
     {
-        title: 'Pengawasan',
-        description: 'Sistem monitoring dan pengawasan investasi real-time',
+        title: 'Pemantauan',
+        description: 'Sistem monitoring dan pemantauan',
         icon: '🔍',
-        status: 'Beta',
+        status: 'Tersedia',
     },
 ];
 

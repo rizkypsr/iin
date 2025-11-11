@@ -6,11 +6,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
-import { Head, Link, router, usePage, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import {
     AlertCircle,
@@ -18,11 +17,8 @@ import {
     Calendar,
     CheckCircle,
     Clock,
-    CreditCard,
     Download,
     Eye,
-    FileText,
-    MapPin,
     Plus,
     Shield,
     TriangleAlert,
@@ -30,6 +26,7 @@ import {
     User,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 
 interface PengawasanIinNasionalApplication {
     id: number;
@@ -69,56 +66,7 @@ interface Props extends PageProps {
     };
 }
 
-const getStatusIcon = (status: string) => {
-    switch (status) {
-        case 'pengajuan':
-            return <FileText className="h-4 w-4" />;
-        case 'perbaikan':
-            return <AlertCircle className="h-4 w-4" />;
-        case 'pembayaran':
-            return <CreditCard className="h-4 w-4" />;
-        case 'verifikasi-lapangan':
-            return <MapPin className="h-4 w-4" />;
-        case 'terbit':
-            return <Award className="h-4 w-4" />;
-        default:
-            return <Clock className="h-4 w-4" />;
-    }
-};
-
-const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-        case 'pengajuan':
-            return 'bg-blue-100 text-blue-800 border-blue-200';
-        case 'perbaikan':
-            return 'bg-red-100 text-red-800 border-red-200';
-        case 'pembayaran':
-            return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-        case 'verifikasi-lapangan':
-            return 'bg-purple-100 text-purple-800 border-purple-200';
-        case 'terbit':
-            return 'bg-green-100 text-green-800 border-green-200';
-        default:
-            return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-};
-
-const getStatusLabel = (status: string) => {
-    switch (status) {
-        case 'pengajuan':
-            return 'Pengajuan';
-        case 'perbaikan':
-            return 'Perbaikan';
-        case 'pembayaran':
-            return 'Pembayaran';
-        case 'verifikasi-lapangan':
-            return 'Verifikasi Lapangan';
-        case 'terbit':
-            return 'Terbit';
-        default:
-            return 'Unknown';
-    }
-};
+// Status utility functions are imported from @/utils/statusUtils
 
 const itemAnimation = {
     hidden: { opacity: 0, y: 20 },
@@ -301,7 +249,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                     </div>
                     {auth.user.role === 'user' && (
                         <Link href={route('pengawasan-iin-nasional.create')}>
-                            <Button className="bg-blue-600 hover:bg-blue-700">
+                            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Ajukan Pengawasan
                             </Button>
@@ -418,19 +366,19 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                         >
                                             <div className="mb-3 flex items-start justify-between">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="bg-gradient-accent flex h-10 w-10 items-center justify-center rounded-lg text-white">
-                                                        {getStatusIcon(application.status)}
-                                                    </div>
+                                                    {/* <div className="bg-gradient-accent flex h-10 w-10 items-center justify-center rounded-lg text-white">
+                                                        {getStatusIcon(application.status, { detailed: false })}
+                                                    </div> */}
                                                     <div>
                                                         <h3 className="font-semibold text-gray-900">{application.application_number}</h3>
                                                         <p className="text-sm text-gray-600">Pengawasan IIN Nasional</p>
                                                     </div>
                                                 </div>
                                                 <Badge
-                                                    className={`${getStatusBadgeClass(application.status)} ${application.status === 'perbaikan' ? 'flex items-center gap-1' : ''}`}
+                                                    className={`${getStatusBadgeClass(application.status, { detailed: false })} ${application.status === 'perbaikan' ? 'flex items-center gap-1' : ''}`}
                                                 >
                                                     {application.status === 'perbaikan' && <AlertCircle className="mr-1 h-3 w-3" />}
-                                                    {getStatusLabel(application.status)}
+                                                    {getStatusLabel(application.status, { detailed: false })}
                                                 </Badge>
                                             </div>
 
@@ -503,33 +451,6 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                                 Lihat Detail
                                                             </Button>
                                                         </Link>
-
-                                                        {application.status === 'pengajuan' && auth.user.role === 'user' && (
-                                                            <Link href={route('pengawasan-iin-nasional.edit', application.id)}>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                                                                >
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width="16"
-                                                                        height="16"
-                                                                        viewBox="0 0 24 24"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        strokeWidth="2"
-                                                                        strokeLinecap="round"
-                                                                        strokeLinejoin="round"
-                                                                        className="mr-2 h-4 w-4"
-                                                                    >
-                                                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                                    </svg>
-                                                                    Edit Pengajuan
-                                                                </Button>
-                                                            </Link>
-                                                        )}
 
                                                         {application.can_download_certificate && !application.additional_documents && (
                                                             <Button

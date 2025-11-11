@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { PageProps } from '@/types';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 import { Head, Link } from '@inertiajs/react';
 import { Eye, Shield } from 'lucide-react';
 
@@ -40,40 +41,6 @@ interface Props extends PageProps {
         pengawasan_single_iin?: number;
     };
 }
-
-const getStatusBadge = (status: string) => {
-    switch (status) {
-        case 'pengajuan':
-            return <Badge className="bg-blue-500 text-white hover:bg-blue-600">DIAJUKAN</Badge>;
-        case 'pembayaran':
-            return <Badge className="bg-orange-500 text-white hover:bg-orange-600">PEMBAYARAN</Badge>;
-        case 'verifikasi-lapangan':
-            return <Badge className="bg-purple-500 text-white hover:bg-purple-600">VERIFIKASI LAPANGAN</Badge>;
-        case 'menunggu-terbit':
-            return <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">MENUNGGU TERBIT</Badge>;
-        case 'terbit':
-            return <Badge className="bg-green-500 text-white hover:bg-green-600">TERBIT</Badge>;
-        default:
-            return <Badge className="bg-gray-500 text-white hover:bg-gray-600">{status.toUpperCase()}</Badge>;
-    }
-};
-
-const getStatusLabel = (status: string) => {
-    switch (status) {
-        case 'pengajuan':
-            return 'Diajukan';
-        case 'pembayaran':
-            return 'Pembayaran';
-        case 'verifikasi-lapangan':
-            return 'Verifikasi Lapangan';
-        case 'menunggu-terbit':
-            return 'Menunggu Terbit';
-        case 'terbit':
-            return 'Terbit';
-        default:
-            return status.toUpperCase();
-    }
-};
 
 export default function Index({ auth, applications }: Props) {
     return (
@@ -132,7 +99,13 @@ export default function Index({ auth, applications }: Props) {
                                                         </p>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell>{getStatusBadge(application.status)}</TableCell>
+                                                <TableCell>
+                                                    <Badge
+                                                        className={`${getStatusBadgeClass(application.status, { detailed: true })} ${application.status === 'perbaikan' ? 'flex items-center gap-1' : ''}`}
+                                                    >
+                                                        {getStatusLabel(application.status, { detailed: true })}
+                                                    </Badge>
+                                                </TableCell>
                                                 <TableCell>
                                                     {application.submitted_at ? new Date(application.submitted_at).toLocaleDateString('id-ID') : '-'}
                                                 </TableCell>

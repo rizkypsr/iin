@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { AlertCircle, Award, Calendar, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, TriangleAlert, Upload, User } from 'lucide-react';
@@ -45,73 +46,6 @@ interface Props extends PageProps {
         meta: any;
     };
 }
-
-const getStatusIcon = (status: string) => {
-    switch (status) {
-        case 'pengajuan':
-            return <FileText className="h-4 w-4" />;
-        case 'perbaikan':
-            return <AlertCircle className="h-4 w-4" />;
-        case 'pembayaran':
-            return <CreditCard className="h-4 w-4" />;
-        case 'verifikasi-lapangan':
-            return <MapPin className="h-4 w-4" />;
-        case 'menunggu-terbit':
-            return <Clock className="h-4 w-4" />;
-        case 'terbit':
-            return <Award className="h-4 w-4" />;
-        default:
-            return <Clock className="h-4 w-4" />;
-    }
-};
-
-const getStatusBadgeClass = (status: string) => {
-    // Normalize status to handle potential whitespace or case issues
-    const normalizedStatus = String(status).trim().toLowerCase();
-
-    switch (normalizedStatus) {
-        case 'pengajuan':
-            return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-        case 'perbaikan':
-            return 'bg-gradient-to-r from-amber-400 to-amber-500 text-white hover:from-amber-500 hover:to-amber-600 border-amber-400 font-medium animate-pulse';
-        case 'pembayaran':
-            return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
-        case 'verifikasi-lapangan':
-            return 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200';
-        case 'menunggu-terbit':
-            return 'bg-cyan-100 text-cyan-800 hover:bg-cyan-200';
-        case 'terbit':
-            return 'bg-green-100 text-green-800 hover:bg-green-200';
-        case 'ditolak':
-            return 'bg-red-100 text-red-800 hover:bg-red-200';
-        default:
-            return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-    }
-};
-
-const getStatusLabel = (status: string) => {
-    // Normalize status to handle potential whitespace or case issues
-    const normalizedStatus = String(status).trim().toLowerCase();
-
-    switch (normalizedStatus) {
-        case 'pengajuan':
-            return 'Sedang Diajukan';
-        case 'perbaikan':
-            return 'Perlu Perbaikan';
-        case 'pembayaran':
-            return 'Menunggu Pembayaran';
-        case 'verifikasi-lapangan':
-            return 'Verifikasi Lapangan';
-        case 'menunggu-terbit':
-            return 'Menunggu Terbit';
-        case 'terbit':
-            return 'Sudah Terbit';
-        case 'ditolak':
-            return 'Ditolak';
-        default:
-            return 'Tidak Diketahui';
-    }
-};
 
 const itemAnimation = {
     hidden: { opacity: 0, y: 20 },
@@ -370,9 +304,6 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                                         <div className="mb-3 flex items-start justify-between">
                                             {' '}
                                             <div className="flex items-center gap-3">
-                                                <div className="bg-gradient-accent flex h-10 w-10 items-center justify-center rounded-lg text-white">
-                                                    {getStatusIcon(application.status)}
-                                                </div>
                                                 <div>
                                                     <h3 className="font-semibold text-gray-900">{application.application_number}</h3>
                                                     <p className="text-sm text-gray-600">IIN Nasional</p>

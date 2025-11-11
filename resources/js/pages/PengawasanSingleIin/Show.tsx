@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Shield, Upload, User } from 'lucide-react';
 import { useState } from 'react';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 
 interface PaymentDocument {
     path: string;
@@ -161,61 +162,7 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
         });
     };
 
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'draft':
-                return <FileText className="h-4 w-4" />;
-            case 'submitted':
-                return <Clock className="h-4 w-4" />;
-            case 'payment_verified':
-                return <CreditCard className="h-4 w-4" />;
-            case 'field_verification':
-                return <User className="h-4 w-4" />;
-            case 'issued':
-                return <Award className="h-4 w-4" />;
-            default:
-                return <FileText className="h-4 w-4" />;
-        }
-    };
-
-    const getStatusBadgeClass = (status: string) => {
-        switch (status) {
-            case 'draft':
-                return 'bg-gray-100 text-gray-800';
-            case 'submitted':
-                return 'bg-blue-100 text-blue-800';
-            case 'payment_verified':
-                return 'bg-green-100 text-green-800';
-            case 'field_verification':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'issued':
-                return 'bg-purple-100 text-purple-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
-
-    const getStatusLabel = (status: string) => {
-        // Normalize status to handle potential whitespace or case issues
-        const normalizedStatus = String(status).trim().toLowerCase();
-
-        switch (normalizedStatus) {
-            case 'pengajuan':
-                return 'Sedang Diajukan';
-            case 'perbaikan':
-                return 'Perlu Perbaikan';
-            case 'pembayaran':
-                return 'Pembayaran Tahap 1';
-            case 'verifikasi-lapangan':
-                return 'Verifikasi Lapangan';
-            case 'pembayaran-tahap-2':
-                return 'Pembayaran Tahap 2';
-            case 'terbit':
-                return 'Sudah Terbit';
-            default:
-                return 'Tidak Diketahui';
-        }
-    };
+    // Status utility functions are imported from @/utils/statusUtils
 
     const formatDate = (dateString: string | undefined) => {
         if (!dateString) return '-';
@@ -242,9 +189,9 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                         </div>
                     </div>
                     <div
-                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${getStatusBadgeClass(application.status)}`}
+                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${getStatusBadgeClass(application.status, { detailed: false })}`}
                     >
-                        {getStatusLabel(application.status)}
+                        {getStatusLabel(application.status, { detailed: false })}
                     </div>
                 </div>
 
@@ -324,9 +271,9 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                     <div>
                                         <Label className="text-sm font-medium text-gray-500">Status</Label>
                                         <div
-                                            className={`mt-1 inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium ${getStatusBadgeClass(application.status)}`}
+                                            className={`mt-1 inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium ${getStatusBadgeClass(application.status, { detailed: false })}`}
                                         >
-                                            {getStatusLabel(application.status)}
+                                            {getStatusLabel(application.status, { detailed: false })}
                                         </div>
                                     </div>
                                     <div>
@@ -708,95 +655,95 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                 {/* Bukti Pembayaran Tahap 1 */}
                                 {(application.payment_proof_path ||
                                     (application.payment_proof_documents && application.payment_proof_documents.length > 0)) && (
-                                    <div className="space-y-4">
-                                        <div className="rounded-lg border bg-gradient-to-r from-gray-50 to-gray-100 p-4">
-                                            <h3 className="mb-2 font-medium text-gray-800">Bukti Pembayaran Tahap 1</h3>
-                                            {application.payment_proof_documents && application.payment_proof_documents.length > 0 ? (
-                                                <div className="space-y-3">
-                                                    {application.payment_proof_documents.map((document: PaymentDocument, index: number) => (
-                                                        <div
-                                                            key={index}
-                                                            className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3"
-                                                        >
-                                                            <div className="flex items-center gap-3">
-                                                                <FileText className="h-5 w-5 text-purple-500" />
-                                                                <div>
-                                                                    <p className="text-sm font-medium text-gray-700">{document.original_name}</p>
-                                                                    <p className="text-xs text-gray-500">
-                                                                        Diunggah pada {new Date(document.uploaded_at).toLocaleDateString('id-ID')}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() =>
-                                                                    window.open(
-                                                                        route('pengawasan-single-iin.download-payment-proof', [
-                                                                            application.id,
-                                                                            index,
-                                                                            1,
-                                                                        ]),
-                                                                        '_blank',
-                                                                    )
-                                                                }
+                                        <div className="space-y-4">
+                                            <div className="rounded-lg border bg-gradient-to-r from-gray-50 to-gray-100 p-4">
+                                                <h3 className="mb-2 font-medium text-gray-800">Bukti Pembayaran Tahap 1</h3>
+                                                {application.payment_proof_documents && application.payment_proof_documents.length > 0 ? (
+                                                    <div className="space-y-3">
+                                                        {application.payment_proof_documents.map((document: PaymentDocument, index: number) => (
+                                                            <div
+                                                                key={index}
+                                                                className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3"
                                                             >
-                                                                <Download className="mr-2 h-4 w-4" />
-                                                                Download
-                                                            </Button>
-                                                        </div>
-                                                    ))}
-                                                    {application.payment_verified_at ? (
-                                                        <p className="mt-2 flex items-center gap-1 text-sm font-medium text-green-600">
-                                                            <CheckCircle className="h-3.5 w-3.5" />
-                                                            Terverifikasi pada {formatDate(application.payment_verified_at)}
-                                                        </p>
-                                                    ) : (
-                                                        <p className="mt-2 flex items-center gap-1 text-sm text-amber-600">
-                                                            <Clock className="h-3.5 w-3.5" />
-                                                            Menunggu verifikasi
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <FileText className="h-6 w-6 text-purple-500" />
-                                                        <div>
-                                                            <p className="text-sm font-medium text-gray-700">
-                                                                Bukti pembayaran tahap 1 telah diunggah
+                                                                <div className="flex items-center gap-3">
+                                                                    <FileText className="h-5 w-5 text-purple-500" />
+                                                                    <div>
+                                                                        <p className="text-sm font-medium text-gray-700">{document.original_name}</p>
+                                                                        <p className="text-xs text-gray-500">
+                                                                            Diunggah pada {new Date(document.uploaded_at).toLocaleDateString('id-ID')}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() =>
+                                                                        window.open(
+                                                                            route('pengawasan-single-iin.download-payment-proof', [
+                                                                                application.id,
+                                                                                index,
+                                                                                1,
+                                                                            ]),
+                                                                            '_blank',
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <Download className="mr-2 h-4 w-4" />
+                                                                    Download
+                                                                </Button>
+                                                            </div>
+                                                        ))}
+                                                        {application.payment_verified_at ? (
+                                                            <p className="mt-2 flex items-center gap-1 text-sm font-medium text-green-600">
+                                                                <CheckCircle className="h-3.5 w-3.5" />
+                                                                Terverifikasi pada {formatDate(application.payment_verified_at)}
                                                             </p>
-                                                            {application.payment_verified_at ? (
-                                                                <p className="mt-1 flex items-center gap-1 text-sm font-medium text-green-600">
-                                                                    <CheckCircle className="h-3.5 w-3.5" />
-                                                                    Terverifikasi pada {formatDate(application.payment_verified_at)}
-                                                                </p>
-                                                            ) : (
-                                                                <p className="mt-1 flex items-center gap-1 text-sm text-amber-600">
-                                                                    <Clock className="h-3.5 w-3.5" />
-                                                                    Menunggu verifikasi
-                                                                </p>
-                                                            )}
-                                                        </div>
+                                                        ) : (
+                                                            <p className="mt-2 flex items-center gap-1 text-sm text-amber-600">
+                                                                <Clock className="h-3.5 w-3.5" />
+                                                                Menunggu verifikasi
+                                                            </p>
+                                                        )}
                                                     </div>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            window.open(
-                                                                route('iin-single-blockholder.download-file', [application.id, 'payment_proof']),
-                                                                '_blank',
-                                                            )
-                                                        }
-                                                    >
-                                                        <Download className="mr-2 h-4 w-4" />
-                                                        Download
-                                                    </Button>
-                                                </div>
-                                            )}
+                                                ) : (
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-3">
+                                                            <FileText className="h-6 w-6 text-purple-500" />
+                                                            <div>
+                                                                <p className="text-sm font-medium text-gray-700">
+                                                                    Bukti pembayaran tahap 1 telah diunggah
+                                                                </p>
+                                                                {application.payment_verified_at ? (
+                                                                    <p className="mt-1 flex items-center gap-1 text-sm font-medium text-green-600">
+                                                                        <CheckCircle className="h-3.5 w-3.5" />
+                                                                        Terverifikasi pada {formatDate(application.payment_verified_at)}
+                                                                    </p>
+                                                                ) : (
+                                                                    <p className="mt-1 flex items-center gap-1 text-sm text-amber-600">
+                                                                        <Clock className="h-3.5 w-3.5" />
+                                                                        Menunggu verifikasi
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                window.open(
+                                                                    route('iin-single-blockholder.download-file', [application.id, 'payment_proof']),
+                                                                    '_blank',
+                                                                )
+                                                            }
+                                                        >
+                                                            <Download className="mr-2 h-4 w-4" />
+                                                            Download
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
                                 {/* Bukti Pembayaran Tahap 2 */}
                                 {application.payment_proof_documents_stage_2 && application.payment_proof_documents_stage_2.length > 0 && (
@@ -1013,7 +960,7 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                             </div>
                                             <div className="flex-1 pb-4">
                                                 <div className="flex items-center gap-2">
-                                                    <p className="font-medium text-gray-900">Status diubah ke: {getStatusLabel(log.status_to)}</p>
+                                                    <p className="font-medium text-gray-900">Status diubah ke: {getStatusLabel(log.status_to, { detailed: false })}</p>
                                                     <span className="text-sm text-gray-500">oleh {log.changed_by.name}</span>
                                                 </div>
                                                 <p className="text-sm text-gray-500">

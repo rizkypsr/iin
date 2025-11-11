@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { User } from '@/types';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -150,57 +151,6 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
         }
     };
 
-    const getStatusLabel = (status: string) => {
-        switch (status) {
-            case 'pengajuan':
-                return 'Diajukan';
-            case 'pembayaran':
-                return 'Pembayaran';
-            case 'verifikasi-lapangan':
-                return 'Verifikasi Lapangan';
-            case 'menunggu-terbit':
-                return 'Menunggu Terbit';
-            case 'terbit':
-                return 'Terbit';
-            default:
-                return status.toUpperCase();
-        }
-    };
-
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'pengajuan':
-                return <Clock className="h-4 w-4" />;
-            case 'pembayaran':
-                return <CreditCard className="h-4 w-4" />;
-            case 'verifikasi-lapangan':
-                return <Shield className="h-4 w-4" />;
-            case 'menunggu-terbit':
-                return <CheckCircle className="h-4 w-4" />;
-            case 'terbit':
-                return <Award className="h-4 w-4" />;
-            default:
-                return <FileText className="h-4 w-4" />;
-        }
-    };
-
-    const getStatusBadgeClass = (status: string) => {
-        switch (status) {
-            case 'pengajuan':
-                return 'bg-blue-100 text-blue-800';
-            case 'pembayaran':
-                return 'bg-orange-100 text-orange-800';
-            case 'verifikasi-lapangan':
-                return 'bg-yellow-100 text-yellow-800';
-            case 'menunggu-terbit':
-                return 'bg-purple-100 text-purple-800';
-            case 'terbit':
-                return 'bg-green-100 text-green-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
-
     return (
         <DashboardLayout user={auth.user}>
             <Head title={`Pengawasan IIN Nasional - ${application.application_number}`} />
@@ -223,7 +173,6 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                     <div
                         className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${getStatusBadgeClass(application.status)}`}
                     >
-                        {getStatusIcon(application.status)}
                         {getStatusLabel(application.status)}
                     </div>
                 </div>
@@ -294,7 +243,6 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                                         <div
                                             className={`mt-1 inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium ${getStatusBadgeClass(application.status)}`}
                                         >
-                                            {getStatusIcon(application.status)}
                                             {getStatusLabel(application.status)}
                                         </div>
                                     </div>

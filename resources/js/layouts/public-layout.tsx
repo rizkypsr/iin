@@ -27,7 +27,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                                 <li>IIN Nasional</li>
                                 <li>Single IIN</li>
                                 <li>Blockholder</li>
-                                <li>Pengawasan</li>
+                                <li>Pemantauan</li>
                             </ul>
                         </div>
                         <div>

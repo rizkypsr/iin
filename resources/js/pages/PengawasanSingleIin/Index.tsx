@@ -5,14 +5,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Award, Calendar, Clock, CreditCard, Download, Eye, File, FileText, MapPin, Plus, TriangleAlert, Upload, User } from 'lucide-react';
+import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, File, Plus, Shield, TriangleAlert, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 
 interface PengawasanSingleIinApplication {
     id: number;
@@ -51,66 +51,7 @@ interface Props extends PageProps {
     };
 }
 
-const getStatusIcon = (status: string) => {
-    switch (status) {
-        case 'pengajuan':
-            return <FileText className="h-4 w-4" />;
-        case 'perbaikan':
-            return <AlertCircle className="h-4 w-4" />;
-        case 'pembayaran':
-            return <CreditCard className="h-4 w-4" />;
-        case 'verifikasi-lapangan':
-            return <MapPin className="h-4 w-4" />;
-        case 'pembayaran-tahap-2':
-            return <CreditCard className="h-4 w-4" />;
-        case 'terbit':
-            return <Award className="h-4 w-4" />;
-        default:
-            return <Clock className="h-4 w-4" />;
-    }
-};
-
-const getStatusBadgeClass = (status: string) => {
-    const normalizedStatus = String(status).trim().toLowerCase();
-
-    switch (normalizedStatus) {
-        case 'pengajuan':
-            return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
-        case 'perbaikan':
-            return 'bg-gradient-to-r from-amber-400 to-amber-500 text-white hover:from-amber-500 hover:to-amber-600 border-amber-400 font-medium animate-pulse';
-        case 'pembayaran':
-            return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
-        case 'verifikasi-lapangan':
-            return 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200';
-        case 'pembayaran-tahap-2':
-            return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
-        case 'terbit':
-            return 'bg-green-100 text-green-800 hover:bg-green-200';
-        default:
-            return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-    }
-};
-
-const getStatusLabel = (status: string) => {
-    const normalizedStatus = String(status).trim().toLowerCase();
-
-    switch (normalizedStatus) {
-        case 'pengajuan':
-            return 'Sedang Diajukan';
-        case 'perbaikan':
-            return 'Perlu Perbaikan';
-        case 'pembayaran':
-            return 'Pembayaran Tahap 1';
-        case 'verifikasi-lapangan':
-            return 'Verifikasi Lapangan';
-        case 'pembayaran-tahap-2':
-            return 'Pembayaran Tahap 2';
-        case 'terbit':
-            return 'Sudah Terbit';
-        default:
-            return 'Tidak Diketahui';
-    }
-};
+// Status utility functions are imported from @/utils/statusUtils
 
 const itemAnimation = {
     hidden: { opacity: 0, y: 20 },
@@ -223,6 +164,53 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                     )}
                 </motion.div>
 
+                {/* Stats Cards */}
+                <motion.div variants={itemAnimation} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="flex items-center">
+                                <div className="rounded-full bg-blue-100 p-3">
+                                    <Shield className="h-6 w-6 text-blue-600" />
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-gray-600">Total Aplikasi</p>
+                                    <p className="text-2xl font-bold text-gray-900">{applications.meta?.total || applications.data.length}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="flex items-center">
+                                <div className="rounded-full bg-yellow-100 p-3">
+                                    <Clock className="h-6 w-6 text-yellow-600" />
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-gray-600">Dalam Proses</p>
+                                    <p className="text-2xl font-bold text-gray-900">
+                                        {applications.data.filter((app) => !['terbit'].includes(app.status)).length}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-6">
+                            <div className="flex items-center">
+                                <div className="rounded-full bg-green-100 p-3">
+                                    <CheckCircle className="h-6 w-6 text-green-600" />
+                                </div>
+                                <div className="ml-4">
+                                    <p className="text-sm font-medium text-gray-600">Selesai</p>
+                                    <p className="text-2xl font-bold text-gray-900">
+                                        {applications.data.filter((app) => app.status === 'terbit').length}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+
                 {/* Applications List */}
                 <motion.div variants={itemAnimation}>
                     <Card>
@@ -258,19 +246,15 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                                         >
                                             <div className="mb-3 flex items-start justify-between">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="bg-gradient-accent flex h-10 w-10 items-center justify-center rounded-lg text-white">
-                                                        {getStatusIcon(application.status)}
-                                                    </div>
                                                     <div>
                                                         <h3 className="font-semibold text-gray-900">{application.application_number}</h3>
                                                         <p className="text-sm text-gray-600">Pengawasan Single IIN</p>
                                                     </div>
                                                 </div>
                                                 <Badge
-                                                    className={`${getStatusBadgeClass(application.status)} ${application.status === 'perbaikan' ? 'flex items-center gap-1' : ''}`}
+                                                    className={`${getStatusBadgeClass(application.status, { detailed: true })} ${application.status === 'perbaikan' ? 'flex items-center gap-1' : ''}`}
                                                 >
-                                                    {application.status === 'perbaikan' && <AlertCircle className="mr-1 h-3 w-3" />}
-                                                    {getStatusLabel(application.status)}
+                                                    {getStatusLabel(application.status, { detailed: true })}
                                                 </Badge>
                                             </div>
 
@@ -568,8 +552,8 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                                                                                 Batal
                                                                             </Button>
                                                                         </DialogTrigger>
-                                                                        <Button 
-                                                                            type="button" 
+                                                                        <Button
+                                                                            type="button"
                                                                             onClick={expenseReimSubmit}
                                                                             disabled={expenseReimProcessing}
                                                                         >
