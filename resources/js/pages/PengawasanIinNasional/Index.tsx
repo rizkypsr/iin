@@ -238,20 +238,20 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
 
     return (
         <DashboardLayout user={auth.user}>
-            <Head title="Pengawasan IIN Nasional" />
+            <Head title="Pemantauan IIN Nasional" />
 
             <motion.div className="space-y-6" initial="hidden" animate="visible" variants={containerAnimation}>
                 {/* Header */}
                 <motion.div variants={itemAnimation} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Pengawasan IIN Nasional</h1>
-                        <p className="text-gray-600">Kelola aplikasi pengawasan IIN Nasional Anda</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Pemantauan IIN Nasional</h1>
+                        <p className="text-gray-600">Kelola aplikasi pemantauan IIN Nasional Anda</p>
                     </div>
                     {auth.user.role === 'user' && (
                         <Link href={route('pengawasan-iin-nasional.create')}>
                             <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                                 <Plus className="mr-2 h-4 w-4" />
-                                Ajukan Pengawasan
+                                Update Pemantauan
                             </Button>
                         </Link>
                     )}
@@ -309,8 +309,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                     <Card>
                         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <CardTitle>Daftar Aplikasi Pengawasan</CardTitle>
-                                <p className="text-sm text-gray-600">Kelola dan pantau status aplikasi pengawasan IIN Nasional</p>
+                                <CardTitle>Daftar Aplikasi Pemantauan</CardTitle>
+                                <p className="text-sm text-gray-600">Kelola dan pantau status aplikasi pemantauan IIN Nasional</p>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -371,7 +371,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                     </div> */}
                                                     <div>
                                                         <h3 className="font-semibold text-gray-900">{application.application_number}</h3>
-                                                        <p className="text-sm text-gray-600">Pengawasan IIN Nasional</p>
+                                                        <p className="text-sm text-gray-600">Pemantauan IIN Nasional</p>
                                                     </div>
                                                 </div>
                                                 <Badge

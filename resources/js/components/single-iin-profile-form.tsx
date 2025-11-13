@@ -4,8 +4,8 @@ import { Building2, Calendar, CreditCard, Mail, MapPin, Phone, User } from 'luci
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface SingleIinProfileData {
     institution_name?: string;
@@ -21,7 +21,6 @@ interface SingleIinProfileData {
     phone_fax_updated?: string;
     email?: string;
     contact_person?: string;
-    remarks_status?: string;
     card_specimen?: string;
     previous_name?: string;
 }
@@ -32,6 +31,47 @@ interface SingleIinProfileFormProps {
     errors: Record<string, string>;
     processing?: boolean;
 }
+
+const PROVINCES = [
+    'Aceh',
+    'Sumatera Utara',
+    'Sumatera Barat',
+    'Riau',
+    'Kepulauan Riau',
+    'Jambi',
+    'Sumatera Selatan',
+    'Bangka Belitung',
+    'Bengkulu',
+    'Lampung',
+    'DKI Jakarta',
+    'Jawa Barat',
+    'Banten',
+    'Jawa Tengah',
+    'DI Yogyakarta',
+    'Jawa Timur',
+    'Bali',
+    'Nusa Tenggara Barat',
+    'Nusa Tenggara Timur',
+    'Kalimantan Barat',
+    'Kalimantan Tengah',
+    'Kalimantan Selatan',
+    'Kalimantan Timur',
+    'Kalimantan Utara',
+    'Sulawesi Utara',
+    'Sulawesi Tengah',
+    'Sulawesi Selatan',
+    'Sulawesi Tenggara',
+    'Gorontalo',
+    'Sulawesi Barat',
+    'Maluku',
+    'Maluku Utara',
+    'Papua',
+    'Papua Barat',
+    'Papua Barat Daya',
+    'Papua Selatan',
+    'Papua Pegunungan',
+    'Papua Tengah',
+];
 
 export default function SingleIinProfileForm({ data, setData, errors, processing }: SingleIinProfileFormProps) {
     return (
@@ -64,26 +104,6 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                             className="h-11 transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
                         />
                         <InputError message={errors['single_iin_profile.institution_name']} className="text-xs" />
-                    </div>
-
-                    {/* Institution Type */}
-                    <div className="space-y-2">
-                        <Label htmlFor="single_institution_type" className="text-sm font-medium text-gray-700">
-                            Tipe Institusi <span className="text-red-500">*</span>
-                        </Label>
-                        <Select value={data.institution_type || ''} onValueChange={(value) => setData('institution_type', value)}>
-                            <SelectTrigger className="h-11 w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20">
-                                <SelectValue placeholder="Pilih tipe institusi" />
-                            </SelectTrigger>
-                            <SelectContent className="border border-gray-200 bg-white shadow-lg">
-                                <SelectItem value="bank">Bank</SelectItem>
-                                <SelectItem value="fintech">Fintech</SelectItem>
-                                <SelectItem value="payment_gateway">Payment Gateway</SelectItem>
-                                <SelectItem value="e_money">E-Money</SelectItem>
-                                <SelectItem value="other">Lainnya</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <InputError message={errors['single_iin_profile.institution_type']} className="text-xs" />
                     </div>
 
                     {/* Year */}
@@ -141,20 +161,27 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
 
                     {/* Regional */}
                     <div className="space-y-2">
-                        <Label htmlFor="single_regional" className="text-sm font-medium text-gray-700">
+                        <Label htmlFor="iin_regional" className="text-sm font-medium text-gray-700">
                             <MapPin className="mr-1 inline h-4 w-4" />
-                            Regional <span className="text-red-500">*</span>
+                            Provinsi <span className="text-red-500">*</span>
                         </Label>
-                        <Input
-                            id="single_regional"
-                            type="text"
-                            value={data.regional || ''}
-                            onChange={(e) => setData('regional', e.target.value)}
+                        <Select
+                            value={data.regional}
+                            onValueChange={(value) => setData('regional', value)}
                             disabled={processing}
-                            placeholder="Masukkan regional"
-                            className="h-11 transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
-                        />
-                        <InputError message={errors['single_iin_profile.regional']} className="text-xs" />
+                        >
+                            <SelectTrigger id="iin_regional" className="w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                                <SelectValue placeholder="Pilih provinsi" />
+                            </SelectTrigger>
+                            <SelectContent className="border border-gray-200 bg-white shadow-lg">
+                                {PROVINCES.map((prov) => (
+                                    <SelectItem key={prov} value={prov}>
+                                        {prov}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors['iin_nasional_profile.regional']} className="text-xs" />
                     </div>
 
                     {/* Phone/Fax */}
@@ -229,22 +256,6 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                         <InputError message={errors['single_iin_profile.contact_person']} className="text-xs" />
                     </div>
 
-                    {/* Remarks Status */}
-                    <div className="space-y-2">
-                        <Label htmlFor="single_remarks_status" className="text-sm font-medium text-gray-700">
-                            Status Remarks <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                            id="single_remarks_status"
-                            type="text"
-                            value={data.remarks_status || ''}
-                            onChange={(e) => setData('remarks_status', e.target.value)}
-                            disabled={processing}
-                            placeholder="Masukkan status remarks"
-                            className="h-11 transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
-                        />
-                        <InputError message={errors['single_iin_profile.remarks_status']} className="text-xs" />
-                    </div>
 
                     {/* Card Specimen */}
                     <div className="space-y-2">

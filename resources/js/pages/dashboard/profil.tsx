@@ -128,16 +128,6 @@ export default function DashboardProfil() {
         });
     };
 
-    // Handle flash messages
-    useEffect(() => {
-        if (flash?.success) {
-            showSuccessToast(flash.success);
-        }
-        if (flash?.error) {
-            showErrorToast(flash.error);
-        }
-    }, [flash]);
-
     return (
         <DashboardLayout user={user} applicationCounts={application_counts}>
             <Head title="Profil" />

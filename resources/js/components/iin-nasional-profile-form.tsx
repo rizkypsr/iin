@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
-import { Building2, Calendar, FileText, Mail, MapPin, Phone, User } from 'lucide-react';
+import { Building2, Calendar, Mail, MapPin, Phone, User } from 'lucide-react';
 
 import InputError from '@/components/input-error';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface IinNasionalProfileData {
     details?: string;
@@ -14,7 +15,6 @@ interface IinNasionalProfileData {
     iin_national_assignment?: string;
     assignment_year?: number;
     regional?: string;
-    aspi_recommendation_letter?: string;
     usage_purpose?: string;
     address?: string;
     phone_fax?: string;
@@ -22,7 +22,6 @@ interface IinNasionalProfileData {
     contact_person_name?: string;
     contact_person_email?: string;
     contact_person_phone?: string;
-    remarks_status?: string;
     card_issued?: boolean;
 }
 
@@ -32,6 +31,47 @@ interface IinNasionalProfileFormProps {
     errors: Record<string, string>;
     processing?: boolean;
 }
+
+const PROVINCES = [
+    'Aceh',
+    'Sumatera Utara',
+    'Sumatera Barat',
+    'Riau',
+    'Kepulauan Riau',
+    'Jambi',
+    'Sumatera Selatan',
+    'Bangka Belitung',
+    'Bengkulu',
+    'Lampung',
+    'DKI Jakarta',
+    'Jawa Barat',
+    'Banten',
+    'Jawa Tengah',
+    'DI Yogyakarta',
+    'Jawa Timur',
+    'Bali',
+    'Nusa Tenggara Barat',
+    'Nusa Tenggara Timur',
+    'Kalimantan Barat',
+    'Kalimantan Tengah',
+    'Kalimantan Selatan',
+    'Kalimantan Timur',
+    'Kalimantan Utara',
+    'Sulawesi Utara',
+    'Sulawesi Tengah',
+    'Sulawesi Selatan',
+    'Sulawesi Tenggara',
+    'Gorontalo',
+    'Sulawesi Barat',
+    'Maluku',
+    'Maluku Utara',
+    'Papua',
+    'Papua Barat',
+    'Papua Barat Daya',
+    'Papua Selatan',
+    'Papua Pegunungan',
+    'Papua Tengah',
+];
 
 export default function IinNasionalProfileForm({ data, setData, errors, processing }: IinNasionalProfileFormProps) {
     return (
@@ -121,36 +161,25 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     <div className="space-y-2">
                         <Label htmlFor="iin_regional" className="text-sm font-medium text-gray-700">
                             <MapPin className="mr-1 inline h-4 w-4" />
-                            Regional <span className="text-red-500">*</span>
+                            Provinsi <span className="text-red-500">*</span>
                         </Label>
-                        <Input
-                            id="iin_regional"
-                            type="text"
-                            value={data.regional || ''}
-                            onChange={(e) => setData('regional', e.target.value)}
+                        <Select
+                            value={data.regional}
+                            onValueChange={(value) => setData('regional', value)}
                             disabled={processing}
-                            placeholder="Masukkan regional"
-                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                        />
+                        >
+                            <SelectTrigger id="iin_regional" className="w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                                <SelectValue placeholder="Pilih provinsi" />
+                            </SelectTrigger>
+                            <SelectContent className="border border-gray-200 bg-white shadow-lg">
+                                {PROVINCES.map((prov) => (
+                                    <SelectItem key={prov} value={prov}>
+                                        {prov}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                         <InputError message={errors['iin_nasional_profile.regional']} className="text-xs" />
-                    </div>
-
-                    {/* ASPI Recommendation Letter */}
-                    <div className="space-y-2">
-                        <Label htmlFor="iin_aspi_recommendation_letter" className="text-sm font-medium text-gray-700">
-                            <FileText className="mr-1 inline h-4 w-4" />
-                            ASPI Recommendation Letter <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                            id="iin_aspi_recommendation_letter"
-                            type="text"
-                            value={data.aspi_recommendation_letter || ''}
-                            onChange={(e) => setData('aspi_recommendation_letter', e.target.value)}
-                            disabled={processing}
-                            placeholder="Masukkan ASPI recommendation letter"
-                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                        />
-                        <InputError message={errors['iin_nasional_profile.aspi_recommendation_letter']} className="text-xs" />
                     </div>
 
                     {/* Phone/Fax */}
@@ -243,22 +272,6 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                         <InputError message={errors['iin_nasional_profile.contact_person_phone']} className="text-xs" />
                     </div>
 
-                    {/* Remarks Status */}
-                    <div className="space-y-2">
-                        <Label htmlFor="iin_remarks_status" className="text-sm font-medium text-gray-700">
-                            Status Remarks <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                            id="iin_remarks_status"
-                            type="text"
-                            value={data.remarks_status || ''}
-                            onChange={(e) => setData('remarks_status', e.target.value)}
-                            disabled={processing}
-                            placeholder="Masukkan status remarks"
-                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                        />
-                        <InputError message={errors['iin_nasional_profile.remarks_status']} className="text-xs" />
-                    </div>
                 </div>
 
                 {/* Full width fields */}
@@ -268,14 +281,17 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                         <Label htmlFor="iin_details" className="text-sm font-medium text-gray-700">
                             Detail <span className="text-red-500">*</span>
                         </Label>
-                        <Textarea
-                            id="iin_details"
-                            value={data.details || ''}
-                            onChange={(e) => setData('details', e.target.value)}
-                            disabled={processing}
-                            placeholder="Masukkan detail informasi"
-                            className="min-h-[100px] transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                        />
+                        <Select value={data.details} onValueChange={(value) => setData('details', value)} required>
+                            <SelectTrigger disabled={processing} className="w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                                <SelectValue placeholder="Pilih detail" />
+                            </SelectTrigger>
+                            <SelectContent className="border border-gray-200 bg-white shadow-lg">
+                                <SelectItem value="bank">Bank</SelectItem>
+                                <SelectItem value="bpr">BPR</SelectItem>
+                                <SelectItem value="fintech">Fintech</SelectItem>
+                                <SelectItem value="other">Lainnya</SelectItem>
+                            </SelectContent>
+                        </Select>
                         <InputError message={errors['iin_nasional_profile.details']} className="text-xs" />
                     </div>
 
@@ -316,12 +332,12 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id="iin_card_issued"
-                            checked={data.card_issued || false}
+                            checked={data.card_issued || true}
                             onCheckedChange={(checked) => setData('card_issued', checked)}
                             disabled={processing}
                         />
                         <Label htmlFor="iin_card_issued" className="text-sm font-medium text-gray-700">
-                            Kartu Sudah Diterbitkan <span className="text-red-500">*</span>
+                            Kartu Sudah Diterbitkan
                         </Label>
                         <InputError message={errors['iin_nasional_profile.card_issued']} className="text-xs" />
                     </div>

@@ -244,7 +244,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
     const handleCompleteFieldVerification = async () => {
         // Validate that at least one file is uploaded
         if (verificationCompletionFiles.length === 0) {
-            showErrorToast('Harap upload minimal 1 file dokumen pengawasan');
+            showErrorToast('Harap upload minimal 1 file dokumen pemantauan');
             return;
         }
 
@@ -253,9 +253,9 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
         try {
             // Create FormData to handle file uploads
             const formData = new FormData();
-            formData.append('notes', 'Dokumen pengawasan telah diupload dan status diubah ke terbit');
+            formData.append('notes', 'Dokumen pemantauan telah diupload dan status diubah ke terbit');
 
-            // Append issuance documents (dokumen pengawasan terbit)
+            // Append issuance documents (dokumen pemantauan terbit)
             verificationCompletionFiles.forEach((file, index) => {
                 formData.append(`issuance_documents[${index}]`, file);
             });
@@ -263,12 +263,12 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
             router.post(route('admin.pengawasan-iin-nasional.upload-issuance-documents', application.id), formData, {
                 forceFormData: true,
                 onSuccess: () => {
-                    showSuccessToast('Dokumen pengawasan berhasil diupload dan status diubah ke terbit');
+                    showSuccessToast('Dokumen pemantauan berhasil diupload dan status diubah ke terbit');
                     setVerificationCompletionFiles([]);
                 },
                 onError: (errors) => {
                     console.error('Error uploading issuance documents:', errors);
-                    showErrorToast('Gagal mengupload dokumen pengawasan. Silakan coba lagi.');
+                    showErrorToast('Gagal mengupload dokumen pemantauan. Silakan coba lagi.');
                 },
                 onFinish: () => {
                     setLoading(false);
@@ -296,8 +296,8 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
     };
 
     return (
-        <DashboardLayout user={auth.user} title="Admin - Detail Pengawasan IIN Nasional">
-            <Head title={`Admin - Detail Pengawasan IIN Nasional - ${application.application_number}`} />
+        <DashboardLayout user={auth.user} title="Admin - Detail Pemantauan IIN Nasional">
+            <Head title={`Admin - Detail Pemantauan IIN Nasional - ${application.application_number}`} />
 
             <div className="mb-8">
                 <div className="flex items-center justify-between">
@@ -309,7 +309,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                             </Button>
                         </Link>
                         <div>
-                            <h2 className="text-xl leading-tight font-semibold text-gray-800">Detail Pengawasan IIN Nasional</h2>
+                            <h2 className="text-xl leading-tight font-semibold text-gray-800">Detail Pemantauan IIN Nasional</h2>
                             <p className="text-sm text-gray-600">{application.application_number}</p>
                         </div>
                     </div>
@@ -579,17 +579,17 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                 </DialogTrigger>
                                 <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
                                     <DialogHeader>
-                                        <DialogTitle>Upload Dokumen Pengawasan</DialogTitle>
+                                        <DialogTitle>Upload Dokumen Pemantauan</DialogTitle>
                                         <DialogDescription>
-                                            Upload dokumen pengawasan. Dokumen ini akan tersedia untuk diunduh oleh pemohon.
+                                            Upload dokumen pemantauan. Dokumen ini akan tersedia untuk diunduh oleh pemohon.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <div className="space-y-6 py-4">
-                                        {/* File Upload untuk Dokumen Pengawasan */}
+                                        {/* File Upload untuk Dokumen Pemantauan */}
                                         <div className="space-y-4">
                                             <div>
                                                 <Label htmlFor="verification_files" className="text-sm font-medium text-gray-700">
-                                                    Dokumen Pengawasan <span className="text-red-500">*</span>
+                                                    Dokumen Pemantauan <span className="text-red-500">*</span>
                                                 </Label>
                                                 <Input
                                                     id="verification_files"
@@ -653,7 +653,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                             ) : (
                                                 <>
                                                     <CheckCircle className="mr-2 h-4 w-4" />
-                                                    Upload & Terbitkan
+                                                    Upload Pemberitahuan Pemantauan
                                                 </>
                                             )}
                                         </Button>
@@ -779,7 +779,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                     )}
                                     {application.iin_nasional_profile.regional && (
                                         <div>
-                                            <Label className="text-sm font-medium text-gray-500">Regional</Label>
+                                            <Label className="text-sm font-medium text-gray-500">Provinsi</Label>
                                             <p className="text-sm">{application.iin_nasional_profile.regional}</p>
                                         </div>
                                     )}
@@ -866,7 +866,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <CheckCircle className="h-5 w-5" />
-                                    Dokumen Pengawasan Terbit
+                                    Dokumen Pemberitahuan Pemantauan
                                 </CardTitle>
                                 <CardDescription>
                                     Diupload pada:{' '}
@@ -1007,17 +1007,10 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                                 <FileText className="h-4 w-4 text-gray-500" />
                                                 <span className="text-sm">{doc.original_name}</span>
                                             </div>
-                                            <Link
-                                                href={route('admin.pengawasan-iin-nasional.download-field-verification-document', [
-                                                    application.id,
-                                                    index,
-                                                ])}
-                                            >
-                                                <Button variant="outline" size="sm">
-                                                    <Download className="mr-2 h-4 w-4" />
-                                                    Unduh
-                                                </Button>
-                                            </Link>
+                                            <Button variant="outline" size="sm" onClick={() => downloadFieldVerificationDocument(index)}>
+                                                <Download className="mr-2 h-4 w-4" />
+                                                Unduh
+                                            </Button>
                                         </div>
                                     ))}
                                 </div>
@@ -1033,7 +1026,7 @@ export default function AdminPengawasanIinNasionalShow({ auth, application, stat
                                 <Clock className="h-5 w-5" />
                                 Riwayat Status
                             </CardTitle>
-                            <CardDescription>Riwayat perubahan status aplikasi pengawasan</CardDescription>
+                            <CardDescription>Riwayat perubahan status aplikasi pemantauan</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {statusLogs.length === 0 ? (

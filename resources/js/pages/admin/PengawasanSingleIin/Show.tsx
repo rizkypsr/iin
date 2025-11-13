@@ -931,7 +931,7 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
                                     <p className="text-sm">{application.single_iin_profile.assignment_date}</p>
                                 </div>
                                 <div>
-                                    <Label className="text-sm font-medium text-gray-500">Regional</Label>
+                                    <Label className="text-sm font-medium text-gray-500">Provinsi</Label>
                                     <p className="text-sm">{application.single_iin_profile.regional}</p>
                                 </div>
                                 <div>

@@ -127,7 +127,7 @@ export default function PengawasanSingleIinCreate() {
                                     </p>
                                 </div>
                                 <div>
-                                    <Label className="text-sm font-medium text-gray-700">Regional</Label>
+                                    <Label className="text-sm font-medium text-gray-700">Provinsi</Label>
                                     <p className="mt-1 text-sm text-gray-900">{singleIinProfile.regional}</p>
                                 </div>
                                 <div>

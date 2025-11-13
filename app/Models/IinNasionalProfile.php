@@ -15,7 +15,6 @@ class IinNasionalProfile extends Model
         'iin_national_assignment',
         'assignment_year',
         'regional',
-        'aspi_recommendation_letter',
         'usage_purpose',
         'address',
         'phone_fax',
@@ -23,7 +22,6 @@ class IinNasionalProfile extends Model
         'contact_person_name',
         'contact_person_email',
         'contact_person_phone',
-        'remarks_status',
         'card_issued',
     ];
 

@@ -22,7 +22,6 @@ class SingleIinProfile extends Model
         'phone_fax_updated',
         'email',
         'contact_person',
-        'remarks_status',
         'card_specimen',
         'previous_name',
     ];

@@ -1,4 +1,5 @@
 import QrisModal from '@/components/QrisModal';
+import SurveyModal from '@/components/SurveyModal';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,27 +71,10 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
     const [activeTab, setActiveTab] = useState('detail');
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
-    const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
-    const [selectedApplication, setSelectedApplication] = useState<PengawasanIinNasionalApplication | null>(null);
     const [formData, setFormData] = useState({
         payment_proof: [] as File[],
     });
-
-    const handleQrisFileUpload = (file: File) => {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        router.post(route('pengawasan-iin-nasional.upload-additional-documents', selectedApplication?.id), formData, {
-            onSuccess: () => {
-                showSuccessToast('File QRIS berhasil diupload!');
-                setIsQrisModalOpen(false);
-            },
-            onError: (errors) => {
-                console.error(errors);
-                showErrorToast('Gagal mengupload file QRIS');
-            },
-        });
-    };
+    const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -153,7 +137,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
 
     return (
         <DashboardLayout user={auth.user}>
-            <Head title={`Pengawasan IIN Nasional - ${application.application_number}`} />
+            <Head title={`Pemantauan IIN Nasional - ${application.application_number}`} />
 
             <div className="space-y-6">
                 {/* Header */}
@@ -166,7 +150,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Pengawasan IIN Nasional</h1>
+                            <h1 className="text-2xl font-bold text-gray-900">Pemantauan IIN Nasional</h1>
                             <p className="text-gray-600">{application.application_number}</p>
                         </div>
                     </div>
@@ -183,7 +167,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                         <Clock className="h-4 w-4" />
                         <AlertTitle>Aplikasi Sedang Diproses</AlertTitle>
                         <AlertDescription>
-                            Aplikasi pengawasan Anda sedang dalam tahap review. Kami akan menghubungi Anda jika diperlukan informasi tambahan.
+                            Aplikasi Pemantauan Anda sedang dalam tahap review. Kami akan menghubungi Anda jika diperlukan informasi tambahan.
                         </AlertDescription>
                     </Alert>
                 )}
@@ -192,7 +176,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                     <Alert>
                         <CreditCard className="h-4 w-4" />
                         <AlertTitle>Upload Bukti Pembayaran</AlertTitle>
-                        <AlertDescription>Silakan upload bukti pembayaran untuk melanjutkan proses pengawasan.</AlertDescription>
+                        <AlertDescription>Silakan upload bukti pembayaran untuk melanjutkan proses pemantauan.</AlertDescription>
                     </Alert>
                 )}
 
@@ -207,9 +191,9 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                 {application.status === 'terbit' && (
                     <Alert className="border-green-200 bg-green-50">
                         <CheckCircle className="h-4 w-4 text-green-600" />
-                        <AlertTitle className="text-green-800">Pengawasan Selesai</AlertTitle>
+                        <AlertTitle className="text-green-800">Pemantauan Selesai</AlertTitle>
                         <AlertDescription className="text-green-700">
-                            Proses pengawasan telah selesai. Dokumen hasil pengawasan dapat diunduh di tab Dokumen.
+                            Proses pemantauan telah selesai. Dokumen hasil pemantauan dapat diunduh di tab Dokumen.
                         </AlertDescription>
                     </Alert>
                 )}
@@ -281,11 +265,11 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {/* Issuance Documents */}
-                                {application.issuance_documents && application.issuance_documents.length > 0 && application.additional_documents && (
+                                {application.issuance_documents && application.issuance_documents.length > 0 && (
                                     <div className="space-y-2">
                                         <h4 className="flex items-center gap-2 font-medium text-green-800">
                                             <Award className="h-5 w-5" />
-                                            Dokumen Pengawasan Terbit
+                                            Dokumen Pemberitahuan Pemantauan
                                         </h4>
                                         {application.issuance_documents.map((doc, index) => (
                                             <div
@@ -295,7 +279,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                                                 <div className="flex items-center gap-3">
                                                     <FileText className="h-8 w-8 text-green-600" />
                                                     <div>
-                                                        <p className="">Dokumen Pengawasan Terbit</p>
+                                                        <p className="">Dokumen Pemberitahuan Pemantauan</p>
                                                         <p className="text-sm text-green-700">
                                                             Diupload: {format(new Date(doc.uploaded_at), 'dd MMM yyyy HH:mm', { locale: id })}
                                                         </p>
@@ -304,15 +288,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() =>
-                                                        window.open(
-                                                            route('pengawasan-iin-nasional.download-issuance-document', {
-                                                                pengawasanIinNasional: application.id,
-                                                                index,
-                                                            }),
-                                                            '_blank',
-                                                        )
-                                                    }
+                                                    onClick={() => setIsSurveyModalOpen(true)}
                                                     className="border-green-200 bg-white text-green-700 hover:bg-green-50 hover:text-green-800"
                                                 >
                                                     <Download className="mr-2 h-4 w-4" />
@@ -320,34 +296,6 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                                                 </Button>
                                             </div>
                                         ))}
-                                    </div>
-                                )}
-
-                                {application.issuance_documents && !application.additional_documents && (
-                                    <div className="flex items-center justify-between rounded-lg border border-yellow-200 bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 shadow-sm">
-                                        <div className="flex items-center gap-4">
-                                            <div className="rounded-full bg-white p-2">
-                                                <Award className="h-8 w-8 text-yellow-500" />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-semibold text-yellow-800">Surat Pernyataan Penggunaan QRIS</h3>
-                                                <p className="text-sm text-yellow-700">
-                                                    Sebelum dapat mendownload sertifikat, harap mengisi surat pernyataan ini.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => {
-                                                setSelectedApplication(application);
-                                                setIsQrisModalOpen(true);
-                                            }}
-                                            className="border-yellow-200 bg-white text-yellow-700 hover:bg-yellow-50 hover:text-yellow-800"
-                                        >
-                                            <Download className="mr-2 h-4 w-4" />
-                                            Isi Surat Pernyataan
-                                        </Button>
                                     </div>
                                 )}
 
@@ -394,7 +342,7 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                                         <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center">
                                             <FileText className="mx-auto mb-3 h-12 w-12 text-gray-400" />
                                             <h3 className="mb-2 text-lg font-medium text-gray-900">Belum Ada Dokumen</h3>
-                                            <p className="text-gray-600">Dokumen verifikasi dan hasil pengawasan belum tersedia.</p>
+                                            <p className="text-gray-600">Dokumen verifikasi dan hasil pemantauan belum tersedia.</p>
                                         </div>
                                     )}
                             </CardContent>
@@ -813,13 +761,19 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                 </Tabs>
             </div>
 
-            <QrisModal
-                isOpen={isQrisModalOpen}
-                onClose={() => setIsQrisModalOpen(false)}
-                onTemplateDownload={() => {
-                    // Any additional actions on template download can be handled here
+            <SurveyModal
+                isOpen={isSurveyModalOpen}
+                onClose={() => setIsSurveyModalOpen(false)}
+                onDownload={() => {
+                    window.open(
+                        route('pengawasan-iin-nasional.download-issuance-document', {
+                            pengawasanIinNasional: application.id,
+                            index: 0,
+                        }),
+                        '_blank',
+                    )
                 }}
-                onFileUpload={(file: File) => handleQrisFileUpload(file)}
+                certificateType="Pemberitahuan Pemantauan IIN Nasional"
             />
         </DashboardLayout>
     );

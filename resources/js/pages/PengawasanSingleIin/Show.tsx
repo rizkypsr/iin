@@ -12,6 +12,7 @@ import { id } from 'date-fns/locale';
 import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Shield, Upload, User } from 'lucide-react';
 import { useState } from 'react';
 import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
+import SurveyModal from '@/components/SurveyModal';
 
 interface PaymentDocument {
     path: string;
@@ -85,6 +86,7 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [selectedApplication, setSelectedApplication] = useState<PengawasanSingleIinApplication | null>(null);
+    const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
 
     const [formData, setFormData] = useState({
         payment_proof: [] as File[],
@@ -346,12 +348,7 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() =>
-                                                        window.open(
-                                                            route('pengawasan-single-iin.download-issuance-document', [application.id, index]),
-                                                            '_blank',
-                                                        )
-                                                    }
+                                                    onClick={() => setIsSurveyModalOpen(true)}
                                                     className="border-green-200 bg-white text-green-700 hover:bg-green-50 hover:text-green-800"
                                                 >
                                                     <Download className="mr-2 h-4 w-4" />
@@ -977,13 +974,16 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                 </Tabs>
             </div>
 
-            <QrisModal
-                isOpen={isQrisModalOpen}
-                onClose={() => setIsQrisModalOpen(false)}
-                onTemplateDownload={() => {
-                    // Any additional actions on template download can be handled here
+            <SurveyModal
+                isOpen={isSurveyModalOpen}
+                onClose={() => setIsSurveyModalOpen(false)}
+                onDownload={() => {
+                    window.open(
+                        route('pengawasan-single-iin.download-issuance-document', [application.id, 0]),
+                        '_blank',
+                    )
                 }}
-                onFileUpload={(file: File) => handleQrisFileUpload(file)}
+                certificateType="Pemberitahuan Pemantauan Single IIN"
             />
         </DashboardLayout>
     );

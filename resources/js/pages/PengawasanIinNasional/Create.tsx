@@ -79,7 +79,7 @@ export default function PengawasanIinNasionalCreate() {
 
     return (
         <DashboardLayout user={auth.user}>
-            <Head title="Ajukan Pengawasan IIN Nasional" />
+            <Head title="Update Pemantauan IIN Nasional" />
 
             <div className="space-y-6">
                 {/* Header */}
@@ -91,8 +91,8 @@ export default function PengawasanIinNasionalCreate() {
                         </Button>
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Ajukan Pengawasan IIN Nasional</h1>
-                        <p className="text-gray-600">Isi formulir aplikasi pengawasan untuk IIN Nasional</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Update Pemantauan IIN Nasional</h1>
+                        <p className="text-gray-600">Isi formulir aplikasi pemantauan untuk IIN Nasional</p>
                     </div>
                 </div>
 
@@ -124,7 +124,7 @@ export default function PengawasanIinNasionalCreate() {
                                     <p className="mt-1 text-sm text-gray-900">{iinNasionalProfile.assignment_year}</p>
                                 </div>
                                 <div>
-                                    <Label className="text-sm font-medium text-gray-700">Regional</Label>
+                                    <Label className="text-sm font-medium text-gray-700">Provinsi</Label>
                                     <p className="mt-1 text-sm text-gray-900">{iinNasionalProfile.regional}</p>
                                 </div>
                                 <div>
@@ -166,8 +166,8 @@ export default function PengawasanIinNasionalCreate() {
                         <CardContent className="p-6">
                             <div className="flex flex-col items-center space-y-4">
                                 <div className="text-center">
-                                    <h3 className="text-lg font-semibold text-gray-900">Ajukan Pengawasan</h3>
-                                    <p className="mt-1 text-sm text-gray-600">Pastikan semua informasi sudah benar sebelum mengajukan pengawasan</p>
+                                    <h3 className="text-lg font-semibold text-gray-900">Update Pemantauan</h3>
+                                    <p className="mt-1 text-sm text-gray-600">Pastikan semua informasi sudah benar sebelum mengajukan pemantauan</p>
                                 </div>
 
                                 <Button
@@ -184,7 +184,7 @@ export default function PengawasanIinNasionalCreate() {
                                     ) : (
                                         <>
                                             <Shield className="mr-2 h-4 w-4" />
-                                            Ajukan Pengawasan
+                                            Update Pemantauan
                                         </>
                                     )}
                                 </Button>
@@ -193,7 +193,7 @@ export default function PengawasanIinNasionalCreate() {
                                     <Alert className="w-full">
                                         <AlertCircle className="h-4 w-4" />
                                         <AlertDescription>
-                                            Anda harus melengkapi profil IIN Nasional terlebih dahulu sebelum dapat mengajukan pengawasan.
+                                            Anda harus melengkapi profil IIN Nasional terlebih dahulu sebelum dapat mengajukan pemantauan.
                                         </AlertDescription>
                                     </Alert>
                                 )}
