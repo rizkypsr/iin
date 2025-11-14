@@ -33,7 +33,7 @@ class PengawasanSingleIinAdminController extends Controller
 
     public function show(PengawasanSingleIin $pengawasanSingleIin)
     {
-        $pengawasanSingleIin->load(['user', 'admin', 'singleIinProfile']);
+        $pengawasanSingleIin->load(['user', 'admin', 'singleIinProfile', 'expenseReimbursement']);
 
         // Get status logs
         $statusLogs = PengawasanSingleIinStatusLog::where('pengawasan_single_iin_id', $pengawasanSingleIin->id)

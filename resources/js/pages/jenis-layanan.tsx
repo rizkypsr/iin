@@ -34,10 +34,10 @@ const layananList = [
 export default function JenisLayanan() {
     return (
         <PublicLayout>
-            <Head title="Jenis Layanan" />
+            <Head title="Jenis Layanan Otoritas Sponsor" />
 
             {/* Hero Section with Primary Gradient */}
-            <div className="bg-gradient-primary relative overflow-hidden pt-40 pb-20">
+            <div className="overflow-hidden relative pt-40 pb-20 bg-gradient-primary">
                 {/* Subtle line pattern overlay */}
                 <div className="absolute inset-0 opacity-10">
                     <div
@@ -52,8 +52,8 @@ export default function JenisLayanan() {
                     ></div>
                 </div>
 
-                <div className="relative z-10 mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
-                    <h1 className="mb-6 text-6xl font-bold tracking-tight text-white drop-shadow-lg">Jenis Layanan Otoritas</h1>
+                <div className="relative z-10 px-4 mx-auto max-w-6xl text-center sm:px-6 lg:px-8">
+                    <h1 className="mb-6 text-6xl font-bold tracking-tight text-white drop-shadow-lg">Jenis Layanan Otoritas Sponsor</h1>
                     <p className="mx-auto max-w-3xl text-xl leading-relaxed text-white/90">
                         Layanan Otoritas Sponsor dibedakan menjadi Penerbitan Nomor Identifikasi, dan Pemantauan Pemanfaatan Nomor Identifikasi.
                         Nomor Identifikasi yang diterbitkan dibedakan menjadi beberapa jenis yaitu IIN Nasional, Single IIN dan Block Holder
@@ -61,13 +61,13 @@ export default function JenisLayanan() {
                 </div>
             </div>
 
-            <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+            <div className="px-4 py-16 mx-auto max-w-6xl sm:px-6 lg:px-8">
                 {/* Services Grid with Gradient Cards */}
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                     {layananList.map((layanan, index) => (
                         <Card key={layanan.id} variant={index % 2 === 0 ? 'gradient' : 'default'} className="h-full">
                             <CardHeader variant={index % 2 === 0 ? 'gradient' : 'default'}>
-                                <div className="flex items-center justify-between">
+                                <div className="flex justify-between items-center">
                                     <CardTitle variant={index % 2 === 0 ? 'gradient' : 'default'} className="text-xl">
                                         {layanan.name}
                                     </CardTitle>

@@ -138,7 +138,7 @@ class PengawasanSingleIin extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->application_number = 'PENGAWASAN-SINGLE-' . date('Ymd') . '-' . str_pad(
+            $model->application_number = 'PEMANTAUAN-' . date('Ymd') . '-' . str_pad(
                 static::whereDate('created_at', today())->count() + 1,
                 4,
                 '0',

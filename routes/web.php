@@ -78,7 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Get recent activities (status logs) for the user's applications
             $recentActivities = App\Models\IinStatusLog::whereIn('application_id', $userApplications->pluck('id'))
                 ->whereIn('application_type', ['nasional', 'single_blockholder'])
-                ->with('user')
+                ->with('changedBy')
                 ->latest()
                 ->take(5)
                 ->get()
@@ -136,7 +136,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('iin-nasional/{iinNasional}/upload-field-verification-documents', [IinNasionalController::class, 'uploadFieldVerificationDocuments'])->name('iin-nasional.upload-field-verification-documents');
     Route::post('iin-nasional/{iinNasional}/upload-additional-documents', [IinNasionalController::class, 'uploadAdditionalDocument'])->name('iin-nasional.upload-additional-documents');
     Route::post('iin-nasional/{iinNasional}/expense-reimbursement', [IinNasionalController::class, 'storeExpenseReimbursement'])->name('iin-nasional.store-expense-reimbursement');
-    Route::get('iin-nasional/{iinNasional}/download/{type}', [IinNasionalController::class, 'downloadFile'])->name('iin-nasional.download-file');
+    Route::get('iin-nasional/{iinNasional}/download/{type}/{index?}', [IinNasionalController::class, 'downloadFile'])->name('iin-nasional.download-file');
     Route::get('iin-nasional/{iinNasional}/download-payment-document/{index}', [IinNasionalController::class, 'downloadPaymentDocument'])->name('iin-nasional.download-payment-document');
     Route::get('iin-nasional/{iinNasional}/download-payment-proof/{index}', [IinNasionalController::class, 'downloadPaymentProof'])->name('iin-nasional.download-payment-proof');
     Route::get('iin-nasional/{iinNasional}/download-field-verification-document/{index}', [IinNasionalController::class, 'downloadFieldVerificationDocument'])->name('iin-nasional.download-field-verification-document');
@@ -151,7 +151,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('iin-single-blockholder/{iinSingleBlockholder}/upload-field-verification-documents', [IinSingleBlockholderController::class, 'uploadFieldVerificationDocuments'])->name('iin-single-blockholder.upload-field-verification-documents');
     Route::post('iin-single-blockholder/{iinSingleBlockholder}/upload-additional-documents', [IinSingleBlockholderController::class, 'uploadAdditionalDocument'])->name('iin-single-blockholder.upload-additional-documents');
     Route::post('iin-single-blockholder/{iinSingleBlockholder}/expense-reimbursement', [IinSingleBlockholderController::class, 'storeExpenseReimbursement'])->name('iin-single-blockholder.store-expense-reimbursement');
-    Route::get('iin-single-blockholder/{iinSingleBlockholder}/download/{type}', [IinSingleBlockholderController::class, 'downloadFile'])->name('iin-single-blockholder.download-file');
+    Route::get('iin-single-blockholder/{iinSingleBlockholder}/download/{type}/{index?}', [IinSingleBlockholderController::class, 'downloadFile'])->name('iin-single-blockholder.download-file');
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-payment-document/{index}', [IinSingleBlockholderController::class, 'downloadPaymentDocument'])->name('iin-single-blockholder.download-payment-document');
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-payment-document-stage-2/{index}', [IinSingleBlockholderController::class, 'downloadPaymentDocumentStage2'])->name('iin-single-blockholder.download-payment-document-stage-2');
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-payment-proof/{index}', [IinSingleBlockholderController::class, 'downloadPaymentProof'])->name('iin-single-blockholder.download-payment-proof');
@@ -163,7 +163,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('pengawasan-iin-nasional/{pengawasanIinNasional}/upload-payment-proof', [PengawasanIinNasionalController::class, 'uploadPaymentProof'])->name('pengawasan-iin-nasional.upload-payment-proof');
     Route::post('pengawasan-iin-nasional/{pengawasanIinNasional}/upload-additional-documents', [PengawasanIinNasionalController::class, 'uploadAdditionalDocument'])->name('pengawasan-iin-nasional.upload-additional-documents');
     Route::post('pengawasan-iin-nasional/{pengawasanIinNasional}/expense-reimbursement', [PengawasanIinNasionalController::class, 'storeExpenseReimbursement'])->name('pengawasan-iin-nasional.store-expense-reimbursement');
-    Route::get('pengawasan-iin-nasional/{pengawasanIinNasional}/download/{type}', [PengawasanIinNasionalController::class, 'downloadFile'])->name('pengawasan-iin-nasional.download-file');
+    Route::get('pengawasan-iin-nasional/{pengawasanIinNasional}/download/{type}/{index?}', [PengawasanIinNasionalController::class, 'downloadFile'])->name('pengawasan-iin-nasional.download-file');
     Route::get('pengawasan-iin-nasional/{pengawasanIinNasional}/download-issuance-document/{index}', [PengawasanIinNasionalController::class, 'downloadIssuanceDocument'])->name('pengawasan-iin-nasional.download-issuance-document');
     // Note: Download routes for payment documents are handled by admin routes only
 
@@ -172,7 +172,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('pengawasan-single-iin/{pengawasanSingleIin}/upload-payment-proof', [PengawasanSingleIinController::class, 'uploadPaymentProof'])->name('pengawasan-single-iin.upload-payment-proof');
     Route::post('pengawasan-single-iin/{pengawasanSingleIin}/upload-additional-documents', [PengawasanSingleIinController::class, 'uploadAdditionalDocument'])->name('pengawasan-single-iin.upload-additional-documents');
     Route::post('pengawasan-single-iin/{pengawasanSingleIin}/expense-reimbursement', [PengawasanSingleIinController::class, 'storeExpenseReimbursement'])->name('pengawasan-single-iin.expense-reimbursement');
-    Route::get('pengawasan-single-iin/{pengawasanSingleIin}/download/{type}', [PengawasanSingleIinController::class, 'downloadFile'])->name('pengawasan-single-iin.download-file');
+    Route::get('pengawasan-single-iin/{pengawasanSingleIin}/download/{type}/{index?}', [PengawasanSingleIinController::class, 'downloadFile'])->name('pengawasan-single-iin.download-file');
     Route::get('pengawasan-single-iin/{pengawasanSingleIin}/download-payment-document/{index}', [PengawasanSingleIinController::class, 'downloadPaymentDocument'])->name('pengawasan-single-iin.download-payment-document');
     Route::get('pengawasan-single-iin/{pengawasanSingleIin}/download-payment-proof/{index}', [PengawasanSingleIinController::class, 'downloadPaymentProof'])->name('pengawasan-single-iin.download-payment-proof');
     Route::get('pengawasan-single-iin/{pengawasanSingleIin}/download-field-verification-document/{index}', [PengawasanSingleIinController::class, 'downloadFieldVerificationDocument'])->name('pengawasan-single-iin.download-field-verification-document');

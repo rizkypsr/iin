@@ -25,9 +25,12 @@ class IinStatusLog extends Model
         return $this->morphTo();
     }
 
-    public function user(): BelongsTo
+    /**
+     * Get the user who changed the status.
+     */
+    public function changedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     protected static function boot()

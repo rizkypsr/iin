@@ -30,12 +30,12 @@ class IinNasionalAdminController extends Controller
 
     public function show(IinNasionalApplication $iinNasional)
     {
-        $iinNasional->load(['user', 'admin']);
+        $iinNasional->load(['user', 'admin', 'expenseReimbursement']);
 
         // Get status logs using polymorphic relationship
         $statusLogs = IinStatusLog::where('application_type', 'nasional')
             ->where('application_id', $iinNasional->id)
-            ->with('user')
+            ->with('changedBy')
             ->orderBy('created_at', 'desc')
             ->get();
 

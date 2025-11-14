@@ -93,7 +93,7 @@ class IinSingleBlockholderController extends Controller
         // Get status logs using polymorphic relationship
         $statusLogs = IinStatusLog::where('application_type', 'single_blockholder')
             ->where('application_id', $iinSingleBlockholder->id)
-            ->with('user')
+            ->with('changedBy')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -543,16 +543,21 @@ class IinSingleBlockholderController extends Controller
         return response()->download($filePath, $document['original_name']);
     }
 
-    public function downloadFile(IinSingleBlockholderApplication $iinSingleBlockholder, string $type)
+    public function downloadFile(IinSingleBlockholderApplication $iinSingleBlockholder, string $type, ?int $index = null)
     {
         $this->authorize('downloadFile', $iinSingleBlockholder);
 
         $path = match ($type) {
             'application_form' => $iinSingleBlockholder->application_form_path,
             'requirements_archive' => $iinSingleBlockholder->requirements_archive_path,
-            'payment_proof' => $iinSingleBlockholder->payment_proof_path, // Keep for backward compatibility
+            'payment_proof' => $iinSingleBlockholder->payment_proof_documents[$index]['path'],
+            'payment_proof_stage2' => $iinSingleBlockholder->payment_proof_documents_stage_2[$index]['path'],
+            'payment_document' => $iinSingleBlockholder->payment_documents[$index]['path'],
+            'payment_document_stage2' => $iinSingleBlockholder->payment_documents_stage_2[$index]['path'],
             'certificate' => $iinSingleBlockholder->certificate_path,
             'qris' => $iinSingleBlockholder->additional_documents['path'],
+            'field_verification_document' => $iinSingleBlockholder->field_verification_documents[$index]['path'],
+            'expense_reimbursement' => $iinSingleBlockholder->expenseReimbursement?->payment_proof_path,
             default => null
         };
 
@@ -745,7 +750,7 @@ class IinSingleBlockholderController extends Controller
                 $paymentProofPath = null;
                 if ($request->hasFile('payment_proof_path')) {
                     $file = $request->file('payment_proof_path');
-                    $filename = 'single_blockholder_' . time() . '_expense_proof.' . $file->getClientOriginalExtension();
+                    $filename = 'single_blockholder_'.time().'_expense_proof.'.$file->getClientOriginalExtension();
                     $paymentProofPath = $file->storeAs('iin-single-blockholder/expense-reimbursement', $filename, 'public');
                 }
 
@@ -773,13 +778,14 @@ class IinSingleBlockholderController extends Controller
                     'user_id' => Auth::id(),
                     'status_from' => null,
                     'status_to' => null,
-                    'notes' => 'Form bukti penggantian transport dan uang harian disubmit'
+                    'notes' => 'Form bukti penggantian transport dan uang harian disubmit',
                 ]);
 
                 return back()->with('success', 'Form bukti penggantian transport dan uang harian berhasil disubmit');
             });
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error submitting expense reimbursement: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Error submitting expense reimbursement: '.$e->getMessage());
+
             return back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.']);
         }
     }

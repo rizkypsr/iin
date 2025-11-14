@@ -10,7 +10,7 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-white text-gray-900 border-gray-300",
+          "bg-white text-gray-900 border-gray-300 uppercase",
         primary:
           "bg-gradient-primary text-white border-transparent shadow-sm",
         accent:

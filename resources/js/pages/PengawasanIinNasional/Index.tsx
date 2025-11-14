@@ -1,4 +1,3 @@
-import QrisModal from '@/components/QrisModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -84,12 +83,10 @@ const containerAnimation = {
 };
 
 export default function PengawasanIinNasionalIndex({ applications, auth, errors, flash }: Props) {
-    const [showSurvey, setShowSurvey] = useState(false);
-    const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [selectedApplication, setSelectedApplication] = useState<PengawasanIinNasionalApplication | null>(null);
 
     // Expense reimbursement form
-    const { data: expenseReimData, setData: setExpenseReimData, post: postExpenseReim, processing: expenseReimProcessing, errors: expenseReimErrors, reset: resetExpenseReim } = useForm({
+    const { data: expenseReimData, setData: setExpenseReimData, processing: expenseReimProcessing, errors: expenseReimErrors, reset: resetExpenseReim } = useForm({
         company_name: '',
         pic_name: '',
         pic_contact: '',
@@ -206,36 +203,6 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
         }
     };
 
-    const handleQrisFileUpload = (file: File) => {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        router.post(route('pengawasan-iin-nasional.upload-additional-documents', selectedApplication?.id), formData, {
-            onSuccess: () => {
-                showSuccessToast('File QRIS berhasil diupload!');
-                setIsQrisModalOpen(false);
-            },
-            onError: (errors) => {
-                console.error(errors);
-                showErrorToast('Gagal mengupload file QRIS');
-            },
-        });
-    };
-
-    useEffect(() => {
-        if (flash && typeof flash === 'object' && 'success' in flash && flash.success) {
-            showSuccessToast(flash.success as string);
-        }
-        if (flash && typeof flash === 'object' && 'error' in flash && flash.error) {
-            showErrorToast(flash.error as string);
-        }
-
-        // Handle validation errors
-        if (errors?.profile) {
-            showErrorToast(errors.profile);
-        }
-    }, [flash, errors]);
-
     return (
         <DashboardLayout user={auth.user}>
             <Head title="Pemantauan IIN Nasional" />
@@ -249,8 +216,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                     </div>
                     {auth.user.role === 'user' && (
                         <Link href={route('pengawasan-iin-nasional.create')}>
-                            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                                <Plus className="mr-2 h-4 w-4" />
+                            <Button className="text-white bg-blue-600 hover:bg-blue-700">
+                                <Plus className="mr-2 w-4 h-4" />
                                 Update Pemantauan
                             </Button>
                         </Link>
@@ -262,8 +229,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                     <Card>
                         <CardContent className="p-6">
                             <div className="flex items-center">
-                                <div className="rounded-full bg-blue-100 p-3">
-                                    <Shield className="h-6 w-6 text-blue-600" />
+                                <div className="p-3 bg-blue-100 rounded-full">
+                                    <Shield className="w-6 h-6 text-blue-600" />
                                 </div>
                                 <div className="ml-4">
                                     <p className="text-sm font-medium text-gray-600">Total Aplikasi</p>
@@ -275,8 +242,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                     <Card>
                         <CardContent className="p-6">
                             <div className="flex items-center">
-                                <div className="rounded-full bg-yellow-100 p-3">
-                                    <Clock className="h-6 w-6 text-yellow-600" />
+                                <div className="p-3 bg-yellow-100 rounded-full">
+                                    <Clock className="w-6 h-6 text-yellow-600" />
                                 </div>
                                 <div className="ml-4">
                                     <p className="text-sm font-medium text-gray-600">Dalam Proses</p>
@@ -290,8 +257,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                     <Card>
                         <CardContent className="p-6">
                             <div className="flex items-center">
-                                <div className="rounded-full bg-green-100 p-3">
-                                    <CheckCircle className="h-6 w-6 text-green-600" />
+                                <div className="p-3 bg-green-100 rounded-full">
+                                    <CheckCircle className="w-6 h-6 text-green-600" />
                                 </div>
                                 <div className="ml-4">
                                     <p className="text-sm font-medium text-gray-600">Selesai</p>
@@ -321,8 +288,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-blue-50">
-                                        <Shield className="h-12 w-12 text-blue-400" />
+                                    <div className="flex justify-center items-center mx-auto mb-4 w-24 h-24 bg-blue-50 rounded-full">
+                                        <Shield className="w-12 h-12 text-blue-400" />
                                     </div>
                                     <h3 className="mb-2 text-xl font-semibold text-gray-900">Belum Ada Aplikasi Pengawasan</h3>
                                     <p className="mx-auto mb-6 max-w-md text-gray-600">
@@ -332,17 +299,17 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                     </p>
                                     {auth.user.role === 'user' && (
                                         <Link href={route('pengawasan-iin-nasional.create')}>
-                                            <Button className="bg-gradient-accent hover:bg-gradient-secondary px-6 text-white">
-                                                <Plus className="mr-2 h-4 w-4" />
+                                            <Button className="px-6 text-white bg-gradient-accent hover:bg-gradient-secondary">
+                                                <Plus className="mr-2 w-4 h-4" />
                                                 Ajukan Pengawasan
                                             </Button>
                                         </Link>
                                     )}
 
                                     {auth.user.role === 'user' && (
-                                        <div className="mx-auto mt-8 max-w-lg rounded-lg border border-blue-100 bg-blue-50/50 p-4">
+                                        <div className="p-4 mx-auto mt-8 max-w-lg rounded-lg border border-blue-100 bg-blue-50/50">
                                             <h4 className="mb-2 font-medium text-blue-800">Panduan Pengawasan IIN Nasional</h4>
-                                            <ul className="list-inside list-disc space-y-1 text-left text-sm text-gray-600">
+                                            <ul className="space-y-1 text-sm list-disc list-inside text-left text-gray-600">
                                                 <li>Ajukan aplikasi pengawasan dengan lengkap</li>
                                                 <li>Upload dokumen yang diperlukan</li>
                                                 <li>Tunggu verifikasi dari admin</li>
@@ -364,9 +331,9 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                 }`}
                                             variants={itemAnimation}
                                         >
-                                            <div className="mb-3 flex items-start justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    {/* <div className="bg-gradient-accent flex h-10 w-10 items-center justify-center rounded-lg text-white">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className="flex gap-3 items-center">
+                                                    {/* <div className="flex justify-center items-center w-10 h-10 text-white rounded-lg bg-gradient-accent">
                                                         {getStatusIcon(application.status, { detailed: false })}
                                                     </div> */}
                                                     <div>
@@ -377,7 +344,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                 <Badge
                                                     className={`${getStatusBadgeClass(application.status, { detailed: false })} ${application.status === 'perbaikan' ? 'flex items-center gap-1' : ''}`}
                                                 >
-                                                    {application.status === 'perbaikan' && <AlertCircle className="mr-1 h-3 w-3" />}
+                                                    {application.status === 'perbaikan' && <AlertCircle className="mr-1 w-3 h-3" />}
                                                     {getStatusLabel(application.status, { detailed: false })}
                                                 </Badge>
                                             </div>
@@ -414,9 +381,9 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                 </div>
                                             </div>
 
-                                            <div className="mb-4 grid grid-cols-2 gap-4 text-sm md:grid-cols-3">
-                                                <div className="flex items-center gap-2">
-                                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                            <div className="grid grid-cols-2 gap-4 mb-4 text-sm md:grid-cols-3">
+                                                <div className="flex gap-2 items-center">
+                                                    <Calendar className="w-4 h-4 text-gray-400" />
                                                     <div>
                                                         <span className="text-gray-600">
                                                             {new Date(application.created_at).toLocaleDateString('id-ID')}
@@ -425,16 +392,16 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                     </div>
                                                 </div>
                                                 {application.iin_number && (
-                                                    <div className="flex items-center gap-2">
-                                                        <Award className="h-4 w-4 text-green-500" />
+                                                    <div className="flex gap-2 items-center">
+                                                        <Award className="w-4 h-4 text-green-500" />
                                                         <div>
                                                             <span className="font-medium text-gray-700">{application.iin_number}</span>
                                                             <p className="text-xs text-gray-500">Nomor IIN</p>
                                                         </div>
                                                     </div>
                                                 )}
-                                                <div className="flex items-center gap-2">
-                                                    <User className="h-4 w-4 text-gray-400" />
+                                                <div className="flex gap-2 items-center">
+                                                    <User className="w-4 h-4 text-gray-400" />
                                                     <div>
                                                         <span className="text-gray-600">{application.user.name}</span>
                                                         <p className="text-xs text-gray-500">Pemohon</p>
@@ -442,36 +409,21 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                 </div>
                                             </div>
 
-                                            <div className="mt-2 border-t pt-3">
-                                                <div className="flex flex-wrap items-center justify-between gap-2">
-                                                    <div className="flex flex-wrap items-center gap-2">
+                                            <div className="pt-3 mt-2 border-t">
+                                                <div className="flex flex-wrap gap-2 justify-between items-center">
+                                                    <div className="flex flex-wrap gap-2 items-center">
                                                         <Link href={route('pengawasan-iin-nasional.show', application.id)}>
                                                             <Button variant="outline" size="sm">
-                                                                <Eye className="mr-2 h-4 w-4" />
+                                                                <Eye className="mr-2 w-4 h-4" />
                                                                 Lihat Detail
                                                             </Button>
                                                         </Link>
-
-                                                        {application.can_download_certificate && !application.additional_documents && (
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="border-purple-200 text-purple-600 hover:bg-purple-50"
-                                                                onClick={() => {
-                                                                    setSelectedApplication(application);
-                                                                    setIsQrisModalOpen(true);
-                                                                }}
-                                                            >
-                                                                <Upload className="mr-2 h-4 w-4" />
-                                                                Upload QRIS
-                                                            </Button>
-                                                        )}
 
                                                         {application.can_download_certificate && application.additional_documents && application.expense_reim_id != null && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
-                                                                className="border-green-200 text-green-600 hover:bg-green-50"
+                                                                className="text-green-600 border-green-200 hover:bg-green-50"
                                                                 onClick={() =>
                                                                     window.open(
                                                                         route('pengawasan-iin-nasional.download-certificate', application.id),
@@ -479,7 +431,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                                     )
                                                                 }
                                                             >
-                                                                <Download className="mr-2 h-4 w-4" />
+                                                                <Download className="mr-2 w-4 h-4" />
                                                                 Download Sertifikat
                                                             </Button>
                                                         )}
@@ -491,10 +443,10 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                                     <Button
                                                                         variant="outline"
                                                                         size="sm"
-                                                                        className="border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-500"
+                                                                        className="text-red-600 border-red-200 hover:border-red-300 hover:bg-red-50 hover:text-red-500"
                                                                         onClick={() => setSelectedApplication(application)}
                                                                     >
-                                                                        <TriangleAlert className="mr-2 h-4 w-4 text-red-500" />
+                                                                        <TriangleAlert className="mr-2 w-4 h-4 text-red-500" />
                                                                         Silahkan isi Form Bukti Penggantian Transport dan Uang Harian
                                                                     </Button>
                                                                 </DialogTrigger>
@@ -714,15 +666,6 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                     </motion.div>
                 )}
             </motion.div>
-
-            <QrisModal
-                isOpen={isQrisModalOpen}
-                onClose={() => setIsQrisModalOpen(false)}
-                onTemplateDownload={() => {
-                    // Any additional actions on template download can be handled here
-                }}
-                onFileUpload={(file: File) => handleQrisFileUpload(file)}
-            />
         </DashboardLayout>
     );
 }

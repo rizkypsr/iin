@@ -31,12 +31,12 @@ class IinSingleBlockholderAdminController extends Controller
 
     public function show(IinSingleBlockholderApplication $iinSingleBlockholder)
     {
-        $iinSingleBlockholder->load(['user', 'admin']);
+        $iinSingleBlockholder->load(['user', 'admin', 'expenseReimbursement']);
 
         // Get status logs using polymorphic relationship
         $statusLogs = IinStatusLog::where('application_type', 'single_blockholder')
             ->where('application_id', $iinSingleBlockholder->id)
-            ->with('user')
+            ->with('changedBy')
             ->orderBy('created_at', 'desc')
             ->get();
 

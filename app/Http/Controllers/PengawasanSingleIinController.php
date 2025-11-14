@@ -82,7 +82,7 @@ class PengawasanSingleIinController extends Controller
     {
         $this->authorize('view', $pengawasanSingleIin);
 
-        $pengawasanSingleIin->load(['user', 'admin', 'singleIinProfile']);
+        $pengawasanSingleIin->load(['user', 'admin', 'singleIinProfile', 'expenseReimbursement']);
 
         // Get status logs using polymorphic relationship
         $statusLogs = PengawasanSingleIinStatusLog::where('pengawasan_single_iin_id', $pengawasanSingleIin->id)
@@ -262,13 +262,20 @@ class PengawasanSingleIinController extends Controller
         return response()->download($fullPath, $originalName);
     }
 
-    public function downloadFile(PengawasanSingleIin $pengawasanSingleIin, string $type)
+    public function downloadFile(PengawasanSingleIin $pengawasanSingleIin, string $type, ?int $index = null)
     {
         $this->authorize('downloadFile', $pengawasanSingleIin);
 
+         $pengawasanSingleIin->load(['expenseReimbursement']);
+
         $path = match ($type) {
+            'certificate' => $pengawasanSingleIin->issuance_documents[$index]['path'],
             'agreement' => $pengawasanSingleIin->agreement_path,
             'qris' => $pengawasanSingleIin->additional_documents['path'],
+            'expense_reimbursement' => $pengawasanSingleIin->expenseReimbursement?->payment_proof_path,
+            'payment_proof' => $pengawasanSingleIin->payment_proof_documents[$index]['path'],
+            'payment_document' => $pengawasanSingleIin->payment_documents[$index]['path'],
+            'field_verification_document' => $pengawasanSingleIin->field_verification_documents[$index]['path'],
             default => null
         };
 

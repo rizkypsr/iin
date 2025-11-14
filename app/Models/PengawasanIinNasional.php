@@ -128,7 +128,7 @@ class PengawasanIinNasional extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->application_number = 'PENGAWASAN-NAS-' . date('Ymd') . '-' . str_pad(
+            $model->application_number = 'PEMANTAUAN-NAS-' . date('Ymd') . '-' . str_pad(
                 static::whereDate('created_at', today())->count() + 1,
                 4,
                 '0',

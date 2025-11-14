@@ -177,7 +177,6 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
 
         router.post(route('iin-single-blockholder.upload-additional-documents', selectedApplication?.id), formData, {
             onSuccess: () => {
-                showSuccessToast('File QRIS berhasil diupload!');
                 setIsQrisModalOpen(false);
             },
             onError: (errors) => {
@@ -193,15 +192,15 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
 
             <div className="space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between">
+                <div className="flex justify-between items-center">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Pengajuan Single IIN/Blockholder</h1>
                         <p className="text-gray-600">Kelola pengajuan Single IIN/Blockholder</p>
                     </div>
                     {auth.user.role === 'user' && (
                         <Link href={route('iin-single-blockholder.create')}>
-                            <Button className="bg-gradient-accent hover:bg-gradient-secondary text-white">
-                                <Plus className="mr-2 h-4 w-4" />
+                            <Button className="text-white bg-gradient-accent hover:bg-gradient-secondary">
+                                <Plus className="mr-2 w-4 h-4" />
                                 Buat Pengajuan Baru
                             </Button>
                         </Link>
@@ -212,13 +211,13 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                 {auth.user.role === 'user' && (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Download className="h-5 w-5" />
+                            <CardTitle className="flex gap-2 items-center">
+                                <Download className="w-5 h-5" />
                                 Download Form Aplikasi
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="rounded-lg border p-4 transition-colors hover:border-purple-300">
+                            <div className="p-4 rounded-lg border transition-colors hover:border-purple-300">
                                 <h3 className="font-semibold text-gray-900">Single IIN/Blockholder</h3>
                                 <p className="mb-3 text-sm text-gray-600">Permohonan Single IIN/Blockholder</p>
                                 <Button
@@ -226,7 +225,7 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                     size="sm"
                                     onClick={() => window.open(route('download-form', 'single-blockholder'), '_blank')}
                                 >
-                                    <Download className="mr-2 h-4 w-4" />
+                                    <Download className="mr-2 w-4 h-4" />
                                     Download File
                                 </Button>
                             </div>
@@ -250,8 +249,8 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
                             >
-                                <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-purple-50">
-                                    <FileText className="h-12 w-12 text-purple-400" />
+                                <div className="flex justify-center items-center mx-auto mb-4 w-24 h-24 bg-purple-50 rounded-full">
+                                    <FileText className="w-12 h-12 text-purple-400" />
                                 </div>
                                 <h3 className="mb-2 text-xl font-semibold text-gray-900">Belum Ada Pengajuan</h3>
                                 <p className="mx-auto mb-6 max-w-md text-gray-600">
@@ -261,17 +260,17 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                 </p>
                                 {auth.user.role === 'user' && (
                                     <Link href={route('iin-single-blockholder.create')}>
-                                        <Button className="bg-gradient-accent hover:bg-gradient-secondary px-6 text-white">
-                                            <Plus className="mr-2 h-4 w-4" />
+                                        <Button className="px-6 text-white bg-gradient-accent hover:bg-gradient-secondary">
+                                            <Plus className="mr-2 w-4 h-4" />
                                             Buat Pengajuan Baru
                                         </Button>
                                     </Link>
                                 )}
 
                                 {auth.user.role === 'user' && (
-                                    <div className="mx-auto mt-8 max-w-lg rounded-lg border border-purple-100 bg-purple-50/50 p-4">
+                                    <div className="p-4 mx-auto mt-8 max-w-lg rounded-lg border border-purple-100 bg-purple-50/50">
                                         <h4 className="mb-2 font-medium text-purple-800">Panduan Pengajuan Single IIN/Blockholder</h4>
-                                        <ul className="list-inside list-disc space-y-1 text-left text-sm text-gray-600">
+                                        <ul className="space-y-1 text-sm list-disc list-inside text-left text-gray-600">
                                             <li>Download dan isi formulir aplikasi dengan lengkap</li>
                                             <li>Upload formulir yang telah diisi</li>
                                             <li>Tunggu verifikasi dari admin</li>
@@ -295,9 +294,9 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                         variants={itemAnimation}
                                     >
                                         {/* Alert notification removed as requested */}
-                                        <div className="mb-3 flex items-start justify-between">
+                                        <div className="flex justify-between items-start mb-3">
                                             {' '}
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex gap-3 items-center">
                                                 <div>
                                                     <h3 className="font-semibold text-gray-900">{application.application_number}</h3>
                                                     <p className="text-sm text-gray-600">Single IIN/Blockholder</p>
@@ -306,7 +305,7 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                             <Badge
                                                 className={`${getStatusBadgeClass(application.status)} ${application.status === 'perbaikan' ? 'flex items-center gap-1' : ''}`}
                                             >
-                                                {application.status === 'perbaikan' && <AlertCircle className="mr-1 h-3 w-3" />}
+                                                {application.status === 'perbaikan' && <AlertCircle className="mr-1 w-3 h-3" />}
                                                 {getStatusLabel(application.status)}
                                             </Badge>
                                         </div>
@@ -344,9 +343,9 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                             </div>
                                         </div>
 
-                                        <div className="mb-4 grid grid-cols-2 gap-4 text-sm md:grid-cols-3">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="h-4 w-4 text-gray-400" />
+                                        <div className="grid grid-cols-2 gap-4 mb-4 text-sm md:grid-cols-3">
+                                            <div className="flex gap-2 items-center">
+                                                <Calendar className="w-4 h-4 text-gray-400" />
                                                 <div>
                                                     <span className="text-gray-600">
                                                         {new Date(application.created_at).toLocaleDateString('id-ID')}
@@ -355,16 +354,16 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                 </div>
                                             </div>
                                             {application.iin_number && (
-                                                <div className="flex items-center gap-2">
-                                                    <Award className="h-4 w-4 text-green-500" />
+                                                <div className="flex gap-2 items-center">
+                                                    <Award className="w-4 h-4 text-green-500" />
                                                     <div>
                                                         <span className="font-medium text-gray-700">{application.iin_number}</span>
                                                         <p className="text-xs text-gray-500">Nomor IIN</p>
                                                     </div>
                                                 </div>
                                             )}
-                                            <div className="flex items-center gap-2">
-                                                <User className="h-4 w-4 text-gray-400" />
+                                            <div className="flex gap-2 items-center">
+                                                <User className="w-4 h-4 text-gray-400" />
                                                 <div>
                                                     <span className="text-gray-600">{application.user.name}</span>
                                                     <p className="text-xs text-gray-500">Pemohon</p>
@@ -372,12 +371,12 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                             </div>
                                         </div>
 
-                                        <div className="mt-2 border-t pt-3">
-                                            <div className="flex flex-wrap items-center justify-between gap-2">
-                                                <div className="flex flex-wrap items-center gap-2">
+                                        <div className="pt-3 mt-2 border-t">
+                                            <div className="flex flex-wrap gap-2 justify-between items-center">
+                                                <div className="flex flex-wrap gap-2 items-center">
                                                     <Link href={route('iin-single-blockholder.show', application.id)}>
                                                         <Button variant="outline" size="sm">
-                                                            <Eye className="mr-2 h-4 w-4" />
+                                                            <Eye className="mr-2 w-4 h-4" />
                                                             Lihat Detail
                                                         </Button>
                                                     </Link>
@@ -389,9 +388,9 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                                 <Button
                                                                     variant="default"
                                                                     size="sm"
-                                                                    className="bg-gradient-to-r from-amber-500 to-amber-600 px-4 font-semibold text-white hover:from-amber-600 hover:to-amber-700"
+                                                                    className="px-4 font-semibold text-white bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700"
                                                                 >
-                                                                    <AlertCircle className="mr-2 h-4 w-4" />
+                                                                    <AlertCircle className="mr-2 w-4 h-4" />
                                                                     Perbaiki Sekarang
                                                                 </Button>
                                                             </Link>
@@ -403,9 +402,9 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                                 <Button
                                                                     variant="outline"
                                                                     size="sm"
-                                                                    className="border-orange-200 text-orange-600 hover:bg-orange-50"
+                                                                    className="text-orange-600 border-orange-200 hover:bg-orange-50"
                                                                 >
-                                                                    <Upload className="mr-2 h-4 w-4" />
+                                                                    <Upload className="mr-2 w-4 h-4" />
                                                                     Upload Bukti Pembayaran
                                                                 </Button>
                                                             </Link>
@@ -415,13 +414,13 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
-                                                            className="border-yellow-200 text-yellow-600 hover:bg-yellow-50"
+                                                            className="text-yellow-600 border-yellow-200 hover:bg-yellow-50"
                                                             onClick={() => {
                                                                 setSelectedApplication(application);
                                                                 setIsQrisModalOpen(true);
                                                             }}
                                                         >
-                                                            <Download className="mr-2 h-4 w-4" />
+                                                            <Download className="mr-2 w-4 h-4" />
                                                             Upload Dokumen Pendukung
                                                         </Button>
                                                     )}
@@ -432,13 +431,13 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
-                                                                className="border-green-200 text-green-600 hover:bg-green-50"
+                                                                className="text-green-600 border-green-200 hover:bg-green-50"
                                                                 onClick={() => {
                                                                     setSelectedApplication(application);
                                                                     setIsSurveyModalOpen(true);
                                                                 }}
                                                             >
-                                                                <Download className="mr-2 h-4 w-4" />
+                                                                <Download className="mr-2 w-4 h-4" />
                                                                 Download Sertifikat
                                                             </Button>
                                                         )}
@@ -450,10 +449,10 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                                 <Button
                                                                     variant="outline"
                                                                     size="sm"
-                                                                    className="border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-500"
+                                                                    className="text-red-600 border-red-200 hover:border-red-300 hover:bg-red-50 hover:text-red-500"
                                                                     onClick={() => setSelectedApplication(application)}
                                                                 >
-                                                                    <TriangleAlert className="mr-2 h-4 w-4 text-red-500" />
+                                                                    <TriangleAlert className="mr-2 w-4 h-4 text-red-500" />
                                                                     Silahkan isi Form Bukti Penggantian Transport dan Uang Harian
                                                                 </Button>
                                                             </DialogTrigger>
@@ -648,39 +647,6 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                         </Dialog>
                                                     )}
                                                 </div>
-
-                                                <div className="flex items-center text-sm text-gray-500">
-                                                    {application.status === 'pembayaran' && (
-                                                        <div className="flex items-center text-purple-500">
-                                                            <CreditCard className="mr-1 h-4 w-4" />
-                                                            <span>Menunggu Pembayaran Tahap 1</span>
-                                                        </div>
-                                                    )}
-                                                    {application.status === 'pembayaran-tahap-2' && (
-                                                        <div className="flex items-center text-orange-500">
-                                                            <CreditCard className="mr-1 h-4 w-4" />
-                                                            <span>Menunggu Pembayaran Tahap 2</span>
-                                                        </div>
-                                                    )}
-                                                    {application.status === 'verifikasi-lapangan' && (
-                                                        <div className="flex items-center text-indigo-500">
-                                                            <MapPin className="mr-1 h-4 w-4" />
-                                                            <span>Sedang Verifikasi Lapangan</span>
-                                                        </div>
-                                                    )}
-                                                    {application.status === 'terbit' && (
-                                                        <div className="flex items-center text-green-500">
-                                                            <CheckCircle className="mr-1 h-4 w-4" />
-                                                            <span>Telah terbit</span>
-                                                        </div>
-                                                    )}
-                                                    {application.status === 'pengajuan' && (
-                                                        <div className="flex items-center text-gray-500">
-                                                            <Clock className="mr-1 h-4 w-4" />
-                                                            <span>Sedang diproses</span>
-                                                        </div>
-                                                    )}
-                                                </div>
                                             </div>
                                         </div>
                                     </motion.div>
@@ -690,7 +656,7 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
 
                         {/* Pagination */}
                         {applications.data.length > 0 && applications.meta?.links && (
-                            <div className="mt-6 flex items-center justify-end gap-2">
+                            <div className="flex gap-2 justify-end items-center mt-6">
                                 {applications.meta.links.map((link: any, index: number) => (
                                     <Link
                                         key={index}

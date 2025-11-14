@@ -31,7 +31,7 @@ class PengawasanIinNasionalAdminController extends Controller
 
     public function show(PengawasanIinNasional $pengawasanIinNasional)
     {
-        $pengawasanIinNasional->load(['user', 'admin', 'iinNasionalProfile']);
+        $pengawasanIinNasional->load(['user', 'admin', 'iinNasionalProfile', 'expenseReimbursement']);
 
         // Get status logs using the new dedicated status log model
         $statusLogs = PengawasanIinNasionalStatusLog::where('pengawasan_iin_nasional_id', $pengawasanIinNasional->id)
@@ -242,8 +242,11 @@ class PengawasanIinNasionalAdminController extends Controller
         $path = match ($type) {
             'agreement' => $pengawasanIinNasional->agreement_path,
             'qris' => $pengawasanIinNasional->additional_documents,
+            'expense_reimbursement' => $pengawasanIinNasional->expense_reimbursement->payment_proof_path,
             default => null
         };
+
+        dd($pengawasanIinNasional, $type, $path);
 
         if (!$path || !Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan');

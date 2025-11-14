@@ -90,12 +90,12 @@ class IinNasionalController extends Controller
     {
         $this->authorize('view', $iinNasional);
 
-        $iinNasional->load(['user', 'admin']);
+        $iinNasional->load(['user', 'admin', 'expenseReimbursement']);
 
         // Get status logs using polymorphic relationship
         $statusLogs = IinStatusLog::where('application_type', 'nasional')
             ->where('application_id', $iinNasional->id)
-            ->with('user')
+            ->with('changedBy')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -444,16 +444,19 @@ class IinNasionalController extends Controller
         return back()->with('success', 'Dokumen tambahan berhasil diupload');
     }
 
-    public function downloadFile(IinNasionalApplication $iinNasional, string $type)
+    public function downloadFile(IinNasionalApplication $iinNasional, string $type, ?int $index = null)
     {
         $this->authorize('downloadFile', $iinNasional);
 
         $path = match ($type) {
             'application_form' => $iinNasional->application_form_path,
             'requirements_archive' => $iinNasional->requirements_archive_path,
-            'payment_proof' => $iinNasional->payment_proof_path,
+            'payment_proof' => $iinNasional->payment_proof_documents[$index]['path'],
+            'payment_document' => $iinNasional->payment_documents[$index]['path'],
             'certificate' => $iinNasional->certificate_path,
-            'qris' => $iinNasional->additional_documents['path'],
+            'qris' => $iinNasional->additional_documents[$index]['path'],
+            'field_verification_document' => $iinNasional->field_verification_documents[$index]['path'],
+            'expense_reimbursement' => $iinNasional->expenseReimbursement?->payment_proof_path,
             default => null
         };
 

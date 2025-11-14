@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\PengawasanIinNasional;
 use App\Models\PengawasanIinNasionalStatusLog;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class PengawasanIinNasionalController extends Controller
@@ -25,30 +25,30 @@ class PengawasanIinNasionalController extends Controller
             ->paginate(10);
 
         return Inertia::render('PengawasanIinNasional/Index', [
-            'applications' => $applications
+            'applications' => $applications,
         ]);
     }
 
     public function create()
     {
         $user = Auth::user();
-        
+
         // Check if user has completed IIN Nasional profile
-        if (!$user->iinNasionalProfile || !$this->isProfileComplete($user->iinNasionalProfile)) {
+        if (! $user->iinNasionalProfile || ! $this->isProfileComplete($user->iinNasionalProfile)) {
             return back()->withErrors(['profile' => 'Anda harus melengkapi profil IIN Nasional terlebih dahulu sebelum mengajukan pengawasan.']);
         }
 
         return Inertia::render('PengawasanIinNasional/Create', [
-            'iinNasionalProfile' => $user->iinNasionalProfile
+            'iinNasionalProfile' => $user->iinNasionalProfile,
         ]);
     }
 
     public function store(Request $request)
     {
         $user = Auth::user();
-        
+
         // Check if user has complete IIN Nasional profile
-        if (!$user->iinNasionalProfile || !$this->isProfileComplete($user->iinNasionalProfile)) {
+        if (! $user->iinNasionalProfile || ! $this->isProfileComplete($user->iinNasionalProfile)) {
             return redirect()->route('iin-nasional.create')
                 ->with('error', 'Silakan lengkapi profil IIN Nasional terlebih dahulu sebelum mengajukan pengawasan.');
         }
@@ -59,7 +59,7 @@ class PengawasanIinNasionalController extends Controller
             $pengawasan = PengawasanIinNasional::create([
                 'user_id' => auth()->id(),
                 'iin_nasional_profile_id' => $user->iinNasionalProfile->id,
-                'application_number' => 'PGW-' . date('Ymd') . '-' . str_pad(PengawasanIinNasional::count() + 1, 4, '0', STR_PAD_LEFT),
+                'application_number' => 'PGW-'.date('Ymd').'-'.str_pad(PengawasanIinNasional::count() + 1, 4, '0', STR_PAD_LEFT),
                 'status' => 'pengajuan',
                 'submitted_at' => now(),
             ]);
@@ -78,7 +78,7 @@ class PengawasanIinNasionalController extends Controller
     {
         $this->authorize('view', $pengawasanIinNasional);
 
-        $pengawasanIinNasional->load(['user', 'admin', 'iinNasionalProfile']);
+        $pengawasanIinNasional->load(['user', 'admin', 'iinNasionalProfile', 'expenseReimbursement']);
 
         // Get status logs using the new dedicated status log model
         $statusLogs = PengawasanIinNasionalStatusLog::where('pengawasan_iin_nasional_id', $pengawasanIinNasional->id)
@@ -91,7 +91,7 @@ class PengawasanIinNasionalController extends Controller
                 'can_upload_payment_proof' => $pengawasanIinNasional->status === 'pembayaran' && $pengawasanIinNasional->user_id === Auth::id(),
                 'can_download_issuance_documents' => $pengawasanIinNasional->issuance_documents && Storage::disk('public')->exists($pengawasanIinNasional->issuance_documents[0]['path'] ?? ''),
             ]),
-            'statusLogs' => $statusLogs
+            'statusLogs' => $statusLogs,
         ]);
     }
 
@@ -103,15 +103,15 @@ class PengawasanIinNasionalController extends Controller
             'payment_proof_documents.*' => 'required|file|max:10240',
         ]);
 
-        if (!$request->hasFile('payment_proof_documents')) {
+        if (! $request->hasFile('payment_proof_documents')) {
             return back()->withErrors(['payment_proof_documents' => 'Silakan pilih file bukti pembayaran']);
         }
 
         $uploadedFiles = [];
         foreach ($request->file('payment_proof_documents') as $file) {
-            $filename = $pengawasanIinNasional->application_number . '_' . time() . '_payment_proof_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $filename = $pengawasanIinNasional->application_number.'_'.time().'_payment_proof_'.uniqid().'.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('pengawasan-iin-nasional/payment-proof', $filename, 'public');
-            
+
             $uploadedFiles[] = [
                 'path' => $path,
                 'original_name' => $file->getClientOriginalName(),
@@ -129,11 +129,11 @@ class PengawasanIinNasionalController extends Controller
             'pengawasan_iin_nasional_id' => $pengawasanIinNasional->id,
             'status_from' => $pengawasanIinNasional->status,
             'status_to' => $pengawasanIinNasional->status,
-            'notes' => 'User mengupload bukti pembayaran (' . count($uploadedFiles) . ' file)',
+            'notes' => 'User mengupload bukti pembayaran ('.count($uploadedFiles).' file)',
             'changed_by' => Auth::id(),
         ]);
 
-        return back()->with('success', count($uploadedFiles) . ' file bukti pembayaran berhasil diupload');
+        return back()->with('success', count($uploadedFiles).' file bukti pembayaran berhasil diupload');
     }
 
     public function downloadPaymentProof(PengawasanIinNasional $pengawasanIinNasional, int $index)
@@ -141,47 +141,55 @@ class PengawasanIinNasionalController extends Controller
         $this->authorize('downloadFile', $pengawasanIinNasional);
 
         $paymentProofs = $pengawasanIinNasional->payment_proof_documents ?? [];
-        
-        if (!isset($paymentProofs[$index])) {
+
+        if (! isset($paymentProofs[$index])) {
             abort(404, 'Bukti pembayaran tidak ditemukan');
         }
 
         $document = $paymentProofs[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
-    public function downloadFile(PengawasanIinNasional $pengawasanIinNasional, string $type)
+    public function downloadFile(PengawasanIinNasional $pengawasanIinNasional, string $type, ?int $index = null)
     {
         $this->authorize('downloadFile', $pengawasanIinNasional);
 
+        $pengawasanIinNasional->load(['expenseReimbursement']);
+
         $path = match ($type) {
+            'certificate' => $pengawasanIinNasional->issuance_documents[$index]['path'],
             'agreement' => $pengawasanIinNasional->agreement_path,
             'qris' => $pengawasanIinNasional->additional_documents['path'],
+            'expense_reimbursement' => $pengawasanIinNasional->expenseReimbursement?->payment_proof_path,
+            'payment_proof' => $pengawasanIinNasional->payment_proof_documents[$index]['path'],
+            'payment_document' => $pengawasanIinNasional->payment_documents[$index]['path'],
+            'field_verification_document' => $pengawasanIinNasional->field_verification_documents[$index]['path'],
             default => null
         };
 
-        if (!$path) {
-            abort(404, 'File path tidak ditemukan untuk tipe: ' . $type);
+
+        if (! $path) {
+            abort(404, 'File path tidak ditemukan untuk tipe: '.$type);
         }
 
-        if (!Storage::disk('public')->exists($path)) {
-            abort(404, 'File tidak ditemukan di storage: ' . $path);
+        if (! Storage::disk('public')->exists($path)) {
+            abort(404, 'File tidak ditemukan di storage: '.$path);
         }
 
         $fullPath = Storage::disk('public')->path($path);
-        
+
         // Get original filename with proper extension
         $originalFilename = match ($type) {
-            'agreement' => $pengawasanIinNasional->application_number . '_iin_nasional.' . pathinfo($path, PATHINFO_EXTENSION),
+            'agreement' => $pengawasanIinNasional->application_number.'_iin_nasional.'.pathinfo($path, PATHINFO_EXTENSION),
             default => basename($path)
         };
 
@@ -193,21 +201,21 @@ class PengawasanIinNasionalController extends Controller
         $this->authorize('downloadFile', $pengawasanIinNasional);
 
         $paymentDocuments = $pengawasanIinNasional->payment_documents ?? [];
-        
-        if (!isset($paymentDocuments[$index])) {
+
+        if (! isset($paymentDocuments[$index])) {
             abort(404, 'Dokumen pembayaran tidak ditemukan');
         }
 
         $document = $paymentDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -216,21 +224,21 @@ class PengawasanIinNasionalController extends Controller
         $this->authorize('downloadFile', $pengawasanIinNasional);
 
         $fieldVerificationDocuments = $pengawasanIinNasional->field_verification_documents ?? [];
-        
-        if (!isset($fieldVerificationDocuments[$index])) {
+
+        if (! isset($fieldVerificationDocuments[$index])) {
             abort(404, 'Dokumen verifikasi lapangan tidak ditemukan');
         }
 
         $document = $fieldVerificationDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -239,21 +247,21 @@ class PengawasanIinNasionalController extends Controller
         $this->authorize('downloadFile', $pengawasanIinNasional);
 
         $issuanceDocuments = $pengawasanIinNasional->issuance_documents ?? [];
-        
-        if (!isset($issuanceDocuments[$index])) {
+
+        if (! isset($issuanceDocuments[$index])) {
             abort(404, 'Dokumen penerbitan tidak ditemukan');
         }
 
         $document = $issuanceDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -265,15 +273,15 @@ class PengawasanIinNasionalController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filename = $pengawasanIinNasional->application_number . '_' . time() . '_' . uniqid() . '_additional.' . $file->getClientOriginalExtension();
+            $filename = $pengawasanIinNasional->application_number.'_'.time().'_'.uniqid().'_additional.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('pengawasan-iin-nasional/additional-document', $filename, 'public');
 
             $existingDocuments = [
                 'path' => $path,
                 'original_name' => $file->getClientOriginalName(),
-                'uploaded_at' => now()->toISOString()
+                'uploaded_at' => now()->toISOString(),
             ];
-            
+
             $pengawasanIinNasional->update([
                 'additional_documents' => $existingDocuments,
             ]);
@@ -282,7 +290,7 @@ class PengawasanIinNasionalController extends Controller
                 'pengawasan_iin_nasional_id' => $pengawasanIinNasional->id,
                 'status_from' => $pengawasanIinNasional->status,
                 'status_to' => $pengawasanIinNasional->status,
-                'notes' => 'Dokumen tambahan diupload (' . $file->getClientOriginalName() . ')',
+                'notes' => 'Dokumen tambahan diupload ('.$file->getClientOriginalName().')',
                 'changed_by' => Auth::id(),
             ]);
         }
@@ -354,7 +362,7 @@ class PengawasanIinNasionalController extends Controller
                 $paymentProofPath = null;
                 if ($request->hasFile('payment_proof_path')) {
                     $file = $request->file('payment_proof_path');
-                    $filename = 'pengawasan_nasional_' . time() . '_expense_proof.' . $file->getClientOriginalExtension();
+                    $filename = 'pemantauan_'.time().'_expense_proof.'.$file->getClientOriginalExtension();
                     $paymentProofPath = $file->storeAs('pengawasan-iin-nasional/expense-reimbursement', $filename, 'public');
                 }
 
@@ -387,7 +395,8 @@ class PengawasanIinNasionalController extends Controller
                 return back()->with('success', 'Form bukti penggantian transport dan uang harian berhasil disubmit');
             });
         } catch (\Exception $e) {
-            Log::error('Error submitting expense reimbursement: ' . $e->getMessage());
+            Log::error('Error submitting expense reimbursement: '.$e->getMessage());
+
             return back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.']);
         }
     }
