@@ -1,17 +1,11 @@
-import QrisModal from '@/components/QrisModal';
 import SurveyModal from '@/components/SurveyModal';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
-import { IinSingleBlockholderApplication, PageProps, PaymentDocument, StatusLog } from '@/types';
+import { IinSingleBlockholderApplication, PageProps, StatusLog } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Upload, User } from 'lucide-react';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import DetailTab from './components/DetailTab';
 import PaymentTab from './components/PaymentTab';
@@ -29,26 +23,9 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
 
     const [selectedApplication, setSelectedApplication] = useState<IinSingleBlockholderApplication | null>(null);
     const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
-    const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         payment_proof: [] as File[],
     });
-
-    const handleQrisFileUpload = (file: File) => {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        router.post(route('iin-single-blockholder.upload-additional-documents', selectedApplication?.id), formData, {
-            onSuccess: () => {
-                showSuccessToast('File QRIS berhasil diupload!');
-                setIsQrisModalOpen(false);
-            },
-            onError: (errors) => {
-                console.error(errors);
-                showErrorToast('Gagal mengupload file QRIS');
-            },
-        });
-    };
 
     return (
         <DashboardLayout user={auth.user}>
@@ -113,15 +90,6 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                     window.open(route('iin-single-blockholder.download-file', [application.id, 'certificate']), '_blank');
                 }}
                 certificateType="Sertifikat Single IIN/Blockholder"
-            />
-
-            <QrisModal
-                isOpen={isQrisModalOpen}
-                onClose={() => setIsQrisModalOpen(false)}
-                onTemplateDownload={() => {
-                    // Any additional actions on template download can be handled here
-                }}
-                onFileUpload={(file: File) => handleQrisFileUpload(file)}
             />
         </DashboardLayout>
     );

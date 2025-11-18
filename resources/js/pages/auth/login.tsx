@@ -1,7 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -15,6 +15,7 @@ type LoginForm = {
     email: string;
     password: string;
     remember: boolean;
+    captcha: string;
 };
 
 interface LoginProps {
@@ -23,16 +24,22 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
+    const [captchaUrl, setCaptchaUrl] = useState<string>(() => `/captcha/default?ts=${Date.now()}`);
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
         remember: false,
+        captcha: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('login'), {
             onFinish: () => reset('password'),
+            onError: () => {
+                setCaptchaUrl(`/captcha/default?ts=${Date.now()}`);
+                reset('captcha');
+            },
         });
     };
 
@@ -102,13 +109,46 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <InputError message={errors.password} />
                     </div>
 
+                    <div className="space-y-2">
+                        <Label htmlFor="captcha" className="text-sm font-medium text-gray-700">
+                            Captcha
+                        </Label>
+                        <div className="flex items-center gap-3">
+                            <img
+                                src={captchaUrl}
+                                alt="captcha"
+                                className="h-10 rounded border"
+                                onClick={() => setCaptchaUrl(`/captcha/default?ts=${Date.now()}`)}
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="h-10"
+                                onClick={() => setCaptchaUrl(`/captcha/default?ts=${Date.now()}`)}
+                            >
+                                Refresh
+                            </Button>
+                        </div>
+                        <Input
+                            id="captcha"
+                            type="text"
+                            required
+                            tabIndex={3}
+                            value={data.captcha}
+                            onChange={(e) => setData('captcha', e.target.value)}
+                            placeholder="Enter captcha"
+                            className="h-12 rounded-lg border-gray-200 px-4 focus:border-blue-500 focus:ring-blue-500"
+                        />
+                        <InputError message={errors.captcha} />
+                    </div>
+
                     <div className="flex items-center space-x-3">
                         <Checkbox
                             id="remember"
                             name="remember"
                             checked={data.remember}
                             onClick={() => setData('remember', !data.remember)}
-                            tabIndex={3}
+                            tabIndex={4}
                             className="border-gray-300"
                         />
                         <Label htmlFor="remember" className="text-sm text-gray-600">
@@ -125,7 +165,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <Button
                         type="submit"
                         className="bg-gradient-accent hover:bg-gradient-secondary h-12 w-full rounded-lg font-medium text-white transition-all duration-300"
-                        tabIndex={4}
+                        tabIndex={5}
                         disabled={processing}
                     >
                         {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
@@ -140,7 +180,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
                 >
                     Need an Account?{' '}
-                    <TextLink href={route('register')} tabIndex={5} className="font-medium text-blue-600 hover:text-blue-500">
+                    <TextLink href={route('register')} tabIndex={6} className="font-medium text-blue-600 hover:text-blue-500">
                         Create Account
                     </TextLink>
                 </motion.div>

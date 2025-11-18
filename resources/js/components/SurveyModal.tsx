@@ -83,7 +83,7 @@ const SurveyModal: React.FC<SurveyModalProps> = ({ isOpen, onClose, onDownload, 
                         className={`${isDownloadEnabled ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-300'}`}
                     >
                         <FileDown className="mr-2 h-4 w-4" />
-                        {isDownloadEnabled ? 'Unduh Sertifikat' : 'Isi Survei Terlebih Dahulu'}
+                        {isDownloadEnabled ? 'Unduh Dokumen' : 'Isi Survei Terlebih Dahulu'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

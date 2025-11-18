@@ -42,8 +42,8 @@ export default function DocumentTab({ application }: { application: PengawasanSi
                                     <Award className="w-5 h-5 text-green-600" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-gray-800">Sertifikat IIN</p>
-                                    <p className="text-sm text-gray-500">Sertifikat IIN Nasional</p>
+                                    <p className="font-medium text-gray-800">Dokumen Pemantauan IIN</p>
+                                    <p className="text-sm text-gray-500">Dokumen Pemantauan IIN Nasional</p>
                                 </div>
                             </div>
                             {application.status === 'terbit' && (

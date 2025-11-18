@@ -391,7 +391,7 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                             </div>
 
                                             {/* Additional Documents Section */}
-                                            <div>
+                                            {/* <div>
                                                 <Label className="text-sm font-medium text-gray-700">Dokumen Tambahan (Opsional)</Label>
                                                 <Input
                                                     type="file"
@@ -414,7 +414,7 @@ export default function AdminIinNasionalShow({ auth, application, statusLogs, ap
                                                         ))}
                                                     </div>
                                                 )}
-                                            </div>
+                                            </div> */}
 
                                             <div>
                                                 <Label htmlFor="verification_notes" className="text-sm font-medium text-gray-700">

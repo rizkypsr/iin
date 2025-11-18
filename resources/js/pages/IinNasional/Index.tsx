@@ -188,7 +188,6 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
 
         router.post(route('iin-nasional.upload-additional-documents', selectedApplication?.id), formData, {
             onSuccess: () => {
-                showSuccessToast('File QRIS berhasil diupload!');
                 setIsQrisModalOpen(false);
             },
             onError: (errors) => {

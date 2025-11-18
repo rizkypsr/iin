@@ -53,24 +53,6 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                         </div>
                     )}
 
-                    {/* Additional Documents */}
-                    {application.additional_documents && (
-                        <div className="flex justify-between items-center p-3 rounded-lg border border-gray-200">
-                            <div className="flex gap-3 items-center">
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <FileText className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <div>
-                                    <p className="font-medium text-gray-800">Surat Pernyataan Penggunaan QRIS</p>
-                                </div>
-                            </div>
-                            <Button variant="outline" size="sm" onClick={() => downloadFile('qris', 0)}>
-                                <Download className="mr-1 w-4 h-4" />
-                                Download
-                            </Button>
-                        </div>
-                    )}
-
                     {/* Application Form */}
                     <div className="flex justify-between items-center p-3 rounded-lg border border-gray-200">
                         <div className="flex gap-3 items-center">
@@ -177,13 +159,13 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                                     <p className="font-medium text-gray-800">Bukti Pembayaran Tahap 2 User</p>
                                     <p className="text-sm text-gray-500">
                                         {application.payment_proof_documents_stage_2.length} file diupload pada{' '}
-                                        {application.payment_proof_uploaded_at
-                                            ? format(new Date(application.payment_proof_uploaded_at), 'dd MMMM yyyy', { locale: id })
+                                        {application.payment_proof_uploaded_at_stage_2
+                                            ? format(new Date(application.payment_proof_uploaded_at_stage_2), 'dd MMMM yyyy', { locale: id })
                                             : '-'}
                                     </p>
                                 </div>
                             </div>
-                            {application.payment_proof_documents?.map((document: PaymentDocument, index: number) => (
+                            {application.payment_proof_documents_stage_2?.map((document: PaymentDocument, index: number) => (
                                 <div
                                     key={index}
                                     className="flex justify-between items-center p-2 ml-12 rounded-lg border border-gray-200"

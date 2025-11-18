@@ -38,6 +38,10 @@ class RegisteredUserController extends Controller
             'company_name' => 'required|string|max:255',
             'company_phone' => 'required|string|max:20',
             'company_email' => 'required|string|lowercase|email|max:255',
+            'captcha' => ['required', 'captcha'],
+        ], [
+            'captcha.required' => 'Captcha harus diisi',
+            'captcha.captcha' => 'Captcha tidak sesuai',
         ]);
 
         $user = User::create([

@@ -1,15 +1,12 @@
-import QrisModal from '@/components/QrisModal';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { AlertCircle, ArrowLeft, Award, CheckCircle, Clock, CreditCard, Download, FileText, Shield, Upload, User } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock, CreditCard, User } from 'lucide-react';
 import { useState } from 'react';
 import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 import SurveyModal from '@/components/SurveyModal';
@@ -163,9 +160,9 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                 {application.status === 'issued' && (
                     <Alert className="bg-green-50 border-green-200">
                         <CheckCircle className="w-4 h-4 text-green-600" />
-                        <AlertTitle className="text-green-800">Pengawasan Selesai</AlertTitle>
+                        <AlertTitle className="text-green-800">Pemantauan Selesai</AlertTitle>
                         <AlertDescription className="text-green-700">
-                            Proses pengawasan telah selesai. Dokumen hasil pengawasan dapat diunduh di bawah ini.
+                            Proses pemantauan telah selesai. Dokumen hasil pemantauan dapat diunduh di bawah ini.
                         </AlertDescription>
                     </Alert>
                 )}
@@ -173,9 +170,9 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                 {application.status === 'terbit' && (
                     <Alert className="bg-green-50 border-green-200">
                         <CheckCircle className="w-4 h-4 text-green-600" />
-                        <AlertTitle className="text-green-800">Pengawasan Selesai</AlertTitle>
+                        <AlertTitle className="text-green-800">Pemantauan Selesai</AlertTitle>
                         <AlertDescription className="text-green-700">
-                            Proses pengawasan telah selesai. Dokumen hasil pengawasan dapat diunduh di tab Dokumen.
+                            Proses pemantauan telah selesai. Dokumen hasil pemantauan dapat diunduh di tab Dokumen.
                         </AlertDescription>
                     </Alert>
                 )}

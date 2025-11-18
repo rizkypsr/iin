@@ -346,7 +346,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
                         <div className="space-y-2">
                             <Label htmlFor="supervision_period_end" className="text-sm font-medium text-gray-700">
                                 <Calendar className="mr-1 inline h-4 w-4" />
-                                Periode Pengawasan Selesai <span className="text-red-500">*</span>
+                                Periode Pemantauan Selesai <span className="text-red-500">*</span>
                             </Label>
                             <Input
                                 id="supervision_period_end"

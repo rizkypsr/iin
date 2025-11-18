@@ -1,7 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
@@ -18,9 +18,11 @@ type RegisterForm = {
     company_name: string;
     company_phone: string;
     company_email: string;
+    captcha: string;
 };
 
 export default function Register() {
+    const [captchaUrl, setCaptchaUrl] = useState<string>(() => `/captcha/default?ts=${Date.now()}`);
     const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
         name: '',
         email: '',
@@ -29,12 +31,17 @@ export default function Register() {
         company_name: '',
         company_phone: '',
         company_email: '',
+        captcha: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('register'), {
             onFinish: () => reset('password', 'password_confirmation'),
+            onError: () => {
+                setCaptchaUrl(`/captcha/default?ts=${Date.now()}`);
+                reset('captcha');
+            },
         });
     };
 
@@ -219,15 +226,54 @@ export default function Register() {
                     </motion.div>
 
                     <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.8 }}
+                        className="space-y-2"
+                    >
+                        <Label htmlFor="captcha" className="text-sm font-medium text-gray-700">
+                            Captcha
+                        </Label>
+                        <div className="flex items-center gap-3">
+                            <img
+                                src={captchaUrl}
+                                alt="captcha"
+                                className="h-10 rounded border"
+                                onClick={() => setCaptchaUrl(`/captcha/default?ts=${Date.now()}`)}
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="h-10"
+                                onClick={() => setCaptchaUrl(`/captcha/default?ts=${Date.now()}`)}
+                            >
+                                Refresh
+                            </Button>
+                        </div>
+                        <Input
+                            id="captcha"
+                            type="text"
+                            required
+                            tabIndex={8}
+                            value={data.captcha}
+                            onChange={(e) => setData('captcha', e.target.value)}
+                            disabled={processing}
+                            placeholder="Enter captcha"
+                            className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        />
+                        <InputError message={errors.captcha} className="text-xs" />
+                    </motion.div>
+
+                    <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.8 }}
+                        transition={{ duration: 0.5, delay: 0.9 }}
                         className="pt-2"
                     >
                         <Button
                             type="submit"
                             className="h-11 w-full bg-gradient-to-r from-blue-700 to-blue-900 font-medium text-white transition-all duration-200 hover:from-blue-800 hover:to-blue-950 hover:shadow-lg hover:shadow-blue-500/25"
-                            tabIndex={8}
+                            tabIndex={9}
                             disabled={processing}
                         >
                             {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
@@ -239,13 +285,13 @@ export default function Register() {
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.9 }}
+                    transition={{ duration: 0.5, delay: 1.0 }}
                     className="text-center text-sm text-gray-600"
                 >
                     Already have an account?{' '}
                     <TextLink
                         href={route('login')}
-                        tabIndex={9}
+                        tabIndex={10}
                         className="font-medium text-blue-700 transition-colors duration-200 hover:text-blue-900"
                     >
                         Log in

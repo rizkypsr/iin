@@ -454,7 +454,7 @@ class IinNasionalController extends Controller
             'payment_proof' => $iinNasional->payment_proof_documents[$index]['path'],
             'payment_document' => $iinNasional->payment_documents[$index]['path'],
             'certificate' => $iinNasional->certificate_path,
-            'qris' => $iinNasional->additional_documents[$index]['path'],
+            'qris' => $iinNasional->additional_documents['path'],
             'field_verification_document' => $iinNasional->field_verification_documents[$index]['path'],
             'expense_reimbursement' => $iinNasional->expenseReimbursement?->payment_proof_path,
             default => null

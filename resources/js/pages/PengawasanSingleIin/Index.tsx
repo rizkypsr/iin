@@ -358,7 +358,7 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                                                             <Link href={route('pengawasan-single-iin.download-certificate', application.id)}>
                                                                 <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700">
                                                                     <Download className="mr-2 h-4 w-4" />
-                                                                    Unduh Sertifikat
+                                                                    Unduh Dokumen Pemantauan
                                                                 </Button>
                                                             </Link>
                                                         )}

@@ -1,4 +1,3 @@
-import QrisModal from '@/components/QrisModal';
 import SurveyModal from '@/components/SurveyModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,14 +6,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
 import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { AlertCircle, Award, Calendar, CheckCircle, Clock, CreditCard, Download, Eye, FileText, MapPin, Plus, TriangleAlert, Upload, User } from 'lucide-react';
+import { AlertCircle, Award, Calendar, Download, Eye, FileText, Plus, TriangleAlert, Upload, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface IinSingleBlockholderApplication {
@@ -69,7 +67,6 @@ const containerAnimation = {
 
 export default function IinSingleBlockholderIndex({ applications, auth, flash }: Props) {
     const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
-    const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
     const [selectedApplication, setSelectedApplication] = useState<IinSingleBlockholderApplication | null>(null);
 
     // Expense reimbursement form
@@ -169,21 +166,6 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
         if (file) {
             setExpenseReimData('payment_proof_path', file);
         }
-    };
-
-    const handleQrisFileUpload = (file: File) => {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        router.post(route('iin-single-blockholder.upload-additional-documents', selectedApplication?.id), formData, {
-            onSuccess: () => {
-                setIsQrisModalOpen(false);
-            },
-            onError: (errors) => {
-                console.error(errors);
-                showErrorToast('Gagal mengupload file QRIS');
-            },
-        });
     };
 
     return (
@@ -288,8 +270,8 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                     <motion.div
                                         key={application.id}
                                         className={`rounded-lg border p-4 transition-shadow hover:shadow-md ${application.status === 'perbaikan' && auth.user.role === 'user'
-                                                ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
-                                                : ''
+                                            ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-white'
+                                            : ''
                                             }`}
                                         variants={itemAnimation}
                                     >
@@ -409,21 +391,6 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                                 </Button>
                                                             </Link>
                                                         )}
-
-                                                    {application.status === 'terbit' && !application.additional_documents && (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="text-yellow-600 border-yellow-200 hover:bg-yellow-50"
-                                                            onClick={() => {
-                                                                setSelectedApplication(application);
-                                                                setIsQrisModalOpen(true);
-                                                            }}
-                                                        >
-                                                            <Download className="mr-2 w-4 h-4" />
-                                                            Upload Dokumen Pendukung
-                                                        </Button>
-                                                    )}
 
                                                     {application.status === 'terbit' &&
                                                         application.iin_number &&
@@ -635,8 +602,8 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                                             Batal
                                                                         </Button>
                                                                     </DialogTrigger>
-                                                                    <Button 
-                                                                        type="button" 
+                                                                    <Button
+                                                                        type="button"
                                                                         onClick={expenseReimSubmit}
                                                                         disabled={expenseReimProcessing}
                                                                     >
@@ -662,10 +629,10 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                         key={index}
                                         href={link.url || '#'}
                                         className={`rounded px-3 py-1 ${link.active
-                                                ? 'bg-blue-100 text-blue-700'
-                                                : link.url
-                                                    ? 'text-gray-600 hover:bg-gray-100'
-                                                    : 'cursor-not-allowed text-gray-300'
+                                            ? 'bg-blue-100 text-blue-700'
+                                            : link.url
+                                                ? 'text-gray-600 hover:bg-gray-100'
+                                                : 'cursor-not-allowed text-gray-300'
                                             }`}
                                         disabled={!link.url}
                                     >
@@ -687,15 +654,6 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                     }
                 }}
                 certificateType="IIN Single Blockholder"
-            />
-
-            <QrisModal
-                isOpen={isQrisModalOpen}
-                onClose={() => setIsQrisModalOpen(false)}
-                onTemplateDownload={() => {
-                    // Any additional actions on template download can be handled here
-                }}
-                onFileUpload={(file: File) => handleQrisFileUpload(file)}
             />
         </DashboardLayout>
     );

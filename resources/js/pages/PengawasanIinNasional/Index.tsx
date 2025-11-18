@@ -294,28 +294,28 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                     <h3 className="mb-2 text-xl font-semibold text-gray-900">Belum Ada Aplikasi Pengawasan</h3>
                                     <p className="mx-auto mb-6 max-w-md text-gray-600">
                                         {auth.user.role === 'user'
-                                            ? 'Anda belum memiliki aplikasi pengawasan IIN Nasional. Buat aplikasi pengawasan pertama Anda untuk memulai proses pengawasan.'
-                                            : 'Tidak ada aplikasi pengawasan yang perlu diproses saat ini. Aplikasi baru akan muncul di sini ketika ada pemohon yang mengajukan.'}
+                                            ? 'Anda belum memiliki aplikasi pemantauan IIN Nasional. Buat aplikasi pemantauan pertama Anda untuk memulai proses pemantauan.'
+                                            : 'Tidak ada aplikasi pemantauan yang perlu diproses saat ini. Aplikasi baru akan muncul di sini ketika ada pemohon yang mengajukan.'}
                                     </p>
                                     {auth.user.role === 'user' && (
                                         <Link href={route('pengawasan-iin-nasional.create')}>
                                             <Button className="px-6 text-white bg-gradient-accent hover:bg-gradient-secondary">
                                                 <Plus className="mr-2 w-4 h-4" />
-                                                Ajukan Pengawasan
+                                                Ajukan Pemantauan
                                             </Button>
                                         </Link>
                                     )}
 
                                     {auth.user.role === 'user' && (
                                         <div className="p-4 mx-auto mt-8 max-w-lg rounded-lg border border-blue-100 bg-blue-50/50">
-                                            <h4 className="mb-2 font-medium text-blue-800">Panduan Pengawasan IIN Nasional</h4>
+                                            <h4 className="mb-2 font-medium text-blue-800">Panduan Pemantauan IIN Nasional</h4>
                                             <ul className="space-y-1 text-sm list-disc list-inside text-left text-gray-600">
-                                                <li>Ajukan aplikasi pengawasan dengan lengkap</li>
+                                                <li>Ajukan aplikasi pemantauan dengan lengkap</li>
                                                 <li>Upload dokumen yang diperlukan</li>
                                                 <li>Tunggu verifikasi dari admin</li>
                                                 <li>Lakukan pembayaran jika aplikasi disetujui</li>
                                                 <li>Tunggu proses verifikasi lapangan</li>
-                                                <li>Sertifikat pengawasan akan diterbitkan jika semua tahapan selesai</li>
+                                                <li>Dokumen pemantauan akan diterbitkan jika semua tahapan selesai</li>
                                             </ul>
                                         </div>
                                     )}
@@ -432,7 +432,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                                 }
                                                             >
                                                                 <Download className="mr-2 w-4 h-4" />
-                                                                Download Sertifikat
+                                                                Download Dokumen Pemantauan
                                                             </Button>
                                                         )}
 

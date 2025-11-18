@@ -42,8 +42,8 @@ export default function DocumentTab({ application }: { application: PengawasanIi
                                     <Award className="w-5 h-5 text-green-600" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-gray-800">Sertifikat IIN</p>
-                                    <p className="text-sm text-gray-500">Sertifikat IIN Nasional</p>
+                                    <p className="font-medium text-gray-800">Dokumen Pemantauan</p>
+                                    <p className="text-sm text-gray-500">Dokumen Pemantauan IIN Nasional</p>
                                 </div>
                             </div>
                             {canDownloadCertificate && (
@@ -52,24 +52,6 @@ export default function DocumentTab({ application }: { application: PengawasanIi
                                     Download
                                 </Button>
                             )}
-                        </div>
-                    )}
-
-                    {/* Additional Documents */}
-                    {application.additional_documents && (
-                        <div className="flex justify-between items-center p-3 rounded-lg border border-gray-200">
-                            <div className="flex gap-3 items-center">
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <FileText className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <div>
-                                    <p className="font-medium text-gray-800">Surat Pernyataan Penggunaan QRIS</p>
-                                </div>
-                            </div>
-                            <Button variant="outline" size="sm" onClick={() => downloadFile('qris', 0)}>
-                                <Download className="mr-1 w-4 h-4" />
-                                Download
-                            </Button>
                         </div>
                     )}
 
