@@ -23,11 +23,11 @@ interface Props extends PageProps {
 
 export default function Index({ auth, applications }: Props) {
     return (
-        <DashboardLayout user={auth.user} title="Admin - Pengawasan Single IIN">
-            <Head title="Admin - Pengawasan Single IIN" />
+        <DashboardLayout user={auth.user} title="Admin - Pemantauan Single IIN">
+            <Head title="Admin - Pemantauan Single IIN" />
 
             <div className="mb-8">
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">Manajemen Aplikasi Pengawasan Single IIN</h2>
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">Manajemen Aplikasi Pemantauan Single IIN</h2>
             </div>
 
             <div>
@@ -35,7 +35,7 @@ export default function Index({ auth, applications }: Props) {
                     <CardHeader>
                         <CardTitle className="flex gap-2 items-center">
                             <Shield className="w-5 h-5" />
-                            Daftar Aplikasi Pengawasan Single IIN
+                            Daftar Aplikasi Pemantauan Single IIN
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -44,7 +44,7 @@ export default function Index({ auth, applications }: Props) {
                                 <Shield className="mx-auto mb-4 w-12 h-12 text-gray-400" />
                                 <p className="text-lg text-gray-500">Belum Ada Aplikasi</p>
                                 <p className="mt-2 text-sm text-gray-400">
-                                    Tidak ada aplikasi Pengawasan Single IIN yang tersedia untuk ditinjau.
+                                    Tidak ada aplikasi Pemantauan Single IIN yang tersedia untuk ditinjau.
                                 </p>
                             </div>
                         ) : (

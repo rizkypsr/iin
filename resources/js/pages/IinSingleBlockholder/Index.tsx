@@ -393,8 +393,7 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                                                         )}
 
                                                     {application.status === 'terbit' &&
-                                                        application.iin_number &&
-                                                        application.additional_documents && application.expense_reim_id != null && (
+                                                        application.iin_number && application.expense_reim_id != null && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"

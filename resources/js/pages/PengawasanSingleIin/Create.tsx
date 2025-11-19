@@ -69,14 +69,14 @@ export default function PengawasanSingleIinCreate() {
                 },
             );
         } catch (error) {
-            showErrorToast('Terjadi kesalahan saat mengajukan aplikasi pengawasan');
+            showErrorToast('Terjadi kesalahan saat mengajukan aplikasi pemantauan');
             setIsSubmitting(false);
         }
     };
 
     return (
         <DashboardLayout user={auth.user}>
-            <Head title="Ajukan Pengawasan Single IIN" />
+            <Head title="Ajukan Pemantauan Single IIN" />
 
             <div className="space-y-6">
                 {/* Header */}
@@ -88,8 +88,8 @@ export default function PengawasanSingleIinCreate() {
                         </Button>
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Ajukan Pengawasan Single IIN</h1>
-                        <p className="text-gray-600">Isi formulir aplikasi pengawasan untuk Single IIN</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Ajukan Pemantauan Single IIN</h1>
+                        <p className="text-gray-600">Isi formulir aplikasi pemantauan untuk Single IIN</p>
                     </div>
                 </div>
 

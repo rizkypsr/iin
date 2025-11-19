@@ -88,7 +88,7 @@ class IinSingleBlockholderController extends Controller
     {
         $this->authorize('view', $iinSingleBlockholder);
 
-        $iinSingleBlockholder->load(['user', 'admin']);
+        $iinSingleBlockholder->load(['user', 'admin', 'expenseReimbursement']);
 
         // Get status logs using polymorphic relationship
         $statusLogs = IinStatusLog::where('application_type', 'single_blockholder')

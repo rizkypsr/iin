@@ -145,14 +145,14 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
 
     return (
         <DashboardLayout user={auth.user}>
-            <Head title="Pengawasan Single IIN" />
+            <Head title="Pemantauan Single IIN" />
 
             <motion.div className="space-y-6" initial="hidden" animate="visible" variants={containerAnimation}>
                 {/* Header */}
                 <motion.div variants={itemAnimation} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Pengawasan Single IIN</h1>
-                        <p className="text-gray-600">Kelola aplikasi pengawasan Single IIN Anda</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Pemantauan Single IIN</h1>
+                        <p className="text-gray-600">Kelola aplikasi pemantauan Single IIN Anda</p>
                     </div>
                     {auth.user.role === 'user' && (
                         <Link href={route('pengawasan-single-iin.create')}>
@@ -216,8 +216,8 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                     <Card>
                         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <CardTitle>Daftar Aplikasi Pengawasan</CardTitle>
-                                <p className="text-sm text-gray-600">Kelola dan pantau status aplikasi pengawasan Single IIN</p>
+                                <CardTitle>Daftar Aplikasi Pemantauan</CardTitle>
+                                <p className="text-sm text-gray-600">Kelola dan pantau status aplikasi pemantauan Single IIN</p>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -231,7 +231,7 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                                     <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-blue-50">
                                         <File className="h-12 w-12 text-blue-400" />
                                     </div>
-                                    <h3 className="mb-2 text-xl font-semibold text-gray-900">Belum Ada Aplikasi Pengawasan</h3>
+                                    <h3 className="mb-2 text-xl font-semibold text-gray-900">Belum Ada Aplikasi Pemantauan</h3>
                                 </motion.div>
                             ) : (
                                 <motion.div className="space-y-4" variants={containerAnimation} initial="hidden" animate="visible">
@@ -248,7 +248,7 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                                                 <div className="flex items-center gap-3">
                                                     <div>
                                                         <h3 className="font-semibold text-gray-900">{application.application_number}</h3>
-                                                        <p className="text-sm text-gray-600">Pengawasan Single IIN</p>
+                                                        <p className="text-sm text-gray-600">Pemantauan Single IIN</p>
                                                     </div>
                                                 </div>
                                                 <Badge
@@ -266,15 +266,15 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                                                         style={{
                                                             width:
                                                                 application.status === 'pengajuan'
-                                                                    ? '33%'
+                                                                    ? '40%' // Pengajuan means user is in Verifikasi Dokumen phase
                                                                     : application.status === 'perbaikan'
-                                                                        ? '33%'
+                                                                        ? '40%' // Perbaikan also means user is in Verifikasi Dokumen phase
                                                                         : application.status === 'pembayaran'
-                                                                            ? '50%'
+                                                                            ? '60%'
                                                                             : application.status === 'verifikasi-lapangan'
-                                                                                ? '67%'
-                                                                                : application.status === 'pembayaran-tahap-2'
-                                                                                    ? '83%'
+                                                                                ? '80%'
+                                                                                : application.status === 'menunggu-terbit'
+                                                                                    ? '80%'
                                                                                     : application.status === 'terbit'
                                                                                         ? '100%'
                                                                                         : '0%',
@@ -284,9 +284,8 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                                                 <div className="flex justify-between text-xs text-gray-500">
                                                     <span>Pengajuan</span>
                                                     <span>Verifikasi Dokumen</span>
-                                                    <span>Pembayaran 1</span>
+                                                    <span>Pembayaran</span>
                                                     <span>Verifikasi Lapangan</span>
-                                                    <span>Pembayaran 2</span>
                                                     <span>Terbit</span>
                                                 </div>
                                             </div>
@@ -347,7 +346,7 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                                                         {(application.status === 'pembayaran' || application.status === 'pembayaran-tahap-2') &&
                                                             auth.user.role === 'user' && (
                                                                 <Link href={route('pengawasan-single-iin.show', application.id) + '#payment'}>
-                                                                    <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700">
+                                                                    <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700 text-white">
                                                                         <CreditCard className="mr-2 h-4 w-4" />
                                                                         Bayar Sekarang
                                                                     </Button>

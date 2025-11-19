@@ -104,7 +104,7 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
 
     return (
         <DashboardLayout user={auth.user}>
-            <Head title={`Pengawasan Single IIN - ${application.application_number}`} />
+            <Head title={`Pemantauan Single IIN - ${application.application_number}`} />
 
             <div className="space-y-6">
                 {/* Header */}
@@ -117,7 +117,7 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Pengawasan Single IIN</h1>
+                            <h1 className="text-2xl font-bold text-gray-900">Pemantauan Single IIN</h1>
                             <p className="text-gray-600">{application.application_number}</p>
                         </div>
                     </div>

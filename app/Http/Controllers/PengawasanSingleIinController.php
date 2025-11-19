@@ -70,12 +70,12 @@ class PengawasanSingleIinController extends Controller
             $application->save();
 
             // Log status change using new status log system
-            $this->logStatusChange($application, null, 'pengajuan', 'Aplikasi Pengawasan Single IIN diajukan');
+            $this->logStatusChange($application, null, 'pengajuan', 'Aplikasi Pemantauan Single IIN diajukan');
 
             return $application;
         });
 
-        return to_route('pengawasan-single-iin.index')->with('success', 'Aplikasi Pengawasan Single IIN berhasil diajukan');
+        return to_route('pengawasan-single-iin.index')->with('success', 'Aplikasi Pemantauan Single IIN berhasil diajukan');
     }
 
     public function show(PengawasanSingleIin $pengawasanSingleIin)

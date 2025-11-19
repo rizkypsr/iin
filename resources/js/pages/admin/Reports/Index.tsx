@@ -94,8 +94,8 @@ export default function Index({ reports, currentType }: Props) {
                                     <SelectContent>
                                         <SelectItem value="iin_nasional">IIN Nasional</SelectItem>
                                         <SelectItem value="single_iin">Single IIN Blockholder</SelectItem>
-                                        <SelectItem value="pengawasan_iin">Pengawasan IIN Nasional</SelectItem>
-                                        <SelectItem value="pengawasan_single_iin">Pengawasan Single IIN</SelectItem>
+                                        <SelectItem value="pengawasan_iin">Pemantauan IIN Nasional</SelectItem>
+                                        <SelectItem value="pengawasan_single_iin">Pemantauan Single IIN</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

@@ -16,6 +16,7 @@ import {
     Calendar,
     CheckCircle,
     Clock,
+    CreditCard,
     Download,
     Eye,
     Plus,
@@ -419,6 +420,16 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                             </Button>
                                                         </Link>
 
+                                                        {(application.status === 'pembayaran') &&
+                                                            auth.user.role === 'user' && (
+                                                                <Link href={route('pengawasan-iin-nasional.show', application.id) + '#payment'}>
+                                                                    <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                                                                        <CreditCard className="mr-2 h-4 w-4" />
+                                                                        Bayar Sekarang
+                                                                    </Button>
+                                                                </Link>
+                                                            )}
+
                                                         {application.can_download_certificate && application.additional_documents && application.expense_reim_id != null && (
                                                             <Button
                                                                 variant="outline"
@@ -625,8 +636,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                                                                 Batal
                                                                             </Button>
                                                                         </DialogTrigger>
-                                                                        <Button 
-                                                                            type="button" 
+                                                                        <Button
+                                                                            type="button"
                                                                             onClick={expenseReimSubmit}
                                                                             disabled={expenseReimProcessing}
                                                                         >
@@ -639,6 +650,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
 
 
                                                     </div>
+
+
                                                 </div>
                                             </div>
                                         </motion.div>
