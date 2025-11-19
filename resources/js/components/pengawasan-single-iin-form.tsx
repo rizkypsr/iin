@@ -48,7 +48,7 @@ export default function PengawasanSingleIinForm({ data, setData, errors, process
             <div className="space-y-6">
                 <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
                     <Shield className="h-5 w-5 text-purple-600" />
-                    <h2 className="text-xl font-semibold text-gray-900">Formulir Pengawasan Single IIN</h2>
+                    <h2 className="text-xl font-semibold text-gray-900">Formulir Pemantauan Single IIN</h2>
                 </div>
 
                 {/* Company Information Section */}
