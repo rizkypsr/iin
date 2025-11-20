@@ -204,7 +204,7 @@ export default function DocumentTab({ application }: { application: PengawasanSi
                 isOpen={isReimModalOpen}
                 onClose={() => setIsReimModalOpen(false)}
                 application={application}
-                type='pengawasan-iin'
+                type='pengawasan-single'
             />
         </>
     )
