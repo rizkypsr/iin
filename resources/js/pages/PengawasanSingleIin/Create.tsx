@@ -187,8 +187,8 @@ export default function PengawasanSingleIinCreate() {
                         <CardContent className="p-6">
                             <div className="flex flex-col items-center space-y-4">
                                 <div className="text-center">
-                                    <h3 className="text-lg font-semibold text-gray-900">Ajukan Pengawasan</h3>
-                                    <p className="mt-1 text-sm text-gray-600">Pastikan semua informasi sudah benar sebelum mengajukan pengawasan</p>
+                                    <h3 className="text-lg font-semibold text-gray-900">Ajukan Pemantauan</h3>
+                                    <p className="mt-1 text-sm text-gray-600">Pastikan semua informasi sudah benar sebelum mengajukan pemantauan</p>
                                 </div>
 
                                 <Button
@@ -205,7 +205,7 @@ export default function PengawasanSingleIinCreate() {
                                     ) : (
                                         <>
                                             <Shield className="mr-2 h-4 w-4" />
-                                            Ajukan Pengawasan
+                                            Ajukan Pemantauan
                                         </>
                                     )}
                                 </Button>
@@ -214,7 +214,7 @@ export default function PengawasanSingleIinCreate() {
                                     <Alert className="w-full">
                                         <AlertCircle className="h-4 w-4" />
                                         <AlertDescription>
-                                            Anda harus melengkapi profil Single IIN terlebih dahulu sebelum dapat mengajukan pengawasan.
+                                            Anda harus melengkapi profil Single IIN terlebih dahulu sebelum dapat mengajukan pemantauan.
                                         </AlertDescription>
                                     </Alert>
                                 )}

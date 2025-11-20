@@ -35,7 +35,7 @@ class PengawasanIinNasionalController extends Controller
 
         // Check if user has completed IIN Nasional profile
         if (! $user->iinNasionalProfile || ! $this->isProfileComplete($user->iinNasionalProfile)) {
-            return back()->withErrors(['profile' => 'Anda harus melengkapi profil IIN Nasional terlebih dahulu sebelum mengajukan pengawasan.']);
+            return back()->withErrors(['profile' => 'Anda harus melengkapi profil IIN Nasional terlebih dahulu sebelum mengajukan pemantauan.']);
         }
 
         return Inertia::render('PengawasanIinNasional/Create', [
@@ -50,7 +50,7 @@ class PengawasanIinNasionalController extends Controller
         // Check if user has complete IIN Nasional profile
         if (! $user->iinNasionalProfile || ! $this->isProfileComplete($user->iinNasionalProfile)) {
             return redirect()->route('iin-nasional.create')
-                ->with('error', 'Silakan lengkapi profil IIN Nasional terlebih dahulu sebelum mengajukan pengawasan.');
+                ->with('error', 'Silakan lengkapi profil IIN Nasional terlebih dahulu sebelum mengajukan pemantauan.');
         }
 
         // Use database transaction to ensure data consistency

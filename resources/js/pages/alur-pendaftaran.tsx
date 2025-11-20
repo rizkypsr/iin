@@ -14,7 +14,7 @@ const steps = [
         number: 2,
         title: 'Pilih Jenis Layanan',
         description: 'Tentukan jenis layanan IIN yang sesuai dengan kebutuhan investasi',
-        details: 'Tersedia IIN Nasional, Single IIN, Blockholder, dan Pengawasan',
+        details: 'Tersedia IIN Nasional, Single IIN, Blockholder, dan Pemantauan',
     },
     {
         number: 3,

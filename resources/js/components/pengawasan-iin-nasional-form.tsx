@@ -258,14 +258,14 @@ export default function PengawasanIinNasionalForm({ data, setData, errors, proce
                 <div className="space-y-4">
                     <h3 className="flex items-center gap-2 text-lg font-medium text-gray-800">
                         <Shield className="h-4 w-4 text-purple-600" />
-                        Informasi Pengawasan
+                        Informasi Pemantauan
                     </h3>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         {/* Supervision Type */}
                         <div className="space-y-2">
                             <Label htmlFor="supervision_type" className="text-sm font-medium text-gray-700">
-                                Jenis Pengawasan <span className="text-red-500">*</span>
+                                Jenis Pemantauan <span className="text-red-500">*</span>
                             </Label>
                             <Select value={data.supervision_type || ''} onValueChange={(value) => setData('supervision_type', value)}>
                                 <SelectTrigger className="h-11 w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20">

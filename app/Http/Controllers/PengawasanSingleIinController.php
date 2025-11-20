@@ -38,7 +38,7 @@ class PengawasanSingleIinController extends Controller
         
         // Check if user has completed Single IIN profile
         if (!$user->singleIinProfile || !$this->isProfileComplete($user->singleIinProfile)) {
-            return back()->withErrors(['profile' => 'Anda harus melengkapi profil Single IIN terlebih dahulu sebelum mengajukan pengawasan.']);
+            return back()->withErrors(['profile' => 'Anda harus melengkapi profil Single IIN terlebih dahulu sebelum mengajukan pemantauan.']);
         }
 
         return Inertia::render('PengawasanSingleIin/Create', [
@@ -52,7 +52,7 @@ class PengawasanSingleIinController extends Controller
         
         // Validate profile completion
         if (!$user->singleIinProfile || !$this->isProfileComplete($user->singleIinProfile)) {
-            return back()->withErrors(['profile' => 'Anda harus melengkapi profil Single IIN terlebih dahulu sebelum mengajukan pengawasan.']);
+            return back()->withErrors(['profile' => 'Anda harus melengkapi profil Single IIN terlebih dahulu sebelum mengajukan pemantauan.']);
         }
 
         $request->validate([

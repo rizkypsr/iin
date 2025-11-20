@@ -292,7 +292,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                     <div className="flex justify-center items-center mx-auto mb-4 w-24 h-24 bg-blue-50 rounded-full">
                                         <Shield className="w-12 h-12 text-blue-400" />
                                     </div>
-                                    <h3 className="mb-2 text-xl font-semibold text-gray-900">Belum Ada Aplikasi Pengawasan</h3>
+                                    <h3 className="mb-2 text-xl font-semibold text-gray-900">Belum Ada Aplikasi Pemantauan</h3>
                                     <p className="mx-auto mb-6 max-w-md text-gray-600">
                                         {auth.user.role === 'user'
                                             ? 'Anda belum memiliki aplikasi pemantauan IIN Nasional. Buat aplikasi pemantauan pertama Anda untuk memulai proses pemantauan.'

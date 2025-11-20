@@ -158,7 +158,7 @@ export default function PengawasanSingleIinIndex({ applications, auth, errors, f
                         <Link href={route('pengawasan-single-iin.create')}>
                             <Button className="bg-blue-600 text-white hover:bg-blue-700">
                                 <Plus className="mr-2 h-4 w-4" />
-                                Ajukan Pengawasan
+                                Ajukan Pemantauan
                             </Button>
                         </Link>
                     )}
