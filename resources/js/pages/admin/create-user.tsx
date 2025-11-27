@@ -53,7 +53,7 @@ type CreateUserForm = {
         email?: string;
         contact_person?: string;
         remarks_status?: string;
-        card_specimen?: string;
+        card_specimen?: File | string;
         previous_name?: string;
     };
 };
@@ -145,6 +145,7 @@ export default function CreateUser({ flash, application_counts }: CreateUserProp
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('admin.users.store'), {
+            forceFormData: true,
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };

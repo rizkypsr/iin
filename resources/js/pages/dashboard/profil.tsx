@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps, User as UserType } from '@/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type ProfileForm = {
     name: string;
@@ -50,7 +51,7 @@ type ProfileForm = {
         email?: string;
         contact_person?: string;
         remarks_status?: string;
-        card_specimen?: string;
+        card_specimen?: File | string;
         previous_name?: string;
     };
 };
@@ -73,27 +74,34 @@ interface ProfilePageProps extends PageProps {
 export default function DashboardProfil() {
     const { user, flash, application_counts } = usePage<ProfilePageProps>().props;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
+    const { data: basicData, setData: setBasicData, patch: patchBasic, errors: basicErrors, processing: basicProcessing } = useForm({
         name: user.name,
         email: user.email,
-        iin_nasional_profile: {
-            details: user.iin_nasional_profile?.details || '',
-            institution_name: user.iin_nasional_profile?.institution_name || '',
-            brand: user.iin_nasional_profile?.brand || '',
-            iin_national_assignment: user.iin_nasional_profile?.iin_national_assignment || '',
-            assignment_year: user.iin_nasional_profile?.assignment_year || undefined,
-            regional: user.iin_nasional_profile?.regional || '',
-            aspi_recommendation_letter: user.iin_nasional_profile?.aspi_recommendation_letter || '',
-            usage_purpose: user.iin_nasional_profile?.usage_purpose || '',
-            address: user.iin_nasional_profile?.address || '',
-            phone_fax: user.iin_nasional_profile?.phone_fax || '',
-            email_office: user.iin_nasional_profile?.email_office || '',
-            contact_person_name: user.iin_nasional_profile?.contact_person_name || '',
-            contact_person_email: user.iin_nasional_profile?.contact_person_email || '',
-            contact_person_phone: user.iin_nasional_profile?.contact_person_phone || '',
-            remarks_status: user.iin_nasional_profile?.remarks_status || '',
-            card_issued: user.iin_nasional_profile?.card_issued || false,
-        },
+    });
+
+    const { data: nasionalData, setData: setNasionalData, patch: patchNasional, errors: nasionalErrors, processing: nasionalProcessing } =
+        useForm({
+            iin_nasional_profile: {
+                details: user.iin_nasional_profile?.details || '',
+                institution_name: user.iin_nasional_profile?.institution_name || '',
+                brand: user.iin_nasional_profile?.brand || '',
+                iin_national_assignment: user.iin_nasional_profile?.iin_national_assignment || '',
+                assignment_year: user.iin_nasional_profile?.assignment_year || undefined,
+                regional: user.iin_nasional_profile?.regional || '',
+                aspi_recommendation_letter: user.iin_nasional_profile?.aspi_recommendation_letter || '',
+                usage_purpose: user.iin_nasional_profile?.usage_purpose || '',
+                address: user.iin_nasional_profile?.address || '',
+                phone_fax: user.iin_nasional_profile?.phone_fax || '',
+                email_office: user.iin_nasional_profile?.email_office || '',
+                contact_person_name: user.iin_nasional_profile?.contact_person_name || '',
+                contact_person_email: user.iin_nasional_profile?.contact_person_email || '',
+                contact_person_phone: user.iin_nasional_profile?.contact_person_phone || '',
+                remarks_status: user.iin_nasional_profile?.remarks_status || '',
+                card_issued: user.iin_nasional_profile?.card_issued || false,
+            },
+        });
+
+    const { data: singleData, setData: setSingleData, post: postSingle, errors: singleErrors, processing: singleProcessing } = useForm({
         single_iin_profile: {
             institution_name: user.single_iin_profile?.institution_name || '',
             institution_type: user.single_iin_profile?.institution_type || '',
@@ -114,16 +122,42 @@ export default function DashboardProfil() {
         },
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submitBasic: FormEventHandler = (e) => {
         e.preventDefault();
-
-        patch(route('dashboard.profil.update'), {
+        patchBasic(route('dashboard.profil.update-basic'), {
             preserveScroll: true,
             onSuccess: () => {
-                showSuccessToast('Profil berhasil diperbarui');
+                showSuccessToast('Informasi dasar berhasil diperbarui');
             },
             onError: () => {
-                showErrorToast('Terjadi kesalahan saat memperbarui profil');
+                showErrorToast('Terjadi kesalahan saat memperbarui informasi dasar');
+            },
+        });
+    };
+
+    const submitNasional: FormEventHandler = (e) => {
+        e.preventDefault();
+        patchNasional(route('dashboard.profil.update-iin-nasional'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                showSuccessToast('Profil IIN Nasional berhasil diperbarui');
+            },
+            onError: () => {
+                showErrorToast('Terjadi kesalahan saat memperbarui Profil IIN Nasional');
+            },
+        });
+    };
+
+    const submitSingle: FormEventHandler = (e) => {
+        e.preventDefault();
+        postSingle(route('dashboard.profil.update-single-iin'), {
+            preserveScroll: true,
+            forceFormData: true,
+            onSuccess: () => {
+                showSuccessToast('Profil Single IIN berhasil diperbarui');
+            },
+            onError: (e) => {
+                showErrorToast('Terjadi kesalahan saat memperbarui Profil Single IIN');
             },
         });
     };
@@ -138,7 +172,7 @@ export default function DashboardProfil() {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="flex items-center justify-between"
+                    className="flex justify-between items-center"
                 >
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Profil Pengguna</h1>
@@ -146,18 +180,18 @@ export default function DashboardProfil() {
                     </div>
                 </motion.div>
 
-                <form onSubmit={submit} className="space-y-8">
+                <form onSubmit={submitBasic} className="space-y-8">
                     {/* Basic Profile Information */}
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
-                        <Card className="border-blue-200/50 bg-white/95 shadow-lg shadow-blue-200/30 backdrop-blur-sm">
-                            <CardHeader className="border-b border-gray-200 pb-4">
-                                <CardTitle className="flex items-center gap-3 text-xl text-gray-900">
-                                    <User className="h-5 w-5 text-blue-600" />
+                        <Card className="shadow-lg backdrop-blur-sm border-blue-200/50 bg-white/95 shadow-blue-200/30">
+                            <CardHeader className="pb-4 border-b border-gray-200">
+                                <CardTitle className="flex gap-3 items-center text-xl text-gray-900">
+                                    <User className="w-5 h-5 text-blue-600" />
                                     Informasi Dasar
                                 </CardTitle>
                                 <CardDescription>Perbarui informasi dasar akun Anda</CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-6 pt-6">
+                            <CardContent className="pt-6 space-y-6">
                                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                     <div className="space-y-2">
                                         <Label htmlFor="name" className="text-sm font-medium text-gray-700">
@@ -166,89 +200,120 @@ export default function DashboardProfil() {
                                         <Input
                                             id="name"
                                             type="text"
-                                            value={data.name}
-                                            onChange={(e) => setData('name', e.target.value)}
-                                            disabled={processing}
+                                            value={basicData.name}
+                                            onChange={(e) => setBasicData('name', e.target.value)}
+                                            disabled={basicProcessing}
                                             placeholder="Masukkan nama lengkap"
                                             className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                         />
-                                        <InputError message={errors.name} className="text-xs" />
+                                        <InputError message={basicErrors.name as any} className="text-xs" />
                                     </div>
 
                                     <div className="space-y-2">
                                         <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                                            <Mail className="mr-1 inline h-4 w-4" />
+                                            <Mail className="inline mr-1 w-4 h-4" />
                                             Email <span className="text-red-500">*</span>
                                         </Label>
                                         <Input
                                             id="email"
                                             type="email"
-                                            value={data.email}
-                                            onChange={(e) => setData('email', e.target.value)}
-                                            disabled={processing}
+                                            value={basicData.email}
+                                            onChange={(e) => setBasicData('email', e.target.value)}
+                                            disabled={basicProcessing}
                                             placeholder="Masukkan alamat email"
                                             className="h-11 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                                         />
-                                        <InputError message={errors.email} className="text-xs" />
+                                        <InputError message={basicErrors.email as any} className="text-xs" />
                                     </div>
                                 </div>
                             </CardContent>
+                            <div className="flex justify-end px-6 pb-6">
+                                <Button
+                                    type="submit"
+                                    disabled={basicProcessing}
+                                    className="px-8 py-2 h-11 text-white bg-gradient-to-r from-blue-600 to-blue-700 transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg disabled:opacity-50"
+                                >
+                                    {basicProcessing ? (
+                                        <>
+                                            <div className="mr-2 w-4 h-4 rounded-full border-2 border-white animate-spin border-t-transparent" />
+                                            Menyimpan...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="mr-2 w-4 h-4" />
+                                            Simpan Informasi Dasar
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
                         </Card>
-                    </motion.div>
-
-                    {/* IIN Nasional Profile */}
-                    <IinNasionalProfileForm
-                        data={data.iin_nasional_profile}
-                        setData={(key, value) => setData('iin_nasional_profile', { ...data.iin_nasional_profile, [key]: value })}
-                        errors={errors}
-                        processing={processing}
-                    />
-
-                    {/* Single IIN Profile */}
-                    <SingleIinProfileForm
-                        data={data.single_iin_profile}
-                        setData={(key, value) => setData('single_iin_profile', { ...data.single_iin_profile, [key]: value })}
-                        errors={errors}
-                        processing={processing}
-                    />
-
-                    {/* Submit Button */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.6 }}
-                        className="flex justify-end"
-                    >
-                        <Button
-                            type="submit"
-                            disabled={processing}
-                            className="h-11 bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-2 text-white transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg disabled:opacity-50"
-                        >
-                            {processing ? (
-                                <>
-                                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                    Menyimpan...
-                                </>
-                            ) : (
-                                <>
-                                    <Save className="mr-2 h-4 w-4" />
-                                    Simpan Perubahan
-                                </>
-                            )}
-                        </Button>
                     </motion.div>
                 </form>
 
+                    <Tabs defaultValue="iin-nasional" className="space-y-4">
+                        <TabsList>
+                            <TabsTrigger value="iin-nasional">IIN Nasional</TabsTrigger>
+                            <TabsTrigger value="single-iin">Single IIN</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="iin-nasional">
+                            <div className="space-y-6">
+                                <IinNasionalProfileForm
+                                    data={nasionalData.iin_nasional_profile}
+                                    setData={(key, value) =>
+                                        setNasionalData('iin_nasional_profile', {
+                                            ...nasionalData.iin_nasional_profile,
+                                            [key]: value,
+                                        })
+                                    }
+                                    errors={nasionalErrors as any}
+                                    processing={nasionalProcessing}
+                                />
+                                <div className="flex justify-end">
+                                    <Button type="button" onClick={submitNasional} disabled={nasionalProcessing} className="px-8 py-2 h-11 text-white bg-blue-600">
+                                        {nasionalProcessing ? 'Menyimpan...' : 'Simpan IIN Nasional'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="single-iin">
+                            <div className="space-y-6">
+                                <SingleIinProfileForm
+                                    data={singleData.single_iin_profile}
+                                    setData={(key, value) =>
+                                        setSingleData((prev: any) => ({
+                                            ...prev,
+                                            single_iin_profile: {
+                                                ...prev.single_iin_profile,
+                                                [key]: value,
+                                            },
+                                        }))
+                                    }
+                                    errors={singleErrors as any}
+                                    processing={singleProcessing}
+                                />
+                                <div className="flex justify-end">
+                                    <Button type="button" onClick={submitSingle} disabled={singleProcessing} className='px-8 py-2 h-11 text-white bg-gradient-to-r from-blue-600 to-blue-700 transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg disabled:opacity-50'>
+                                        {singleProcessing ? 'Menyimpan...' : 'Simpan Single IIN'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+
+                
+
                 {/* User Information Card */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.7 }}>
-                    <Card className="border-gray-200/50 bg-white/95 shadow-lg shadow-gray-200/30 backdrop-blur-sm">
-                        <CardHeader className="border-b border-gray-200 pb-4">
-                            <CardTitle className="flex items-center gap-3 text-xl text-gray-900">
-                                <User className="h-5 w-5 text-gray-600" />
+                    <Card className="shadow-lg backdrop-blur-sm border-gray-200/50 bg-white/95 shadow-gray-200/30">
+                        <CardHeader className="pb-4 border-b border-gray-200">
+                            <CardTitle className="flex gap-3 items-center text-xl text-gray-900">
+                                <User className="w-5 h-5 text-gray-600" />
                                 Informasi Akun
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4 pt-6">
+                        <CardContent className="pt-6 space-y-4">
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div>
                                     <p className="text-sm font-medium text-gray-500">Status Akun</p>

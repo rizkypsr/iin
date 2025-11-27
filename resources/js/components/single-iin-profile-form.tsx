@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
 import { Building2, Calendar, CreditCard, Mail, MapPin, Phone, User } from 'lucide-react';
 
 import InputError from '@/components/input-error';
@@ -21,7 +22,7 @@ interface SingleIinProfileData {
     phone_fax_updated?: string;
     email?: string;
     contact_person?: string;
-    card_specimen?: string;
+    card_specimen?: File | string;
     previous_name?: string;
 }
 
@@ -74,16 +75,29 @@ const PROVINCES = [
 ];
 
 export default function SingleIinProfileForm({ data, setData, errors, processing }: SingleIinProfileFormProps) {
+    const [localFileError, setLocalFileError] = useState<string | null>(null);
+    const previewUrl = useMemo(() => {
+        if (data.card_specimen && data.card_specimen instanceof File) {
+            return URL.createObjectURL(data.card_specimen);
+        }
+        if (typeof data.card_specimen === 'string' && data.card_specimen.length > 0) {
+            if (data.card_specimen.startsWith('http') || data.card_specimen.startsWith('/')) {
+                return data.card_specimen;
+            }
+            return `/storage/${data.card_specimen}`;
+        }
+        return null;
+    }, [data.card_specimen]);
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="rounded-2xl border border-green-200/50 bg-white/95 p-8 shadow-lg shadow-green-200/30 backdrop-blur-sm"
+            className="p-8 rounded-2xl border shadow-lg bg-white/95"
         >
             <div className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
-                    <CreditCard className="h-5 w-5 text-green-600" />
+                <div className="flex gap-3 items-center pb-4 border-b border-gray-200">
+                    <CreditCard className="w-5 h-5 text-green-600" />
                     <h2 className="text-xl font-semibold text-gray-900">Single IIN Profile</h2>
                 </div>
 
@@ -91,7 +105,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Institution Name */}
                     <div className="space-y-2">
                         <Label htmlFor="single_institution_name" className="text-sm font-medium text-gray-700">
-                            <Building2 className="mr-1 inline h-4 w-4" />
+                            <Building2 className="inline mr-1 w-4 h-4" />
                             Nama Institusi <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -109,7 +123,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Year */}
                     <div className="space-y-2">
                         <Label htmlFor="single_year" className="text-sm font-medium text-gray-700">
-                            <Calendar className="mr-1 inline h-4 w-4" />
+                            <Calendar className="inline mr-1 w-4 h-4" />
                             Tahun <span className="text-red-500">*</span>
                         </Label>
 
@@ -145,7 +159,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Assignment Date */}
                     <div className="space-y-2">
                         <Label htmlFor="single_assignment_date" className="text-sm font-medium text-gray-700">
-                            <Calendar className="mr-1 inline h-4 w-4" />
+                            <Calendar className="inline mr-1 w-4 h-4" />
                             Tanggal Assignment <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -162,7 +176,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Regional */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_regional" className="text-sm font-medium text-gray-700">
-                            <MapPin className="mr-1 inline h-4 w-4" />
+                            <MapPin className="inline mr-1 w-4 h-4" />
                             Provinsi <span className="text-red-500">*</span>
                         </Label>
                         <Select
@@ -170,10 +184,10 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                             onValueChange={(value) => setData('regional', value)}
                             disabled={processing}
                         >
-                            <SelectTrigger id="iin_regional" className="w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                            <SelectTrigger id="iin_regional" className="w-full bg-white border-gray-300 transition-all duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
                                 <SelectValue placeholder="Pilih provinsi" />
                             </SelectTrigger>
-                            <SelectContent className="border border-gray-200 bg-white shadow-lg">
+                            <SelectContent className="bg-white border border-gray-200 shadow-lg">
                                 {PROVINCES.map((prov) => (
                                     <SelectItem key={prov} value={prov}>
                                         {prov}
@@ -181,13 +195,13 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                                 ))}
                             </SelectContent>
                         </Select>
-                        <InputError message={errors['iin_nasional_profile.regional']} className="text-xs" />
+                        <InputError message={errors['single_iin_profile.regional']} className="text-xs" />
                     </div>
 
                     {/* Phone/Fax */}
                     <div className="space-y-2">
                         <Label htmlFor="single_phone_fax" className="text-sm font-medium text-gray-700">
-                            <Phone className="mr-1 inline h-4 w-4" />
+                            <Phone className="inline mr-1 w-4 h-4" />
                             Telepon/Fax <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -205,7 +219,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Phone/Fax Updated */}
                     <div className="space-y-2">
                         <Label htmlFor="single_phone_fax_updated" className="text-sm font-medium text-gray-700">
-                            <Phone className="mr-1 inline h-4 w-4" />
+                            <Phone className="inline mr-1 w-4 h-4" />
                             Telepon/Fax (Updated) <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -223,7 +237,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Email */}
                     <div className="space-y-2">
                         <Label htmlFor="single_email" className="text-sm font-medium text-gray-700">
-                            <Mail className="mr-1 inline h-4 w-4" />
+                            <Mail className="inline mr-1 w-4 h-4" />
                             Email <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -241,7 +255,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Contact Person */}
                     <div className="space-y-2">
                         <Label htmlFor="single_contact_person" className="text-sm font-medium text-gray-700">
-                            <User className="mr-1 inline h-4 w-4" />
+                            <User className="inline mr-1 w-4 h-4" />
                             Contact Person <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -257,21 +271,37 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     </div>
 
 
-                    {/* Card Specimen */}
+                    {/* Card Specimen (Image Upload) */}
                     <div className="space-y-2">
                         <Label htmlFor="single_card_specimen" className="text-sm font-medium text-gray-700">
-                            <CreditCard className="mr-1 inline h-4 w-4" />
-                            Card Specimen <span className="text-red-500">*</span>
+                            <CreditCard className="inline mr-1 w-4 h-4" />
+                            Card Specimen
                         </Label>
                         <Input
                             id="single_card_specimen"
-                            type="text"
-                            value={data.card_specimen || ''}
-                            onChange={(e) => setData('card_specimen', e.target.value)}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    if (file.size <= 2 * 1024 * 1024) {
+                                        setLocalFileError(null);
+                                        setData('card_specimen', file);
+                                    } else {
+                                        setLocalFileError('Maksimal ukuran file 2MB');
+                                        e.currentTarget.value = '';
+                                    }
+                                }
+                            }}
                             disabled={processing}
-                            placeholder="Masukkan card specimen"
                             className="h-11 transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
                         />
+                        {previewUrl && (
+                            <div className="mt-2">
+                                <img src={previewUrl} alt="Card specimen preview" className="w-auto h-24 rounded border" />
+                            </div>
+                        )}
+                        {localFileError && <p className="text-xs text-red-600">{localFileError}</p>}
                         <InputError message={errors['single_iin_profile.card_specimen']} className="text-xs" />
                     </div>
 
@@ -314,7 +344,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Address */}
                     <div className="space-y-2">
                         <Label htmlFor="single_address" className="text-sm font-medium text-gray-700">
-                            <MapPin className="mr-1 inline h-4 w-4" />
+                            <MapPin className="inline mr-1 w-4 h-4" />
                             Alamat <span className="text-red-500">*</span>
                         </Label>
                         <Textarea
@@ -331,7 +361,7 @@ export default function SingleIinProfileForm({ data, setData, errors, processing
                     {/* Address Updated */}
                     <div className="space-y-2">
                         <Label htmlFor="single_address_updated" className="text-sm font-medium text-gray-700">
-                            <MapPin className="mr-1 inline h-4 w-4" />
+                            <MapPin className="inline mr-1 w-4 h-4" />
                             Alamat (Updated) <span className="text-red-500">*</span>
                         </Label>
                         <Textarea

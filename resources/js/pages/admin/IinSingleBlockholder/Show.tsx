@@ -47,7 +47,7 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
 
     // Form untuk terbitkan IIN menggunakan useForm
     const { data, setData, post, processing, progress } = useForm({
-        certificate: null as File | null,
+        certificates: [] as File[],
         iin_number: '',
         notes: '',
     });
@@ -75,13 +75,13 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
 
     const handleIssueIIN = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!data.certificate) return;
+        if (!data.certificates || data.certificates.length === 0) return;
 
         post(route('admin.iin-single-blockholder.upload-certificate', application.id), {
             onSuccess: () => {
                 showSuccessToast('IIN berhasil diterbitkan');
                 setData({
-                    certificate: null,
+                    certificates: [],
                     iin_number: '',
                     notes: '',
                 });
@@ -89,6 +89,7 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
             onError: () => {
                 showErrorToast('Gagal menerbitkan IIN');
             },
+            forceFormData: true,
         });
     };
 
@@ -169,6 +170,7 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                     <div className="flex gap-3 items-center">
                         {/* Show status badge only when no action buttons are displayed */}
                         {application.status !== 'pengajuan' &&
+                            application.status !== 'perbaikan' &&
                             application.status !== 'pembayaran' &&
                             application.status !== 'verifikasi-lapangan' &&
                             application.status !== 'pembayaran-tahap-2' && (
@@ -215,7 +217,7 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                                             <DialogClose asChild>
                                                 <Button
                                                     onClick={async () => {
-                                                        await handleStatusUpdate('perbaikan');
+                                                        await handleStatusUpdate('perbaikan', statusNotes);
                                                     }}
                                                     className="text-white bg-red-600 hover:bg-red-700"
                                                     disabled={loading}
@@ -729,7 +731,8 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                                                         id="certificate"
                                                         type="file"
                                                         accept=".pdf,.doc,.docx"
-                                                        onChange={(e) => setData('certificate', e.target.files?.[0] || null)}
+                                                        multiple
+                                                        onChange={(e) => setData('certificates', Array.from(e.target.files || []))}
                                                         className="mt-1"
                                                         required
                                                     />
@@ -767,7 +770,7 @@ export default function AdminIinSingleBlockholderShow({ application, statusLogs,
                                                 <Button
                                                     onClick={handleIssueIIN}
                                                     className="text-white bg-green-600 hover:bg-green-700"
-                                                    disabled={processing || !data.certificate || !data.iin_number}
+                                                    disabled={processing || !data.certificates || data.certificates.length === 0 || !data.iin_number}
                                                 >
                                                     {processing ? 'Memproses...' : 'Terbitkan IIN'}
                                                 </Button>

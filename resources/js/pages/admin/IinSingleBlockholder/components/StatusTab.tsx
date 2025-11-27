@@ -6,7 +6,6 @@ import { id } from "date-fns/locale";
 import { Clock, FileText } from "lucide-react";
 
 export default function StatusTab({ statusLogs }: { statusLogs: StatusLog[] }) {
-    console.log(statusLogs);
     return (
         <Card>
             <CardHeader>

@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -70,7 +71,7 @@ class UserManagementController extends Controller
             'single_iin_profile.updated_phone_fax' => 'nullable|string|max:255',
             'single_iin_profile.email' => 'nullable|email|max:255',
             'single_iin_profile.contact_person' => 'nullable|string|max:255',
-            'single_iin_profile.card_specimen' => 'nullable|string|max:255',
+            'single_iin_profile.card_specimen' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'single_iin_profile.previous_name' => 'nullable|string|max:255',
         ]);
 
@@ -96,7 +97,26 @@ class UserManagementController extends Controller
 
         // Create Single IIN Profile if data is provided
         if ($request->has('single_iin_profile') && !empty(array_filter($request->single_iin_profile))) {
-            $user->singleIinProfile()->create($request->single_iin_profile);
+            $singleIinData = $request->single_iin_profile;
+
+            if ($request->hasFile('single_iin_profile.card_specimen')) {
+                $file = $request->file('single_iin_profile.card_specimen');
+                $filename = 'single_iin_card_specimen_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('single-iin/card-specimen', $filename, 'public');
+                $singleIinData['card_specimen'] = $path;
+            } else {
+                if (isset($singleIinData['card_specimen']) && !is_string($singleIinData['card_specimen'])) {
+                    unset($singleIinData['card_specimen']);
+                }
+            }
+
+            $singleIinData = array_filter($singleIinData, function ($v) {
+                return !is_null($v) && $v !== '';
+            });
+
+            if (!empty($singleIinData)) {
+                $user->singleIinProfile()->create($singleIinData);
+            }
         }
 
         return to_route('admin.users.index')
@@ -186,7 +206,7 @@ class UserManagementController extends Controller
             'single_iin_profile.updated_phone_fax' => 'nullable|string|max:255',
             'single_iin_profile.email' => 'nullable|email|max:255',
             'single_iin_profile.contact_person' => 'nullable|string|max:255',
-            'single_iin_profile.card_specimen' => 'nullable|string|max:255',
+            'single_iin_profile.card_specimen' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'single_iin_profile.previous_name' => 'nullable|string|max:255',
         ]);
 
@@ -219,14 +239,34 @@ class UserManagementController extends Controller
 
         // Update or create Single IIN Profile
         if ($request->has('single_iin_profile')) {
-            $singleIinData = array_filter($request->single_iin_profile);
+            $singleIinData = $request->single_iin_profile;
+
+            if ($request->hasFile('single_iin_profile.card_specimen')) {
+                $existing = $user->singleIinProfile?->card_specimen;
+                if ($existing && Storage::disk('public')->exists($existing)) {
+                    Storage::disk('public')->delete($existing);
+                }
+
+                $file = $request->file('single_iin_profile.card_specimen');
+                $filename = 'single_iin_card_specimen_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('single-iin/card-specimen', $filename, 'public');
+                $singleIinData['card_specimen'] = $path;
+            } else {
+                if (isset($singleIinData['card_specimen']) && !is_string($singleIinData['card_specimen'])) {
+                    unset($singleIinData['card_specimen']);
+                }
+            }
+
+            $singleIinData = array_filter($singleIinData, function ($v) {
+                return !is_null($v) && $v !== '';
+            });
+
             if (!empty($singleIinData)) {
                 $user->singleIinProfile()->updateOrCreate(
                     ['user_id' => $user->id],
                     $singleIinData
                 );
             } else {
-                // Delete if all fields are empty
                 $user->singleIinProfile()->delete();
             }
         }

@@ -79,11 +79,11 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="rounded-2xl border border-blue-200/50 bg-white/95 p-8 shadow-lg shadow-blue-200/30 backdrop-blur-sm"
+            className="p-8 rounded-2xl border shadow-lg bg-white/95"
         >
             <div className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-gray-200 pb-4">
-                    <Building2 className="h-5 w-5 text-blue-600" />
+                <div className="flex gap-3 items-center pb-4 border-b border-gray-200">
+                    <Building2 className="w-5 h-5 text-blue-600" />
                     <h2 className="text-xl font-semibold text-gray-900">IIN Nasional Profile</h2>
                 </div>
 
@@ -142,7 +142,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Assignment Year */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_assignment_year" className="text-sm font-medium text-gray-700">
-                            <Calendar className="mr-1 inline h-4 w-4" />
+                            <Calendar className="inline mr-1 w-4 h-4" />
                             Tahun Assignment <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -160,7 +160,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Regional */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_regional" className="text-sm font-medium text-gray-700">
-                            <MapPin className="mr-1 inline h-4 w-4" />
+                            <MapPin className="inline mr-1 w-4 h-4" />
                             Provinsi <span className="text-red-500">*</span>
                         </Label>
                         <Select
@@ -168,10 +168,10 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                             onValueChange={(value) => setData('regional', value)}
                             disabled={processing}
                         >
-                            <SelectTrigger id="iin_regional" className="w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                            <SelectTrigger id="iin_regional" className="w-full bg-white border-gray-300 transition-all duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
                                 <SelectValue placeholder="Pilih provinsi" />
                             </SelectTrigger>
-                            <SelectContent className="border border-gray-200 bg-white shadow-lg">
+                            <SelectContent className="bg-white border border-gray-200 shadow-lg">
                                 {PROVINCES.map((prov) => (
                                     <SelectItem key={prov} value={prov}>
                                         {prov}
@@ -185,7 +185,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Phone/Fax */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_phone_fax" className="text-sm font-medium text-gray-700">
-                            <Phone className="mr-1 inline h-4 w-4" />
+                            <Phone className="inline mr-1 w-4 h-4" />
                             Telepon/Fax <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -203,7 +203,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Email Office */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_email_office" className="text-sm font-medium text-gray-700">
-                            <Mail className="mr-1 inline h-4 w-4" />
+                            <Mail className="inline mr-1 w-4 h-4" />
                             Email Kantor <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -221,7 +221,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Contact Person Name */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_contact_person_name" className="text-sm font-medium text-gray-700">
-                            <User className="mr-1 inline h-4 w-4" />
+                            <User className="inline mr-1 w-4 h-4" />
                             Nama Contact Person <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -239,7 +239,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Contact Person Email */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_contact_person_email" className="text-sm font-medium text-gray-700">
-                            <Mail className="mr-1 inline h-4 w-4" />
+                            <Mail className="inline mr-1 w-4 h-4" />
                             Email Contact Person <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -257,7 +257,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Contact Person Phone */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_contact_person_phone" className="text-sm font-medium text-gray-700">
-                            <Phone className="mr-1 inline h-4 w-4" />
+                            <Phone className="inline mr-1 w-4 h-4" />
                             Telepon Contact Person <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -282,10 +282,10 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                             Detail <span className="text-red-500">*</span>
                         </Label>
                         <Select value={data.details} onValueChange={(value) => setData('details', value)} required>
-                            <SelectTrigger disabled={processing} className="w-full border-gray-300 bg-white transition-all duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                            <SelectTrigger disabled={processing} className="w-full bg-white border-gray-300 transition-all duration-200 hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
                                 <SelectValue placeholder="Pilih detail" />
                             </SelectTrigger>
-                            <SelectContent className="border border-gray-200 bg-white shadow-lg">
+                            <SelectContent className="bg-white border border-gray-200 shadow-lg">
                                 <SelectItem value="bank">Bank</SelectItem>
                                 <SelectItem value="bpr">BPR</SelectItem>
                                 <SelectItem value="fintech">Fintech</SelectItem>
@@ -314,7 +314,7 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     {/* Address */}
                     <div className="space-y-2">
                         <Label htmlFor="iin_address" className="text-sm font-medium text-gray-700">
-                            <MapPin className="mr-1 inline h-4 w-4" />
+                            <MapPin className="inline mr-1 w-4 h-4" />
                             Alamat <span className="text-red-500">*</span>
                         </Label>
                         <Textarea
@@ -332,8 +332,8 @@ export default function IinNasionalProfileForm({ data, setData, errors, processi
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id="iin_card_issued"
-                            checked={data.card_issued || true}
-                            onCheckedChange={(checked) => setData('card_issued', checked)}
+                            checked={!!data.card_issued}
+                            onCheckedChange={(checked) => setData('card_issued', checked === true)}
                             disabled={processing}
                         />
                         <Label htmlFor="iin_card_issued" className="text-sm font-medium text-gray-700">

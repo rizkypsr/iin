@@ -108,7 +108,8 @@ class IinSingleBlockholderAdminController extends Controller
     public function uploadCertificate(Request $request, IinSingleBlockholderApplication $iinSingleBlockholder)
     {
         $request->validate([
-            'certificate' => 'required|file|mimes:pdf,doc,docx|max:10240',
+            'certificates' => 'required|array|min:1',
+            'certificates.*' => 'required|file|mimes:pdf,doc,docx|max:10240',
             'iin_number' => 'required|string|max:20',
             'notes' => 'nullable|string|max:1000',
         ]);
@@ -118,40 +119,52 @@ class IinSingleBlockholderAdminController extends Controller
                 'iin_number' => $request->iin_number,
                 'status' => 'terbit',
                 'issued_at' => now(),
-                'notes' => $request->notes
+                'notes' => $request->notes,
+                'admin_id' => Auth::id(),
             ];
 
-            if ($request->hasFile('certificate')) {
-                // Delete old certificate if exists
+            $uploadedFiles = [];
+
+            if ($request->hasFile('certificates')) {
                 if ($iinSingleBlockholder->certificate_path && Storage::disk('public')->exists($iinSingleBlockholder->certificate_path)) {
                     Storage::disk('public')->delete($iinSingleBlockholder->certificate_path);
                 }
 
-                $file = $request->file('certificate');
-                $filename = $iinSingleBlockholder->application_number . '_' . time() . '_certificate.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('iin-single-blockholder/certificates', $filename, 'public');
-                
-                $updateData['certificate_path'] = $path;
-                $updateData['certificate_uploaded_at'] = now();
+                foreach ($request->file('certificates') as $index => $file) {
+                    $filename = $iinSingleBlockholder->application_number . '_' . time() . '_certificate_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $path = $file->storeAs('iin-single-blockholder/certificates', $filename, 'public');
+
+                    if ($index === 0) {
+                        $updateData['certificate_path'] = $path;
+                    }
+
+                    $uploadedFiles[] = [
+                        'path' => $path,
+                        'original_name' => $file->getClientOriginalName(),
+                        'uploaded_at' => now()->toISOString(),
+                    ];
+                }
+
+                $existingAdditional = $iinSingleBlockholder->additional_documents ?? [];
+                $updateData['additional_documents'] = array_merge($existingAdditional, $uploadedFiles);
             }
 
-            // Update application
+            $oldStatus = $iinSingleBlockholder->status;
+
             $iinSingleBlockholder->update($updateData);
 
-            // Log status change
             IinStatusLog::create([
                 'application_type' => 'single_blockholder',
                 'application_id' => $iinSingleBlockholder->id,
                 'user_id' => Auth::id(),
-                'status_from' => 'pembayaran-tahap-2',
+                'status_from' => $oldStatus,
                 'status_to' => 'terbit',
                 'notes' => $request->notes ?: 'IIN berhasil diterbitkan dengan nomor: ' . $request->iin_number
             ]);
 
             $message = 'IIN berhasil diterbitkan';
-            if ($request->hasFile('additional_documents')) {
-                $additionalCount = count($request->file('additional_documents'));
-                $message .= ' beserta ' . $additionalCount . ' dokumen tambahan';
+            if (!empty($uploadedFiles)) {
+                $message .= ' dan ' . count($uploadedFiles) . ' sertifikat diupload';
             }
 
             return back()->with('success', $message);

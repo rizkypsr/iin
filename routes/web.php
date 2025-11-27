@@ -125,6 +125,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('dashboard/profil', [App\Http\Controllers\Dashboard\ProfileController::class, 'show'])->name('dashboard.profil');
     Route::patch('dashboard/profil', [App\Http\Controllers\Dashboard\ProfileController::class, 'update'])->name('dashboard.profil.update');
+    Route::patch('dashboard/profil/basic', [App\Http\Controllers\Dashboard\ProfileController::class, 'updateBasic'])->name('dashboard.profil.update-basic');
+    Route::patch('dashboard/profil/iin-nasional', [App\Http\Controllers\Dashboard\ProfileController::class, 'updateIinNasional'])->name('dashboard.profil.update-iin-nasional');
+    Route::patch('dashboard/profil/single-iin', [App\Http\Controllers\Dashboard\ProfileController::class, 'updateSingleIin'])->name('dashboard.profil.update-single-iin');
+    Route::post('dashboard/profil/single-iin', [App\Http\Controllers\Dashboard\ProfileController::class, 'updateSingleIin']);
 
     // IIN Application routes
     // IIN Nasional routes

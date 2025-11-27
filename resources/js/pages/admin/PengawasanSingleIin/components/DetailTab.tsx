@@ -8,8 +8,6 @@ import { id } from 'date-fns/locale';
 import { FileText, Shield } from "lucide-react";
 
 export default function DetailTab({ application }: { application: PengawasanSingleIinApplication }) {
-    console.log(application);
-
     return (
         <>
             <Card>

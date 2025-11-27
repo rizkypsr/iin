@@ -121,7 +121,7 @@ export default function EditUser({ user, flash, application_counts }: EditUserPr
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        put(route('admin.users.update', user.id));
+        put(route('admin.users.update', user.id), { forceFormData: true });
     };
 
     const getRoleDescription = (role: string) => {

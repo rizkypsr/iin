@@ -11,6 +11,7 @@ import DetailTab from './components/DetailTab';
 import PaymentTab from './components/PaymentTab';
 import StatusTab from './components/StatusTab';
 import DocumentTab from './components/DocumentTab';
+import { Alert } from '@/components/ui/alert';
 
 
 interface Props extends PageProps {
@@ -58,6 +59,15 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                         </Link>
                     )}
                 </div>
+
+                {application.status === 'perbaikan' && (
+                    <Alert className="text-amber-800 bg-amber-50 border-amber-200">
+                        <AlertCircle className="mr-2 w-4 h-4" />
+                        Permohonan Single IIN ditolak. Silakan perbaiki aplikasi terlebih dahulu.
+                        <br />
+                        Catatan: {application.notes || 'Tidak ada catatan'}
+                    </Alert>
+                )}
 
                 <Tabs defaultValue="detail">
                     <div className='flex justify-center'>

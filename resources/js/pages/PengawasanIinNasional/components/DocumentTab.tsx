@@ -24,8 +24,6 @@ export default function DocumentTab({ application }: { application: PengawasanIi
         );
     };
 
-    console.log(application);
-
     return (
         <>
             <Card className="border-purple-100 shadow-md bg-white/95">

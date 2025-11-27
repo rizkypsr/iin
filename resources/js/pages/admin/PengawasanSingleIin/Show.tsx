@@ -49,9 +49,6 @@ export default function AdminPengawasanSingleIinShow({ auth, application, status
     const [verificationNotes, setVerificationNotes] = useState('');
     const [verificationCompletionFiles, setVerificationCompletionFiles] = useState<File[]>([]);
 
-    console.log(application);
-
-
     const downloadFile = (type: string, stage?: string) => {
         const url = route('pengawasan-single-iin.download-file', {
             pengawasanSingleIin: application.id,

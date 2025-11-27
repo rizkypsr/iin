@@ -24,7 +24,12 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
         );
     };
 
-    console.log(application);
+    const downloadAdditionalDocument = (index: number) => {
+        window.open(
+            route('iin-single-blockholder.download-additional-document', [application.id, index]),
+            '_blank',
+        );
+    };
 
     return (
         <>
@@ -35,26 +40,29 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {/* Certificate */}
-                    {application.status === 'terbit' && (
-                        <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200">
+                    {application.status === 'terbit' && application.additional_documents && application.additional_documents.length > 0 && (
+                        <div className="space-y-2">
                             <div className="flex gap-3 items-center">
                                 <div className="p-2 bg-green-100 rounded-lg">
                                     <Award className="w-5 h-5 text-green-600" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-gray-800">Sertifikat IIN</p>
-                                    <p className="text-sm text-gray-500">Sertifikat IIN Nasional</p>
+                                    <p className="font-medium text-gray-800">Sertifikat Single IIN</p>
+                                    <p className="text-sm text-gray-500">Daftar sertifikat Single IIN/Blockholder</p>
                                 </div>
                             </div>
-                            {application.can_download_certificate && (
-                                <Button variant="outline" size="sm" onClick={() => {
-                                    setSelectedApplication(application);
-                                    setIsSurveyModalOpen(true);
-                                }}>
-                                    <Download className="mr-1 w-4 h-4" />
-                                    Download
-                                </Button>
-                            )}
+                            {application.additional_documents.map((document: PaymentDocument, index: number) => (
+                                <div key={index} className="flex justify-between items-center p-2 ml-12 rounded-lg border border-gray-200">
+                                    <div className="flex gap-2 items-center">
+                                        <FileText className="w-4 h-4 text-gray-600" />
+                                        <span className="text-sm text-gray-700">{document.original_name}</span>
+                                    </div>
+                                    <Button variant="outline" size="sm" onClick={() => downloadAdditionalDocument(index)}>
+                                        <Download className="mr-1 w-3 h-3" />
+                                        Download
+                                    </Button>
+                                </div>
+                            ))}
                         </div>
                     )}
 
