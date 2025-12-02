@@ -26,7 +26,10 @@ Route::get('/tarif', function () {
 })->name('tarif');
 
 Route::get('/layanan-publik', function () {
-    return Inertia::render('layanan-publik');
+    $information = App\Models\Information::getActive();
+    return Inertia::render('layanan-publik', [
+        'information' => $information,
+    ]);
 })->name('layanan-publik');
 
 Route::get('/pengaduan', function () {

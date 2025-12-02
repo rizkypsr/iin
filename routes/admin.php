@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\IinSingleBlockholderAdminController;
 use App\Http\Controllers\Admin\PengawasanIinNasionalAdminController;
 use App\Http\Controllers\Admin\PengawasanSingleIinAdminController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\InformationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -151,4 +152,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Settings Routes
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/document-requirements', [SettingsController::class, 'updateDocumentRequirements'])->name('settings.update-document-requirements');
+
+    // Information Routes
+    Route::get('/information', [InformationController::class, 'index'])->name('information.index');
+    Route::post('/information', [InformationController::class, 'store'])->name('information.store');
+    Route::put('/information/{information}', [InformationController::class, 'update'])->name('information.update');
+    Route::post('/information/upload-image', [InformationController::class, 'uploadImage'])->name('information.upload-image');
 });

@@ -311,8 +311,8 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                                         <div className="p-4 mx-auto mt-8 max-w-lg rounded-lg border border-blue-100 bg-blue-50/50">
                                             <h4 className="mb-2 font-medium text-blue-800">Panduan Pemantauan IIN Nasional</h4>
                                             <ul className="space-y-1 text-sm list-disc list-inside text-left text-gray-600">
+                                                <li>Update profil di menu profil</li>
                                                 <li>Ajukan aplikasi pemantauan dengan lengkap</li>
-                                                <li>Upload dokumen yang diperlukan</li>
                                                 <li>Tunggu verifikasi dari admin</li>
                                                 <li>Lakukan pembayaran jika aplikasi disetujui</li>
                                                 <li>Tunggu proses verifikasi lapangan</li>
