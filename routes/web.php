@@ -26,11 +26,20 @@ Route::get('/tarif', function () {
 })->name('tarif');
 
 Route::get('/layanan-publik', function () {
-    $information = App\Models\Information::getActive();
+    $informations = App\Models\Information::where('is_active', true)->latest()->paginate(6);
     return Inertia::render('layanan-publik', [
-        'information' => $information,
+        'informations' => $informations,
     ]);
 })->name('layanan-publik');
+
+Route::get('/layanan-publik/{information}', function (App\Models\Information $information) {
+    if (!$information->is_active) {
+        abort(404);
+    }
+    return Inertia::render('layanan-publik-detail', [
+        'information' => $information,
+    ]);
+})->name('layanan-publik.show');
 
 Route::get('/pengaduan', function () {
     return Inertia::render('pengaduan');
@@ -187,18 +196,60 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Form download routes
     Route::get('download-form/{type}', function (string $type) {
-        $filename = match ($type) {
-            'nasional' => 'Permohonan Issuer Identification Number (IIN).docx',
-            'single-blockholder' => 'Application Agreement for Issuer Identification Number.pdf',
-            'qris' => 'Surat Pernyataan Penggunaan Sistem Pembayaran Nasional Berbasis QRIS.doc',
+        $files = match ($type) {
+            'nasional' => [
+                'Permohonan Issuer Identification Number (IIN).docx',
+                'F.PSP.13.1.1 Term and Condition for Application of Sponsoring Authority_Rev 1.docx',
+            ],
+            'single-blockholder' => [
+                'Application Agreement for Issuer Identification Number.pdf',
+                'F.PSP.13.1.1 Term and Condition for Application of Sponsoring Authority_Rev 1.docx',
+            ],
+            'qris' => [
+                'Surat Pernyataan Penggunaan Sistem Pembayaran Nasional Berbasis QRIS.doc',
+            ],
             default => null
         };
 
-        if (!$filename || !file_exists(public_path("forms/{$filename}"))) {
+        if (!$files) {
             abort(404, 'Form tidak ditemukan');
         }
 
-        return response()->download(public_path("forms/{$filename}"));
+        // Check if all files exist
+        foreach ($files as $file) {
+            if (!file_exists(public_path("forms/{$file}"))) {
+                abort(404, "Form tidak ditemukan: {$file}");
+            }
+        }
+
+        // If only one file, download directly
+        if (count($files) === 1) {
+            return response()->download(public_path("forms/{$files[0]}"));
+        }
+
+        // Create ZIP for multiple files
+        $zipFileName = match ($type) {
+            'nasional' => 'Form_IIN_Nasional.zip',
+            'single-blockholder' => 'Form_Single_IIN_Blockholder.zip',
+            default => 'Forms.zip'
+        };
+
+        $zipPath = storage_path("app/temp/{$zipFileName}");
+
+        // Ensure temp directory exists
+        if (!file_exists(storage_path('app/temp'))) {
+            mkdir(storage_path('app/temp'), 0755, true);
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+            foreach ($files as $file) {
+                $zip->addFile(public_path("forms/{$file}"), $file);
+            }
+            $zip->close();
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
     })->name('download-form');
 });
 

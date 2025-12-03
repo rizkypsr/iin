@@ -17,13 +17,23 @@ final class InformationController extends Controller
 {
     public function index(): Response
     {
-        $information = Information::getActive();
+        $informations = Information::latest()->paginate(6);
 
         $applicationCountService = new ApplicationCountService();
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/information/index', [
-            'information' => $information,
+            'informations' => $informations,
+            'application_counts' => $applicationCounts,
+        ]);
+    }
+
+    public function create(): Response
+    {
+        $applicationCountService = new ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+
+        return Inertia::render('admin/information/create', [
             'application_counts' => $applicationCounts,
         ]);
     }
@@ -32,41 +42,83 @@ final class InformationController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'content' => 'required|string',
+            'is_active' => 'boolean',
         ]);
 
-        // Deactivate all existing information
-        Information::query()->update(['is_active' => false]);
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = Storage::url($request->file('image')->store('information-images', 'public'));
+        }
 
-        // Create new active information
         Information::create([
             'title' => $request->title,
+            'image' => $imagePath,
             'content' => $request->content,
-            'is_active' => true,
+            'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->back()->with('success', 'Informasi berhasil disimpan.');
+        return redirect()->route('admin.information.index')->with('success', 'Informasi berhasil ditambahkan.');
+    }
+
+    public function edit(Information $information): Response
+    {
+        $applicationCountService = new ApplicationCountService();
+        $applicationCounts = $applicationCountService->getNewApplicationCounts();
+
+        return Inertia::render('admin/information/edit', [
+            'information' => $information,
+            'application_counts' => $applicationCounts,
+        ]);
     }
 
     public function update(Request $request, Information $information)
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'content' => 'required|string',
+            'is_active' => 'boolean',
         ]);
 
-        $information->update([
+        $data = [
             'title' => $request->title,
             'content' => $request->content,
-        ]);
+            'is_active' => $request->boolean('is_active', $information->is_active),
+        ];
 
-        return redirect()->back()->with('success', 'Informasi berhasil diperbarui.');
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($information->image) {
+                $oldPath = str_replace('/storage/', '', $information->image);
+                Storage::disk('public')->delete($oldPath);
+            }
+            $data['image'] = Storage::url($request->file('image')->store('information-images', 'public'));
+        }
+
+        $information->update($data);
+
+        return redirect()->route('admin.information.index')->with('success', 'Informasi berhasil diperbarui.');
+    }
+
+    public function destroy(Information $information)
+    {
+        // Delete image if exists
+        if ($information->image) {
+            $path = str_replace('/storage/', '', $information->image);
+            Storage::disk('public')->delete($path);
+        }
+
+        $information->delete();
+
+        return redirect()->route('admin.information.index')->with('success', 'Informasi berhasil dihapus.');
     }
 
     public function uploadImage(Request $request): JsonResponse
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         $path = $request->file('image')->store('information-images', 'public');

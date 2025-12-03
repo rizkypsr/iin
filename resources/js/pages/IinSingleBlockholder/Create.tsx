@@ -85,9 +85,13 @@ export default function IinSingleBlockholderCreate() {
                         <div className="rounded-lg border p-4 transition-colors hover:border-purple-300">
                             <h3 className="mb-2 font-semibold text-gray-900">Single IIN/Blockholder</h3>
                             <p className="mb-3 text-sm text-gray-600">Permohonan Issuer Identification Number untuk layanan Single IIN/Blockholder</p>
+                            <ul className="mb-3 list-inside list-disc text-sm text-gray-500">
+                                <li>Application Agreement for Issuer Identification Number.pdf</li>
+                                <li>F.PSP.13.1.1 Term and Condition for Application of Sponsoring Authority_Rev 1.docx</li>
+                            </ul>
                             <Button variant="outline" size="sm" onClick={() => window.open(route('download-form', 'single-blockholder'), '_blank')}>
                                 <Download className="mr-2 h-4 w-4" />
-                                Download Form
+                                Download Form (ZIP)
                             </Button>
                         </div>
                     </CardContent>

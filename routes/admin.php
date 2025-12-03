@@ -155,7 +155,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Information Routes
     Route::get('/information', [InformationController::class, 'index'])->name('information.index');
+    Route::get('/information/create', [InformationController::class, 'create'])->name('information.create');
     Route::post('/information', [InformationController::class, 'store'])->name('information.store');
+    Route::get('/information/{information}/edit', [InformationController::class, 'edit'])->name('information.edit');
     Route::put('/information/{information}', [InformationController::class, 'update'])->name('information.update');
+    Route::delete('/information/{information}', [InformationController::class, 'destroy'])->name('information.destroy');
     Route::post('/information/upload-image', [InformationController::class, 'uploadImage'])->name('information.upload-image');
 });
