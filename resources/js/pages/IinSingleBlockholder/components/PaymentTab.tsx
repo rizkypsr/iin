@@ -220,9 +220,10 @@ export default function PaymentTab({ application }: { application: IinSingleBloc
                                                         size="sm"
                                                         onClick={() =>
                                                             window.open(
-                                                                route('iin-single-blockholder.download-payment-document-stage-2', [
+                                                                route('iin-single-blockholder.download-payment-document', [
                                                                     application.id,
                                                                     index,
+                                                                    'stage2'
                                                                 ]),
                                                                 '_blank',
                                                             )

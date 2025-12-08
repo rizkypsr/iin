@@ -6,9 +6,8 @@ import DashboardLayout from '@/layouts/dashboard-layout';
 import { showErrorToast, showSuccessToast } from '@/lib/toast-helper';
 import { PageProps } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft, Download, FileText, Upload } from 'lucide-react';
-import { FormEventHandler, useEffect } from 'react';
+import { DragEvent, FormEventHandler, useEffect, useState } from 'react';
 
 interface FormTemplate {
     id: number;
@@ -36,6 +35,9 @@ export default function IinSingleBlockholderCreate() {
         requirements_archive: null as File | null,
     });
 
+    const [dragActiveForm, setDragActiveForm] = useState(false);
+    const [dragActiveArchive, setDragActiveArchive] = useState(false);
+
     // Handle flash messages
     useEffect(() => {
         if (flash.success) {
@@ -45,6 +47,59 @@ export default function IinSingleBlockholderCreate() {
             showErrorToast(flash.error);
         }
     }, [flash]);
+
+    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDragEnterForm = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActiveForm(true);
+    };
+
+    const handleDragLeaveForm = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActiveForm(false);
+    };
+
+    const handleDropForm = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActiveForm(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file && file.type === 'application/pdf') {
+            setData('application_form', file);
+        } else {
+            showErrorToast('Hanya file PDF yang diperbolehkan');
+        }
+    };
+
+    const handleDragEnterArchive = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActiveArchive(true);
+    };
+
+    const handleDragLeaveArchive = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActiveArchive(false);
+    };
+
+    const handleDropArchive = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActiveArchive(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file && (file.name.endsWith('.zip') || file.name.endsWith('.rar'))) {
+            setData('requirements_archive', file);
+        } else {
+            showErrorToast('Hanya file ZIP/RAR yang diperbolehkan');
+        }
+    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -151,15 +206,20 @@ export default function IinSingleBlockholderCreate() {
                             {/* File Upload */}
                             <div className="space-y-2">
                                 <Label htmlFor="application_form">Upload Formulir Aplikasi *</Label>
-                                <motion.div
-                                    className="relative rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-purple-300"
-                                    whileHover={{ scale: 1.01 }}
+                                <div
+                                    className={`relative rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
+                                        dragActiveForm ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-purple-300'
+                                    }`}
+                                    onDragOver={handleDragOver}
+                                    onDragEnter={handleDragEnterForm}
+                                    onDragLeave={handleDragLeaveForm}
+                                    onDrop={handleDropForm}
                                 >
                                     <label htmlFor="application_form" className="flex cursor-pointer flex-col items-center">
                                         <Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
                                         <div className="space-y-2">
                                             <p className="text-sm font-medium text-gray-900">Klik untuk upload atau drag and drop</p>
-                                            <p className="text-xs text-gray-500">Format asli, maksimal 20MB (PDF)</p>
+                                            <p className="text-xs text-gray-500">Format PDF, maksimal 20MB</p>
                                             {data.application_form && (
                                                 <p className="mt-2 text-sm font-medium text-purple-600">{data.application_form.name}</p>
                                             )}
@@ -170,25 +230,29 @@ export default function IinSingleBlockholderCreate() {
                                         type="file"
                                         onChange={(e) => setData('application_form', e.target.files?.[0] || null)}
                                         className="hidden"
-                                        accept='application/pdf'
-                                        max={20 * 1024 * 1024}
+                                        accept="application/pdf"
                                         required
                                     />
                                     {progress && (
-                                        <div className="mt-4 h-2.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                                        <div className="mt-4 h-2.5 w-full rounded-full bg-gray-200">
                                             <div className="bg-gradient-accent h-2.5 rounded-full" style={{ width: `${progress.percentage}%` }}></div>
                                         </div>
                                     )}
-                                </motion.div>
+                                </div>
                                 {errors.application_form && <p className="text-sm text-red-600">{errors.application_form}</p>}
                             </div>
 
                             {/* Requirements Archive Upload */}
                             <div className="space-y-2">
                                 <Label htmlFor="requirements_archive">Upload Persyaratan (ZIP/RAR) *</Label>
-                                <motion.div
-                                    className="relative rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-purple-300"
-                                    whileHover={{ scale: 1.01 }}
+                                <div
+                                    className={`relative rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
+                                        dragActiveArchive ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-purple-300'
+                                    }`}
+                                    onDragOver={handleDragOver}
+                                    onDragEnter={handleDragEnterArchive}
+                                    onDragLeave={handleDragLeaveArchive}
+                                    onDrop={handleDropArchive}
                                 >
                                     <label htmlFor="requirements_archive" className="flex cursor-pointer flex-col items-center">
                                         <Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
@@ -208,7 +272,7 @@ export default function IinSingleBlockholderCreate() {
                                         className="hidden"
                                         required
                                     />
-                                </motion.div>
+                                </div>
                                 {errors.requirements_archive && <p className="text-sm text-red-600">{errors.requirements_archive}</p>}
                             </div>
 

@@ -12,6 +12,7 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
     const [selectedApplication, setSelectedApplication] = useState<IinSingleBlockholderApplication | null>(null);
     const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
     const [isReimModalOpen, setIsReimModalOpen] = useState(false);
+    const [selectedDocumentIndex, setSelectedDocumentIndex] = useState<number>(0);
 
     const downloadFile = (type: string, index?: number) => {
         window.open(
@@ -57,7 +58,11 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                                         <FileText className="w-4 h-4 text-gray-600" />
                                         <span className="text-sm text-gray-700">{document.original_name}</span>
                                     </div>
-                                    <Button variant="outline" size="sm" onClick={() => downloadAdditionalDocument(index)}>
+                                    <Button variant="outline" size="sm" onClick={() => {
+                                        setSelectedApplication(application);
+                                        setSelectedDocumentIndex(index);
+                                        setIsSurveyModalOpen(true);
+                                    }}>
                                         <Download className="mr-1 w-3 h-3" />
                                         Download
                                     </Button>
@@ -187,7 +192,7 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                                         <FileText className="w-4 h-4 text-gray-600" />
                                         <span className="text-sm text-gray-700">{document.original_name}</span>
                                     </div>
-                                    <Button variant="outline" size="sm" onClick={() => downloadFile('payment_proof', index)}>
+                                    <Button variant="outline" size="sm" onClick={() => downloadFile('payment_proof_stage2', index)}>
                                         <Download className="mr-1 w-3 h-3" />
                                         Download
                                     </Button>
@@ -273,7 +278,7 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                                         <FileText className="w-4 h-4 text-gray-600" />
                                         <span className="text-sm text-gray-700">{document.original_name}</span>
                                     </div>
-                                    <Button variant="outline" size="sm" onClick={() => downloadFile('payment_document', index)}>
+                                    <Button variant="outline" size="sm" onClick={() => downloadFile('payment_document_stage2', index)}>
                                         <Download className="mr-1 w-3 h-3" />
                                         Download
                                     </Button>
@@ -324,7 +329,7 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
             <SurveyModal
                 isOpen={isSurveyModalOpen}
                 onClose={() => setIsSurveyModalOpen(false)}
-                onDownload={() => downloadFile('certificate')}
+                onDownload={() => downloadAdditionalDocument(selectedDocumentIndex)}
                 certificateType="IIN Single Blockholder"
             />
 

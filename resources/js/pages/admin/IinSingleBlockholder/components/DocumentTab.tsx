@@ -66,7 +66,7 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                                 </div>
                                 <div>
                                     <p className="font-medium text-gray-800">Sertifikat IIN</p>
-                                    <p className="text-sm text-gray-500">Daftar sertifikat IIN Nasional</p>
+                                    <p className="text-sm text-gray-500">Daftar sertifikat Single IIN/Blockholder</p>
                                 </div>
                             </div>
                             {application.additional_documents.map((document: PaymentDocument, index: number) => (
@@ -205,7 +205,7 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                                         <FileText className="w-4 h-4 text-gray-600" />
                                         <span className="text-sm text-gray-700">{document.original_name}</span>
                                     </div>
-                                    <Button variant="outline" size="sm" onClick={() => downloadFile('payment_proof', index)}>
+                                    <Button variant="outline" size="sm" onClick={() => downloadFile('payment_proof_stage2', index)}>
                                         <Download className="mr-1 w-3 h-3" />
                                         Download
                                     </Button>
@@ -291,7 +291,7 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                                         <FileText className="w-4 h-4 text-gray-600" />
                                         <span className="text-sm text-gray-700">{document.original_name}</span>
                                     </div>
-                                    <Button variant="outline" size="sm" onClick={() => downloadFile('payment_document', index)}>
+                                    <Button variant="outline" size="sm" onClick={() => downloadFile('payment_document_stage2', index)}>
                                         <Download className="mr-1 w-3 h-3" />
                                         Download
                                     </Button>

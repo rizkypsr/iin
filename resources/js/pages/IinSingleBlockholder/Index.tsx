@@ -394,18 +394,25 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
 
                                                     {application.status === 'terbit' &&
                                                         application.iin_number && application.expense_reim_id != null && (
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="text-green-600 border-green-200 hover:bg-green-50"
-                                                                onClick={() => {
-                                                                    setSelectedApplication(application);
-                                                                    setIsSurveyModalOpen(true);
-                                                                }}
-                                                            >
-                                                                <Download className="mr-2 w-4 h-4" />
-                                                                Download Sertifikat
-                                                            </Button>
+                                                            // <Button
+                                                            //     variant="outline"
+                                                            //     size="sm"
+                                                            //     className="text-green-600 border-green-200 hover:bg-green-50"
+                                                            //     onClick={() => {
+                                                            //         setSelectedApplication(application);
+                                                            //         setIsSurveyModalOpen(true);
+                                                            //     }}
+                                                            // >
+                                                            //     <Download className="mr-2 w-4 h-4" />
+                                                            //     Download Sertifikat
+                                                            // </Button>
+
+                                                            <Link href={route('iin-single-blockholder.show', application.id)}>
+                                                                <Button variant="outline" size="sm" className='text-green-600 border-green-200 hover:bg-green-50'>
+                                                                    <Download className="mr-2 w-4 h-4 " />
+                                                                    Download Sertifikat
+                                                                </Button>
+                                                            </Link>
                                                         )}
 
                                                     {/* Expense Reimbursement Button */}

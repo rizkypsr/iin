@@ -168,8 +168,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('iin-single-blockholder/{iinSingleBlockholder}/upload-additional-documents', [IinSingleBlockholderController::class, 'uploadAdditionalDocument'])->name('iin-single-blockholder.upload-additional-documents');
     Route::post('iin-single-blockholder/{iinSingleBlockholder}/expense-reimbursement', [IinSingleBlockholderController::class, 'storeExpenseReimbursement'])->name('iin-single-blockholder.store-expense-reimbursement');
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download/{type}/{index?}', [IinSingleBlockholderController::class, 'downloadFile'])->name('iin-single-blockholder.download-file');
-    Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-payment-document/{index}', [IinSingleBlockholderController::class, 'downloadPaymentDocument'])->name('iin-single-blockholder.download-payment-document');
-    Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-payment-document-stage-2/{index}', [IinSingleBlockholderController::class, 'downloadPaymentDocumentStage2'])->name('iin-single-blockholder.download-payment-document-stage-2');
+    Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-payment-document/{index}/{stage?}', [IinSingleBlockholderController::class, 'downloadPaymentDocument'])->name('iin-single-blockholder.download-payment-document');
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-payment-proof/{index}', [IinSingleBlockholderController::class, 'downloadPaymentProof'])->name('iin-single-blockholder.download-payment-proof');
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-field-verification-document/{index}', [IinSingleBlockholderController::class, 'downloadFieldVerificationDocument'])->name('iin-single-blockholder.download-field-verification-document');
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-additional-document/{index}', [IinSingleBlockholderController::class, 'downloadAdditionalDocument'])->name('iin-single-blockholder.download-additional-document');
@@ -196,6 +195,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Form download routes
     Route::get('download-form/{type}', function (string $type) {
+        // Handle QRIS form from public folder (static file)
+        if ($type === 'qris') {
+            $filename = 'Surat Pernyataan Penggunaan Sistem Pembayaran Nasional Berbasis QRIS.doc';
+            $filePath = public_path("forms/{$filename}");
+
+            if (!file_exists($filePath)) {
+                abort(404, 'Form QRIS tidak ditemukan');
+            }
+
+            return response()->download($filePath, $filename);
+        }
+
+        // Handle dynamic form templates from database
         $formTemplates = App\Models\FormTemplate::getByType($type);
 
         if ($formTemplates->isEmpty()) {
