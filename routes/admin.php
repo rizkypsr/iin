@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\PengawasanIinNasionalAdminController;
 use App\Http\Controllers\Admin\PengawasanSingleIinAdminController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\InformationController;
+use App\Http\Controllers\Admin\FormTemplateController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -161,4 +162,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/information/{information}', [InformationController::class, 'update'])->name('information.update');
     Route::delete('/information/{information}', [InformationController::class, 'destroy'])->name('information.destroy');
     Route::post('/information/upload-image', [InformationController::class, 'uploadImage'])->name('information.upload-image');
+
+    // Form Templates Routes
+    Route::get('/form-templates', [FormTemplateController::class, 'index'])->name('form-templates.index');
+    Route::post('/form-templates', [FormTemplateController::class, 'store'])->name('form-templates.store');
+    Route::post('/form-templates/{formTemplate}', [FormTemplateController::class, 'update'])->name('form-templates.update');
+    Route::delete('/form-templates/{formTemplate}', [FormTemplateController::class, 'destroy'])->name('form-templates.destroy');
 });

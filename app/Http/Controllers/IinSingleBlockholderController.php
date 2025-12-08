@@ -32,9 +32,11 @@ class IinSingleBlockholderController extends Controller
     public function create()
     {
         $documentRequirements = DocumentRequirement::getIinSingleBlockholderRequirements();
+        $formTemplates = \App\Models\FormTemplate::getSingleBlockholderForms();
 
         return Inertia::render('IinSingleBlockholder/Create', [
             'documentRequirements' => $documentRequirements,
+            'formTemplates' => $formTemplates,
         ]);
     }
 

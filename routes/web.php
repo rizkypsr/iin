@@ -196,35 +196,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Form download routes
     Route::get('download-form/{type}', function (string $type) {
-        $files = match ($type) {
-            'nasional' => [
-                'Permohonan Issuer Identification Number (IIN).docx',
-                'F.PSP.13.1.1 Term and Condition for Application of Sponsoring Authority_Rev 1.docx',
-            ],
-            'single-blockholder' => [
-                'Application Agreement for Issuer Identification Number.pdf',
-                'F.PSP.13.1.1 Term and Condition for Application of Sponsoring Authority_Rev 1.docx',
-            ],
-            'qris' => [
-                'Surat Pernyataan Penggunaan Sistem Pembayaran Nasional Berbasis QRIS.doc',
-            ],
-            default => null
-        };
+        $formTemplates = App\Models\FormTemplate::getByType($type);
 
-        if (!$files) {
+        if ($formTemplates->isEmpty()) {
             abort(404, 'Form tidak ditemukan');
         }
 
         // Check if all files exist
-        foreach ($files as $file) {
-            if (!file_exists(public_path("forms/{$file}"))) {
-                abort(404, "Form tidak ditemukan: {$file}");
+        foreach ($formTemplates as $template) {
+            if (!Storage::disk('public')->exists($template->file_path)) {
+                abort(404, "Form tidak ditemukan: {$template->name}");
             }
         }
 
         // If only one file, download directly
-        if (count($files) === 1) {
-            return response()->download(public_path("forms/{$files[0]}"));
+        if ($formTemplates->count() === 1) {
+            $template = $formTemplates->first();
+            return Storage::disk('public')->download($template->file_path, $template->original_name);
         }
 
         // Create ZIP for multiple files
@@ -243,8 +231,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         $zip = new \ZipArchive();
         if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-            foreach ($files as $file) {
-                $zip->addFile(public_path("forms/{$file}"), $file);
+            foreach ($formTemplates as $template) {
+                $filePath = Storage::disk('public')->path($template->file_path);
+                $zip->addFile($filePath, $template->original_name);
             }
             $zip->close();
         }

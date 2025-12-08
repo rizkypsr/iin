@@ -10,6 +10,13 @@ import { motion } from 'framer-motion';
 import { AlertCircle, ArrowLeft, Download, FileText, Upload } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
+interface FormTemplate {
+    id: number;
+    type: string;
+    name: string;
+    original_name: string;
+}
+
 interface Props extends PageProps {
     documentRequirements?: {
         id: number;
@@ -18,11 +25,12 @@ interface Props extends PageProps {
         created_at: string;
         updated_at: string;
     } | null;
+    formTemplates?: FormTemplate[];
     [key: string]: any;
 }
 
 export default function IinNasionalCreate() {
-    const { auth, flash, documentRequirements } = usePage<Props>().props;
+    const { auth, flash, documentRequirements, formTemplates } = usePage<Props>().props;
     const { data, setData, post, processing, errors, progress } = useForm({
         application_form: null as File | null,
         requirements_archive: null as File | null,
@@ -76,14 +84,21 @@ export default function IinNasionalCreate() {
                         <div className="rounded-lg border p-4 transition-colors hover:border-purple-300">
                             <h3 className="mb-2 font-semibold text-gray-900">IIN Nasional</h3>
                             <p className="mb-3 text-sm text-gray-600">Permohonan Issuer Identification Number untuk layanan IIN Nasional</p>
-                            <ul className="mb-3 list-inside list-disc text-sm text-gray-500">
-                                <li>Permohonan Issuer Identification Number (IIN).docx</li>
-                                <li>F.PSP.13.1.1 Term and Condition for Application of Sponsoring Authority_Rev 1.docx</li>
-                            </ul>
-                            <Button variant="outline" size="sm" onClick={() => window.open(route('download-form', 'nasional'), '_blank')}>
-                                <Download className="mr-2 h-4 w-4" />
-                                Download Form (ZIP)
-                            </Button>
+                            {formTemplates && formTemplates.length > 0 ? (
+                                <>
+                                    <ul className="mb-3 list-inside list-disc text-sm text-gray-500">
+                                        {formTemplates.map((template) => (
+                                            <li key={template.id}>{template.name}</li>
+                                        ))}
+                                    </ul>
+                                    <Button variant="outline" size="sm" onClick={() => window.open(route('download-form', 'nasional'), '_blank')}>
+                                        <Download className="mr-2 h-4 w-4" />
+                                        Download Form {formTemplates.length > 1 ? '(ZIP)' : ''}
+                                    </Button>
+                                </>
+                            ) : (
+                                <p className="text-sm text-gray-500 italic">Form belum tersedia. Silakan hubungi administrator.</p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

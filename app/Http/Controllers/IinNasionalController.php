@@ -35,9 +35,11 @@ class IinNasionalController extends Controller
     public function create()
     {
         $documentRequirements = DocumentRequirement::getIinNasionalRequirements();
+        $formTemplates = \App\Models\FormTemplate::getNasionalForms();
         
         return Inertia::render('IinNasional/Create', [
             'documentRequirements' => $documentRequirements,
+            'formTemplates' => $formTemplates,
         ]);
     }
 

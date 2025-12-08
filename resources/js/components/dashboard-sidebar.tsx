@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { PageProps, User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { BarChart3, ChevronRight, CreditCard, FileText, Info, LayoutDashboard, LogOut, Settings, Shield, User as UserIcon, Users } from 'lucide-react';
+import { BarChart3, ChevronRight, CreditCard, FileArchive, FileText, Info, LayoutDashboard, LogOut, Settings, Shield, User as UserIcon, Users } from 'lucide-react';
 
 interface DashboardSidebarProps {
     user?: User;
@@ -31,6 +31,7 @@ const menuItems = {
         { name: 'User Management', href: '/admin/users', icon: Users },
         { name: 'Laporan', href: '/admin/reports', icon: BarChart3 },
         { name: 'Information', href: '/admin/information', icon: Info },
+        { name: 'Form Templates', href: '/admin/form-templates', icon: FileArchive },
         { name: 'Settings', href: '/admin/settings', icon: Settings },
     ],
 };
