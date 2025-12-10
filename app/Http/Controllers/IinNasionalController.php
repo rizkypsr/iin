@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\DocumentRequirement;
 use App\Models\IinNasionalApplication;
 use App\Models\IinStatusLog;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class IinNasionalController extends Controller
@@ -25,10 +23,10 @@ class IinNasionalController extends Controller
         $applications = IinNasionalApplication::with(['user', 'admin'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(5);
 
         return Inertia::render('IinNasional/Index', [
-            'applications' => $applications
+            'applications' => $applications,
         ]);
     }
 
@@ -36,7 +34,7 @@ class IinNasionalController extends Controller
     {
         $documentRequirements = DocumentRequirement::getIinNasionalRequirements();
         $formTemplates = \App\Models\FormTemplate::getNasionalForms();
-        
+
         return Inertia::render('IinNasional/Create', [
             'documentRequirements' => $documentRequirements,
             'formTemplates' => $formTemplates,
@@ -50,17 +48,17 @@ class IinNasionalController extends Controller
             'requirements_archive' => 'required|file|mimes:zip,rar|max:51200', // 50MB max for ZIP/RAR
         ]);
 
-        $application = new IinNasionalApplication();
+        $application = new IinNasionalApplication;
         $application->user_id = Auth::id();
         $application->submitted_at = now();
-        
+
         // Save first to generate the application_number
         $application->save();
-        
+
         // Handle file upload after generating application number
         if ($request->hasFile('application_form')) {
             $file = $request->file('application_form');
-            $filename = $application->application_number . '_' . time() . '_form.' . $file->getClientOriginalExtension();
+            $filename = $application->application_number.'_'.time().'_form.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-nasional', $filename, 'public');
             $application->application_form_path = $path;
         }
@@ -68,7 +66,7 @@ class IinNasionalController extends Controller
         // Handle requirements archive upload
         if ($request->hasFile('requirements_archive')) {
             $file = $request->file('requirements_archive');
-            $filename = $application->application_number . '_' . time() . '_requirements.' . $file->getClientOriginalExtension();
+            $filename = $application->application_number.'_'.time().'_requirements.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-nasional', $filename, 'public');
             $application->requirements_archive_path = $path;
         }
@@ -82,7 +80,7 @@ class IinNasionalController extends Controller
             'user_id' => Auth::id(),
             'status_from' => null,
             'status_to' => 'pengajuan',
-            'notes' => 'Aplikasi IIN Nasional diajukan'
+            'notes' => 'Aplikasi IIN Nasional diajukan',
         ]);
 
         return to_route('iin-nasional.index')->with('success', 'Aplikasi IIN Nasional berhasil diajukan');
@@ -107,7 +105,7 @@ class IinNasionalController extends Controller
                 'can_download_certificate' => $iinNasional->certificate_path && Storage::disk('public')->exists($iinNasional->certificate_path),
                 'can_upload_certificate' => Auth::user()->hasRole('admin') && in_array($iinNasional->status, ['menunggu-terbit', 'terbit']),
             ]),
-            'statusLogs' => $statusLogs
+            'statusLogs' => $statusLogs,
         ]);
     }
 
@@ -129,14 +127,14 @@ class IinNasionalController extends Controller
         // Validation for new flow requirements
         if ($oldStatus === 'pengajuan' && $newStatus === 'pembayaran') {
             // Admin must upload payment documents before changing to pembayaran
-            if (!$iinNasional->payment_documents || count($iinNasional->payment_documents) === 0) {
+            if (! $iinNasional->payment_documents || count($iinNasional->payment_documents) === 0) {
                 return back()->withErrors(['status' => 'Admin harus upload dokumen pembayaran sebelum mengubah status ke pembayaran']);
             }
         }
 
         if ($oldStatus === 'pembayaran' && $newStatus === 'verifikasi-lapangan') {
             // Admin must upload field verification documents before changing to verifikasi-lapangan
-            if (!$iinNasional->field_verification_documents || count($iinNasional->field_verification_documents) === 0) {
+            if (! $iinNasional->field_verification_documents || count($iinNasional->field_verification_documents) === 0) {
                 return back()->withErrors(['status' => 'Admin harus upload dokumen pendukung verifikasi lapangan sebelum mengubah status ke verifikasi-lapangan']);
             }
         }
@@ -169,7 +167,7 @@ class IinNasionalController extends Controller
             'user_id' => Auth::id(),
             'status_from' => $oldStatus,
             'status_to' => $newStatus,
-            'notes' => $request->notes
+            'notes' => $request->notes,
         ]);
 
         return back()->with('success', 'Status aplikasi berhasil diperbarui');
@@ -188,23 +186,23 @@ class IinNasionalController extends Controller
 
         if ($request->hasFile('payment_proof')) {
             foreach ($request->file('payment_proof') as $file) {
-                $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_payment_proof.' . $file->getClientOriginalExtension();
+                $filename = $iinNasional->application_number.'_'.time().'_'.uniqid().'_payment_proof.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional/payment-proofs', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
         }
 
         // Merge with existing proofs
         $allProofs = array_merge($existingProofs, $uploadedFiles);
-        
+
         $iinNasional->update([
             'payment_proof_documents' => $allProofs,
-            'payment_proof_uploaded_at' => now()
+            'payment_proof_uploaded_at' => now(),
         ]);
 
         // Log activity
@@ -214,10 +212,10 @@ class IinNasionalController extends Controller
             'user_id' => Auth::id(),
             'status_from' => $iinNasional->status,
             'status_to' => $iinNasional->status,
-            'notes' => 'User mengupload bukti pembayaran (' . count($uploadedFiles) . ' file)'
+            'notes' => 'User mengupload bukti pembayaran ('.count($uploadedFiles).' file)',
         ]);
 
-        return back()->with('success', count($uploadedFiles) . ' bukti pembayaran berhasil diupload');
+        return back()->with('success', count($uploadedFiles).' bukti pembayaran berhasil diupload');
     }
 
     public function uploadPaymentDocuments(Request $request, IinNasionalApplication $iinNasional)
@@ -229,13 +227,13 @@ class IinNasionalController extends Controller
         if ($request->hasFile('payment_documents')) {
             $validationRules['payment_documents.*'] = 'required|file|max:10240';
         }
-        
+
         // Validasi untuk perubahan status jika diminta
         if ($request->has('upload_and_change_status')) {
             $validationRules['status'] = 'required|string|in:pembayaran';
             $validationRules['notes'] = 'nullable|string|max:1000';
         }
-        
+
         $request->validate($validationRules);
 
         $uploadedFiles = [];
@@ -245,54 +243,54 @@ class IinNasionalController extends Controller
         // Upload dokumen jika ada
         if ($request->hasFile('payment_documents')) {
             foreach ($request->file('payment_documents') as $file) {
-                $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_payment_doc.' . $file->getClientOriginalExtension();
+                $filename = $iinNasional->application_number.'_'.time().'_'.uniqid().'_payment_doc.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional/payment-documents', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
         }
 
         // Merge with existing documents
         $allDocuments = array_merge($existingDocuments, $uploadedFiles);
-        
+
         // Update data aplikasi
         $updateData = [
             'payment_documents' => $allDocuments,
-            'payment_documents_uploaded_at' => now()
+            'payment_documents_uploaded_at' => now(),
         ];
-        
+
         // Jika diminta untuk mengubah status bersamaan
         if ($request->has('upload_and_change_status') && $request->status === 'pembayaran') {
             // Validasi bahwa ada dokumen pembayaran (baik yang baru diupload atau yang sudah ada)
             if (empty($allDocuments)) {
                 return back()->withErrors([
-                    'payment_documents' => 'Dokumen pembayaran harus diupload sebelum mengubah status ke pembayaran.'
+                    'payment_documents' => 'Dokumen pembayaran harus diupload sebelum mengubah status ke pembayaran.',
                 ]);
             }
-            
+
             $updateData['status'] = 'pembayaran';
             $updateData['admin_id'] = Auth::id();
         }
-        
+
         return DB::transaction(function () use ($iinNasional, $updateData, $uploadedFiles, $oldStatus, $request) {
             $iinNasional->update($updateData);
 
             // Log activity untuk upload dokumen
-            if (!empty($uploadedFiles)) {
+            if (! empty($uploadedFiles)) {
                 IinStatusLog::create([
                     'application_type' => 'nasional',
                     'application_id' => $iinNasional->id,
                     'user_id' => Auth::id(),
                     'status_from' => $oldStatus,
                     'status_to' => $iinNasional->status,
-                    'notes' => 'Dokumen pembayaran diupload oleh admin (' . count($uploadedFiles) . ' file)'
+                    'notes' => 'Dokumen pembayaran diupload oleh admin ('.count($uploadedFiles).' file)',
                 ]);
             }
-            
+
             // Log activity untuk perubahan status jika ada
             if ($request->has('upload_and_change_status') && $oldStatus !== $iinNasional->status) {
                 IinStatusLog::create([
@@ -301,7 +299,7 @@ class IinNasionalController extends Controller
                     'user_id' => Auth::id(),
                     'status_from' => $oldStatus,
                     'status_to' => $iinNasional->status,
-                    'notes' => $request->notes ?: 'Status diubah ke pembayaran oleh admin'
+                    'notes' => $request->notes ?: 'Status diubah ke pembayaran oleh admin',
                 ]);
             }
 
@@ -312,7 +310,7 @@ class IinNasionalController extends Controller
                     $message = 'Status berhasil diubah ke pembayaran';
                 }
             } else {
-                $message = count($uploadedFiles) . ' dokumen pembayaran berhasil diupload';
+                $message = count($uploadedFiles).' dokumen pembayaran berhasil diupload';
             }
 
             return back()->with('success', $message);
@@ -329,64 +327,61 @@ class IinNasionalController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-
-
         $uploadedFiles = [];
         $existingDocuments = $iinNasional->field_verification_documents ?? [];
         $oldStatus = $iinNasional->status;
 
         if ($request->hasFile('field_verification_documents')) {
             foreach ($request->file('field_verification_documents') as $file) {
-                $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_field_verification.' . $file->getClientOriginalExtension();
+                $filename = $iinNasional->application_number.'_'.time().'_'.uniqid().'_field_verification.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional/field-verification-documents', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
         }
 
         // Merge with existing documents
         $allDocuments = array_merge($existingDocuments, $uploadedFiles);
-        
+
         // Update data aplikasi
         $updateData = [
             'field_verification_documents' => $allDocuments,
-            'field_verification_documents_uploaded_at' => now()
+            'field_verification_documents_uploaded_at' => now(),
         ];
-        
+
         // Jika diminta untuk mengubah status bersamaan
         if ($request->has('upload_and_change_status') && $request->status === 'verifikasi-lapangan') {
             // Validasi bahwa ada dokumen verifikasi lapangan (baik yang baru diupload atau yang sudah ada)
             if (empty($allDocuments)) {
 
                 return back()->withErrors([
-                    'field_verification_documents' => 'Dokumen verifikasi lapangan harus diupload sebelum mengubah status ke verifikasi lapangan.'
+                    'field_verification_documents' => 'Dokumen verifikasi lapangan harus diupload sebelum mengubah status ke verifikasi lapangan.',
                 ]);
             }
-            
+
             $updateData['status'] = 'verifikasi-lapangan';
             $updateData['admin_id'] = Auth::id();
-            
 
         }
-        
+
         $iinNasional->update($updateData);
 
         // Log activity untuk upload dokumen
-        if (!empty($uploadedFiles)) {
+        if (! empty($uploadedFiles)) {
             IinStatusLog::create([
                 'application_type' => 'nasional',
                 'application_id' => $iinNasional->id,
                 'user_id' => Auth::id(),
                 'status_from' => $oldStatus,
                 'status_to' => $iinNasional->status,
-                'notes' => 'Dokumen pendukung verifikasi lapangan diupload oleh admin (' . count($uploadedFiles) . ' file)'
+                'notes' => 'Dokumen pendukung verifikasi lapangan diupload oleh admin ('.count($uploadedFiles).' file)',
             ]);
         }
-        
+
         // Log activity untuk perubahan status jika ada
         if ($request->has('upload_and_change_status') && $request->status === 'verifikasi-lapangan' && $oldStatus !== 'verifikasi-lapangan') {
             IinStatusLog::create([
@@ -395,7 +390,7 @@ class IinNasionalController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $oldStatus,
                 'status_to' => 'verifikasi-lapangan',
-                'notes' => $request->notes ?? 'Status diubah ke verifikasi lapangan oleh admin'
+                'notes' => $request->notes ?? 'Status diubah ke verifikasi lapangan oleh admin',
             ]);
         }
 
@@ -406,7 +401,7 @@ class IinNasionalController extends Controller
                 $message = 'Status berhasil diubah ke verifikasi lapangan';
             }
         } else {
-            $message = count($uploadedFiles) . ' dokumen pendukung verifikasi lapangan berhasil diupload';
+            $message = count($uploadedFiles).' dokumen pendukung verifikasi lapangan berhasil diupload';
         }
 
         return back()->with('success', $message);
@@ -420,15 +415,15 @@ class IinNasionalController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_additional.' . $file->getClientOriginalExtension();
+            $filename = $iinNasional->application_number.'_'.time().'_'.uniqid().'_additional.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-nasional/additional-document', $filename, 'public');
 
             $existingDocuments = [
                 'path' => $path,
                 'original_name' => $file->getClientOriginalName(),
-                'uploaded_at' => now()->toISOString()
+                'uploaded_at' => now()->toISOString(),
             ];
-            
+
             $iinNasional->update([
                 'additional_documents' => $existingDocuments,
             ]);
@@ -439,7 +434,7 @@ class IinNasionalController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $iinNasional->status,
                 'status_to' => $iinNasional->status,
-                'notes' => 'Dokumen tambahan diupload (' . $file->getClientOriginalName() . ')'
+                'notes' => 'Dokumen tambahan diupload ('.$file->getClientOriginalName().')',
             ]);
         }
 
@@ -462,24 +457,24 @@ class IinNasionalController extends Controller
             default => null
         };
 
-        if (!$path) {
+        if (! $path) {
             Log::error('File path not found', ['type' => $type]);
-            abort(404, 'File path tidak ditemukan untuk tipe: ' . $type);
+            abort(404, 'File path tidak ditemukan untuk tipe: '.$type);
         }
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             Log::error('File does not exist in storage', ['path' => $path]);
-            abort(404, 'File tidak ditemukan di storage: ' . $path);
+            abort(404, 'File tidak ditemukan di storage: '.$path);
         }
 
         $fullPath = Storage::disk('public')->path($path);
-        
+
         // Get original filename with proper extension
         $originalFilename = match ($type) {
-            'application_form' => $iinNasional->application_number . '_formulir_aplikasi.' . pathinfo($path, PATHINFO_EXTENSION),
-            'requirements_archive' => $iinNasional->application_number . '_persyaratan.' . pathinfo($path, PATHINFO_EXTENSION),
-            'payment_proof' => $iinNasional->application_number . '_bukti_pembayaran.' . pathinfo($path, PATHINFO_EXTENSION),
-            'certificate' => $iinNasional->application_number . '_sertifikat_iin.' . pathinfo($path, PATHINFO_EXTENSION),
+            'application_form' => $iinNasional->application_number.'_formulir_aplikasi.'.pathinfo($path, PATHINFO_EXTENSION),
+            'requirements_archive' => $iinNasional->application_number.'_persyaratan.'.pathinfo($path, PATHINFO_EXTENSION),
+            'payment_proof' => $iinNasional->application_number.'_bukti_pembayaran.'.pathinfo($path, PATHINFO_EXTENSION),
+            'certificate' => $iinNasional->application_number.'_sertifikat_iin.'.pathinfo($path, PATHINFO_EXTENSION),
             default => basename($path)
         };
 
@@ -491,21 +486,21 @@ class IinNasionalController extends Controller
         $this->authorize('downloadFile', $iinNasional);
 
         $paymentDocuments = $iinNasional->payment_documents ?? [];
-        
-        if (!isset($paymentDocuments[$index])) {
+
+        if (! isset($paymentDocuments[$index])) {
             abort(404, 'Dokumen pembayaran tidak ditemukan');
         }
 
         $document = $paymentDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -514,21 +509,21 @@ class IinNasionalController extends Controller
         $this->authorize('downloadFile', $iinNasional);
 
         $additionalDocuments = $iinNasional->additional_documents ?? [];
-        
-        if (!isset($additionalDocuments[$index])) {
+
+        if (! isset($additionalDocuments[$index])) {
             abort(404, 'Dokumen tambahan tidak ditemukan');
         }
 
         $document = $additionalDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -537,21 +532,21 @@ class IinNasionalController extends Controller
         $this->authorize('downloadFile', $iinNasional);
 
         $paymentProofs = $iinNasional->payment_proof_documents ?? [];
-        
-        if (!isset($paymentProofs[$index])) {
+
+        if (! isset($paymentProofs[$index])) {
             abort(404, 'Bukti pembayaran tidak ditemukan');
         }
 
         $document = $paymentProofs[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -560,21 +555,21 @@ class IinNasionalController extends Controller
         $this->authorize('downloadFile', $iinNasional);
 
         $fieldVerificationDocuments = $iinNasional->field_verification_documents ?? [];
-        
-        if (!isset($fieldVerificationDocuments[$index])) {
+
+        if (! isset($fieldVerificationDocuments[$index])) {
             abort(404, 'Dokumen verifikasi lapangan tidak ditemukan');
         }
 
         $document = $fieldVerificationDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -593,11 +588,11 @@ class IinNasionalController extends Controller
             }
 
             $file = $request->file('certificate');
-            $filename = $iinNasional->application_number . '_' . time() . '_certificate.' . $file->getClientOriginalExtension();
+            $filename = $iinNasional->application_number.'_'.time().'_certificate.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-nasional', $filename, 'public');
-            
+
             $oldStatus = $iinNasional->status;
-            
+
             // Update certificate path and change status to 'terbit' if currently 'verifikasi-lapangan'
             $updateData = ['certificate_path' => $path];
             if ($oldStatus === 'verifikasi-lapangan') {
@@ -605,7 +600,7 @@ class IinNasionalController extends Controller
                 $updateData['admin_id'] = Auth::id();
                 $updateData['issued_at'] = now();
             }
-            
+
             $iinNasional->update($updateData);
 
             // Log activity
@@ -615,13 +610,13 @@ class IinNasionalController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $oldStatus,
                 'status_to' => ($oldStatus === 'verifikasi-lapangan') ? 'terbit' : $oldStatus,
-                'notes' => ($oldStatus === 'verifikasi-lapangan') 
+                'notes' => ($oldStatus === 'verifikasi-lapangan')
                     ? 'Sertifikat IIN diupload dan IIN diterbitkan'
-                    : 'Sertifikat IIN diupload'
+                    : 'Sertifikat IIN diupload',
             ]);
         }
 
-        $message = $iinNasional->status === 'terbit' 
+        $message = $iinNasional->status === 'terbit'
             ? 'Sertifikat berhasil diupload dan IIN telah diterbitkan'
             : 'Sertifikat berhasil diupload';
 
@@ -631,16 +626,16 @@ class IinNasionalController extends Controller
     public function edit(IinNasionalApplication $iinNasional)
     {
         $this->authorize('update', $iinNasional);
-        
+
         return Inertia::render('IinNasional/Edit', [
-            'application' => $iinNasional
+            'application' => $iinNasional,
         ]);
     }
 
     public function update(Request $request, IinNasionalApplication $iinNasional)
     {
         $this->authorize('update', $iinNasional);
-        
+
         $request->validate([
             'application_form' => 'nullable|file|max:10240',
             'requirements_archive' => 'nullable|file|mimes:zip,rar|max:51200', // 50MB max for ZIP/RAR
@@ -651,7 +646,7 @@ class IinNasionalController extends Controller
             $newStatus = $originalStatus;
             $hasFileUploaded = false;
             $updateData = [];
-            
+
             // Handle application form upload if provided
             if ($request->hasFile('application_form')) {
                 // Delete old file if exists
@@ -660,7 +655,7 @@ class IinNasionalController extends Controller
                 }
 
                 $file = $request->file('application_form');
-                $filename = $iinNasional->application_number . '_' . time() . '_form.' . $file->getClientOriginalExtension();
+                $filename = $iinNasional->application_number.'_'.time().'_form.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional', $filename, 'public');
                 $updateData['application_form_path'] = $path;
                 $hasFileUploaded = true;
@@ -674,7 +669,7 @@ class IinNasionalController extends Controller
                 }
 
                 $file = $request->file('requirements_archive');
-                $filename = $iinNasional->application_number . '_' . time() . '_requirements.' . $file->getClientOriginalExtension();
+                $filename = $iinNasional->application_number.'_'.time().'_requirements.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional', $filename, 'public');
                 $updateData['requirements_archive_path'] = $path;
                 $hasFileUploaded = true;
@@ -689,7 +684,7 @@ class IinNasionalController extends Controller
             }
 
             // Update application if there are changes
-            if (!empty($updateData)) {
+            if (! empty($updateData)) {
                 $iinNasional->update($updateData);
             }
 
@@ -702,7 +697,7 @@ class IinNasionalController extends Controller
                     'user_id' => Auth::id(),
                     'status_from' => $originalStatus,
                     'status_to' => $newStatus,
-                    'notes' => 'Dokumen baru diunggah, status dikembalikan ke pengajuan untuk ditinjau ulang'
+                    'notes' => 'Dokumen baru diunggah, status dikembalikan ke pengajuan untuk ditinjau ulang',
                 ]);
             } elseif ($hasFileUploaded) {
                 // Log file update without status change
@@ -712,7 +707,7 @@ class IinNasionalController extends Controller
                     'user_id' => Auth::id(),
                     'status_from' => $originalStatus,
                     'status_to' => $originalStatus,
-                    'notes' => 'Dokumen aplikasi diperbarui'
+                    'notes' => 'Dokumen aplikasi diperbarui',
                 ]);
             }
 
@@ -736,14 +731,14 @@ class IinNasionalController extends Controller
         ]);
 
         $oldStatus = $iinNasional->status;
-        
+
         $updateData = [
             'iin_number' => $request->iin_number,
             'status' => 'terbit',
             'admin_id' => Auth::id(),
             'issued_at' => now(),
         ];
-        
+
         // Handle certificate upload if provided
         if ($request->hasFile('certificate_file')) {
             // Delete old file if exists
@@ -752,12 +747,12 @@ class IinNasionalController extends Controller
             }
 
             $file = $request->file('certificate_file');
-            $filename = $iinNasional->application_number . '_' . time() . '_certificate.' . $file->getClientOriginalExtension();
+            $filename = $iinNasional->application_number.'_'.time().'_certificate.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-nasional', $filename, 'public');
-            
+
             $updateData['certificate_path'] = $path;
         }
-        
+
         $iinNasional->update($updateData);
 
         // Log activity
@@ -767,10 +762,10 @@ class IinNasionalController extends Controller
             'user_id' => Auth::id(),
             'status_from' => $oldStatus,
             'status_to' => 'terbit',
-            'notes' => $request->notes ?? 'IIN berhasil diterbitkan'
+            'notes' => $request->notes ?? 'IIN berhasil diterbitkan',
         ]);
 
-        $message = $request->hasFile('certificate_file') 
+        $message = $request->hasFile('certificate_file')
             ? 'IIN berhasil diterbitkan dan sertifikat telah diupload'
             : 'IIN berhasil diterbitkan';
 
@@ -798,7 +793,7 @@ class IinNasionalController extends Controller
                 $paymentProofPath = null;
                 if ($request->hasFile('payment_proof_path')) {
                     $file = $request->file('payment_proof_path');
-                    $filename = $iinNasional->application_number . '_' . time() . '_expense_proof.' . $file->getClientOriginalExtension();
+                    $filename = $iinNasional->application_number.'_'.time().'_expense_proof.'.$file->getClientOriginalExtension();
                     $paymentProofPath = $file->storeAs('iin-nasional/expense-reimbursement', $filename, 'public');
                 }
 
@@ -816,7 +811,7 @@ class IinNasionalController extends Controller
 
                 // Link expense reimbursement to IIN application
                 $iinNasional->update([
-                    'expense_reim_id' => $expenseReimbursement->id
+                    'expense_reim_id' => $expenseReimbursement->id,
                 ]);
 
                 // Log activity
@@ -826,13 +821,14 @@ class IinNasionalController extends Controller
                     'user_id' => Auth::id(),
                     'status_from' => $iinNasional->status,
                     'status_to' => $iinNasional->status,
-                    'notes' => 'Form bukti penggantian transport dan uang harian disubmit'
+                    'notes' => 'Form bukti penggantian transport dan uang harian disubmit',
                 ]);
 
                 return back()->with('success', 'Form bukti penggantian transport dan uang harian berhasil disubmit');
             });
         } catch (\Exception $e) {
-            Log::error('Error submitting expense reimbursement: ' . $e->getMessage());
+            Log::error('Error submitting expense reimbursement: '.$e->getMessage());
+
             return back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.']);
         }
     }
@@ -845,7 +841,7 @@ class IinNasionalController extends Controller
         $filePaths = [
             $iinNasional->application_form_path,
             $iinNasional->payment_proof_path,
-            $iinNasional->certificate_path
+            $iinNasional->certificate_path,
         ];
 
         foreach ($filePaths as $path) {

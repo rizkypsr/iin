@@ -20,12 +20,12 @@ class PengawasanIinNasionalAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/PengawasanIinNasional/Index', [
             'applications' => $applications,
-            'application_counts' => $applicationCounts
+            'application_counts' => $applicationCounts,
         ]);
     }
 
@@ -41,7 +41,7 @@ class PengawasanIinNasionalAdminController extends Controller
 
         return Inertia::render('admin/PengawasanIinNasional/Show', [
             'application' => $pengawasanIinNasional,
-            'statusLogs' => $statusLogs
+            'statusLogs' => $statusLogs,
         ]);
     }
 
@@ -87,7 +87,7 @@ class PengawasanIinNasionalAdminController extends Controller
             'status' => 'nullable|in:pembayaran',
         ]);
 
-        if (!$request->hasFile('payment_documents')) {
+        if (! $request->hasFile('payment_documents')) {
             return back()->withErrors(['payment_documents' => 'Silakan pilih file dokumen pembayaran']);
         }
 
@@ -96,9 +96,9 @@ class PengawasanIinNasionalAdminController extends Controller
             $uploadedFiles = [];
 
             foreach ($request->file('payment_documents') as $file) {
-                $filename = $pengawasanIinNasional->application_number . '_' . time() . '_payment_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = $pengawasanIinNasional->application_number.'_'.time().'_payment_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('pengawasan-iin-nasional/payment', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -112,7 +112,7 @@ class PengawasanIinNasionalAdminController extends Controller
 
             $updateData = [
                 'payment_documents' => $allDocuments,
-                'payment_documents_uploaded_at' => now()
+                'payment_documents_uploaded_at' => now(),
             ];
 
             // Change status if requested
@@ -124,9 +124,9 @@ class PengawasanIinNasionalAdminController extends Controller
             $pengawasanIinNasional->update($updateData);
 
             // Log activity
-            $logNotes = 'Admin mengupload dokumen pembayaran (' . count($uploadedFiles) . ' file)';
+            $logNotes = 'Admin mengupload dokumen pembayaran ('.count($uploadedFiles).' file)';
             if ($request->upload_and_change_status && $request->status) {
-                $logNotes .= ' dan mengubah status ke ' . $request->status;
+                $logNotes .= ' dan mengubah status ke '.$request->status;
             }
 
             PengawasanIinNasionalStatusLog::create([
@@ -137,8 +137,8 @@ class PengawasanIinNasionalAdminController extends Controller
                 'changed_by' => Auth::id(),
             ]);
 
-            return back()->with('success', count($uploadedFiles) . ' dokumen pembayaran berhasil diupload' . 
-                ($request->upload_and_change_status && $request->status ? ' dan status diubah ke ' . $request->status : ''));
+            return back()->with('success', count($uploadedFiles).' dokumen pembayaran berhasil diupload'.
+                ($request->upload_and_change_status && $request->status ? ' dan status diubah ke '.$request->status : ''));
         });
     }
 
@@ -148,7 +148,7 @@ class PengawasanIinNasionalAdminController extends Controller
             'field_verification_documents.*' => 'required|file|max:10240',
         ]);
 
-        if (!$request->hasFile('field_verification_documents')) {
+        if (! $request->hasFile('field_verification_documents')) {
             return back()->withErrors(['field_verification_documents' => 'Silakan pilih file dokumen verifikasi lapangan']);
         }
 
@@ -157,9 +157,9 @@ class PengawasanIinNasionalAdminController extends Controller
             $uploadedFiles = [];
 
             foreach ($request->file('field_verification_documents') as $file) {
-                $filename = $pengawasanIinNasional->application_number . '_' . time() . '_field_verification_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = $pengawasanIinNasional->application_number.'_'.time().'_field_verification_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('pengawasan-iin-nasional/field-verification', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -174,7 +174,7 @@ class PengawasanIinNasionalAdminController extends Controller
             $pengawasanIinNasional->update([
                 'field_verification_documents' => $allDocuments,
                 'status' => 'verifikasi-lapangan',
-                'field_verification_documents_uploaded_at' => now()
+                'field_verification_documents_uploaded_at' => now(),
             ]);
 
             // Log activity
@@ -182,11 +182,11 @@ class PengawasanIinNasionalAdminController extends Controller
                 'pengawasan_iin_nasional_id' => $pengawasanIinNasional->id,
                 'status_from' => $oldStatus,
                 'status_to' => 'verifikasi-lapangan',
-                'notes' => 'Admin mengupload dokumen verifikasi lapangan (' . count($uploadedFiles) . ' file) dan mengubah status ke verifikasi lapangan',
+                'notes' => 'Admin mengupload dokumen verifikasi lapangan ('.count($uploadedFiles).' file) dan mengubah status ke verifikasi lapangan',
                 'changed_by' => Auth::id(),
             ]);
 
-            return back()->with('success', count($uploadedFiles) . ' dokumen verifikasi lapangan berhasil diupload');
+            return back()->with('success', count($uploadedFiles).' dokumen verifikasi lapangan berhasil diupload');
         });
     }
 
@@ -197,7 +197,7 @@ class PengawasanIinNasionalAdminController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        if (!$request->hasFile('issuance_documents')) {
+        if (! $request->hasFile('issuance_documents')) {
             return back()->withErrors(['issuance_documents' => 'Silakan pilih file dokumen penerbitan']);
         }
 
@@ -205,9 +205,9 @@ class PengawasanIinNasionalAdminController extends Controller
             $uploadedFiles = [];
 
             foreach ($request->file('issuance_documents') as $file) {
-                $filename = $pengawasanIinNasional->application_number . '_' . time() . '_issuance_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = $pengawasanIinNasional->application_number.'_'.time().'_issuance_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('pengawasan-iin-nasional/issuance', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -221,7 +221,7 @@ class PengawasanIinNasionalAdminController extends Controller
                 'issuance_documents_uploaded_at' => now(),
                 'status' => 'terbit',
                 'issued_at' => now(),
-                'notes' => $request->notes
+                'notes' => $request->notes,
             ]);
 
             // Log status change
@@ -248,7 +248,7 @@ class PengawasanIinNasionalAdminController extends Controller
 
         dd($pengawasanIinNasional, $type, $path);
 
-        if (!$path || !Storage::disk('public')->exists($path)) {
+        if (! $path || ! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan');
         }
 
@@ -258,8 +258,8 @@ class PengawasanIinNasionalAdminController extends Controller
     public function downloadPaymentDocument(PengawasanIinNasional $pengawasanIinNasional, int $index)
     {
         $documents = $pengawasanIinNasional->payment_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -272,8 +272,8 @@ class PengawasanIinNasionalAdminController extends Controller
     public function downloadPaymentProofDocument(PengawasanIinNasional $pengawasanIinNasional, int $index)
     {
         $documents = $pengawasanIinNasional->payment_proof_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -286,8 +286,8 @@ class PengawasanIinNasionalAdminController extends Controller
     public function downloadPaymentProof(PengawasanIinNasional $pengawasanIinNasional, int $index)
     {
         $proofs = $pengawasanIinNasional->payment_proof_documents ?? [];
-        
-        if (!isset($proofs[$index]) || !Storage::disk('public')->exists($proofs[$index]['path'])) {
+
+        if (! isset($proofs[$index]) || ! Storage::disk('public')->exists($proofs[$index]['path'])) {
             abort(404, 'Bukti pembayaran tidak ditemukan');
         }
 
@@ -300,8 +300,8 @@ class PengawasanIinNasionalAdminController extends Controller
     public function downloadFieldVerificationDocument(PengawasanIinNasional $pengawasanIinNasional, int $index)
     {
         $documents = $pengawasanIinNasional->field_verification_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -314,8 +314,8 @@ class PengawasanIinNasionalAdminController extends Controller
     public function downloadIssuanceDocument(PengawasanIinNasional $pengawasanIinNasional, int $index)
     {
         $documents = $pengawasanIinNasional->issuance_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 

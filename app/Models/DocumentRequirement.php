@@ -19,6 +19,7 @@ final class DocumentRequirement extends Model
     ];
 
     public const TYPE_IIN_NASIONAL = 'iin_nasional';
+
     public const TYPE_IIN_SINGLE_BLOCKHOLDER = 'iin_single_blockholder';
 
     public static function getByType(string $type): ?self

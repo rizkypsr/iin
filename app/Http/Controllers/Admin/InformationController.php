@@ -19,7 +19,7 @@ final class InformationController extends Controller
     {
         $informations = Information::latest()->paginate(6);
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/information/index', [
@@ -30,7 +30,7 @@ final class InformationController extends Controller
 
     public function create(): Response
     {
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/information/create', [
@@ -64,7 +64,7 @@ final class InformationController extends Controller
 
     public function edit(Information $information): Response
     {
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/information/edit', [

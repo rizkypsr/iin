@@ -14,7 +14,7 @@ return new class extends Migration
         // add expense_reimbursements_id to iin_nasinal_applications and iin_single_blockholder_applications
         Schema::table('iin_nasional_applications', function (Blueprint $table) {
             $table->foreignId('expense_reim_id')->nullable()->constrained('expense_reimbursements')->onDelete('set null');
-        }); 
+        });
 
         Schema::table('iin_single_blockholder_applications', function (Blueprint $table) {
             $table->foreignId('expense_reim_id')->nullable()->constrained('expense_reimbursements')->onDelete('set null');

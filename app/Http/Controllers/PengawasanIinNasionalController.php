@@ -22,7 +22,7 @@ class PengawasanIinNasionalController extends Controller
         $applications = PengawasanIinNasional::with(['user', 'admin', 'iinNasionalProfile'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(5);
 
         return Inertia::render('PengawasanIinNasional/Index', [
             'applications' => $applications,
@@ -175,7 +175,6 @@ class PengawasanIinNasionalController extends Controller
             'field_verification_document' => $pengawasanIinNasional->field_verification_documents[$index]['path'],
             default => null
         };
-
 
         if (! $path) {
             abort(404, 'File path tidak ditemukan untuk tipe: '.$type);

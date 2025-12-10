@@ -30,7 +30,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
                 ->where('status', 'terbit')
                 ->get()
                 ->map(function ($item) {
-                    return (object)[
+                    return (object) [
                         'company_name' => $item->user->company_name,
                         'created_at' => $item->created_at,
                         'service_type' => 'IIN Nasional',
@@ -38,7 +38,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
                         'nominal_pembayaran' => 0,
                         'issued_at' => $item->issued_at,
                         'service_days' => $item->issued_at && $item->created_at
-                            ? (int)max(0, $item->created_at->diffInDays($item->issued_at))
+                            ? (int) max(0, $item->created_at->diffInDays($item->issued_at))
                             : 0,
                         'iin_number' => $item->iin_number,
                         'pic_name' => $item->user->name,
@@ -54,7 +54,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
                 ->where('status', 'terbit')
                 ->get()
                 ->map(function ($item) {
-                    return (object)[
+                    return (object) [
                         'company_name' => $item->user->company_name,
                         'created_at' => $item->created_at,
                         'service_type' => 'Single IIN Blockholder',
@@ -62,7 +62,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
                         'nominal_pembayaran' => 0,
                         'issued_at' => $item->issued_at,
                         'service_days' => $item->issued_at && $item->created_at
-                            ? (int)max(0, $item->created_at->diffInDays($item->issued_at))
+                            ? (int) max(0, $item->created_at->diffInDays($item->issued_at))
                             : 0,
                         'iin_number' => $item->iin_number,
                         'pic_name' => $item->user->name,
@@ -78,7 +78,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
                 ->where('status', 'terbit')
                 ->get()
                 ->map(function ($item) {
-                    return (object)[
+                    return (object) [
                         'company_name' => $item->iinNasionalProfile->institution_name,
                         'created_at' => $item->created_at,
                         'service_type' => 'Pengawasan IIN Nasional',
@@ -86,7 +86,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
                         'nominal_pembayaran' => 0,
                         'issued_at' => $item->issued_at,
                         'service_days' => $item->issued_at && $item->created_at
-                            ? (int)max(0, $item->created_at->diffInDays($item->issued_at))
+                            ? (int) max(0, $item->created_at->diffInDays($item->issued_at))
                             : 0,
                         'iin_number' => $item->iinNasionalProfile->iin_national_assignment,
                         'pic_name' => $item->iinNasionalProfile->contact_person_name,
@@ -102,7 +102,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
                 ->where('status', 'terbit')
                 ->get()
                 ->map(function ($item) {
-                    return (object)[
+                    return (object) [
                         'company_name' => $item->singleIinProfile->institution_name,
                         'created_at' => $item->created_at,
                         'service_type' => 'Pengawasan Single IIN Blockholder',
@@ -110,7 +110,7 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
                         'nominal_pembayaran' => 0,
                         'issued_at' => $item->issued_at,
                         'service_days' => $item->issued_at && $item->created_at
-                            ? (int)max(0, $item->created_at->diffInDays($item->issued_at))
+                            ? (int) max(0, $item->created_at->diffInDays($item->issued_at))
                             : 0,
                         'iin_number' => $item->singleIinProfile->iin_assignment,
                         'pic_name' => $item->singleIinProfile->contact_person,

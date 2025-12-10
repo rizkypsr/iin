@@ -28,7 +28,7 @@ return new class extends Migration
             $table->dropColumn([
                 'company_name',
                 'company_phone',
-                'company_email'
+                'company_email',
             ]);
         });
     }

@@ -41,7 +41,7 @@ class PengawasanSingleIinPolicy
     public function update(User $user, PengawasanSingleIin $pengawasanSingleIin): bool
     {
         // Only owner can update, and only in certain statuses
-        return $user->id === $pengawasanSingleIin->user_id && 
+        return $user->id === $pengawasanSingleIin->user_id &&
                in_array($pengawasanSingleIin->status, ['pengajuan']);
     }
 
@@ -67,7 +67,7 @@ class PengawasanSingleIinPolicy
      */
     public function uploadPaymentProof(User $user, PengawasanSingleIin $pengawasanSingleIin): bool
     {
-        return $user->id === $pengawasanSingleIin->user_id && 
+        return $user->id === $pengawasanSingleIin->user_id &&
                in_array($pengawasanSingleIin->status, ['pembayaran', 'pembayaran-tahap-2']);
     }
 
@@ -76,7 +76,7 @@ class PengawasanSingleIinPolicy
      */
     public function uploadPaymentDocuments(User $user, PengawasanSingleIin $pengawasanSingleIin): bool
     {
-        return $user->hasRole('admin') && 
+        return $user->hasRole('admin') &&
                in_array($pengawasanSingleIin->status, ['pengajuan', 'pembayaran']);
     }
 
@@ -85,7 +85,7 @@ class PengawasanSingleIinPolicy
      */
     public function uploadFieldVerificationDocuments(User $user, PengawasanSingleIin $pengawasanSingleIin): bool
     {
-        return $user->hasRole('admin') && 
+        return $user->hasRole('admin') &&
                $pengawasanSingleIin->status === 'pembayaran';
     }
 
@@ -94,7 +94,7 @@ class PengawasanSingleIinPolicy
      */
     public function uploadIssuanceDocuments(User $user, PengawasanSingleIin $pengawasanSingleIin): bool
     {
-        return $user->hasRole('admin') && 
+        return $user->hasRole('admin') &&
                $pengawasanSingleIin->status === 'menunggu-terbit';
     }
 

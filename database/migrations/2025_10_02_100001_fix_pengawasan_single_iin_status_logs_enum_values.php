@@ -15,7 +15,7 @@ return new class extends Migration
             // Drop existing enum columns
             $table->dropColumn(['status_from', 'status_to']);
         });
-        
+
         Schema::table('pengawasan_single_iin_status_logs', function (Blueprint $table) {
             // Add new enum columns with correct values matching pengawasan_single_iin table
             $table->enum('status_from', ['pengajuan', 'pembayaran', 'verifikasi-lapangan', 'menunggu-terbit', 'terbit'])->nullable()->after('pengawasan_single_iin_id');
@@ -32,7 +32,7 @@ return new class extends Migration
             // Drop updated enum columns
             $table->dropColumn(['status_from', 'status_to']);
         });
-        
+
         Schema::table('pengawasan_single_iin_status_logs', function (Blueprint $table) {
             // Restore original enum columns
             $table->enum('status_from', ['pengajuan', 'dalam_proses', 'selesai', 'ditolak'])->nullable()->after('pengawasan_single_iin_id');

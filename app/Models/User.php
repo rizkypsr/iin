@@ -12,7 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -52,15 +52,14 @@ class User extends Authenticatable
             'password_changed_at' => 'datetime',
         ];
     }
-    
+
     /**
      * Check if the user has a specific role
      * This method extends Spatie's HasRoles trait functionality
      * to also check the legacy 'role' column for backward compatibility
      *
-     * @param mixed $roles
-     * @param string|null $guard
-     * @return bool
+     * @param  mixed  $roles
+     * @param  string|null  $guard
      */
     public function hasRole($roles, $guard = null): bool
     {
@@ -71,20 +70,18 @@ class User extends Authenticatable
                 return true;
             }
         }
-        
+
         // Fallback to direct role property check for backward compatibility
         if (isset($this->role) && $this->role === $roles) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Helper method to check if the HasRoles trait is properly loaded
      * and the roles relationship is accessible
-     * 
-     * @return bool
      */
     protected function hasSpatieTrait(): bool
     {

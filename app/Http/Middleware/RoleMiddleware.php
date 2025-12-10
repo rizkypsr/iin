@@ -16,11 +16,11 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
 
-        if (!Auth::user()->hasRole($role)) {
+        if (! Auth::user()->hasRole($role)) {
             abort(403, 'Unauthorized. You do not have the required role.');
         }
 

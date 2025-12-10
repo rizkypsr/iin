@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 use App\Http\Controllers\IinNasionalController;
 use App\Http\Controllers\IinSingleBlockholderController;
 use App\Http\Controllers\PengawasanIinNasionalController;
 use App\Http\Controllers\PengawasanSingleIinController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -27,15 +27,17 @@ Route::get('/tarif', function () {
 
 Route::get('/layanan-publik', function () {
     $informations = App\Models\Information::where('is_active', true)->latest()->paginate(6);
+
     return Inertia::render('layanan-publik', [
         'informations' => $informations,
     ]);
 })->name('layanan-publik');
 
 Route::get('/layanan-publik/{information}', function (App\Models\Information $information) {
-    if (!$information->is_active) {
+    if (! $information->is_active) {
         abort(404);
     }
+
     return Inertia::render('layanan-publik-detail', [
         'information' => $information,
     ]);
@@ -71,6 +73,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->get()
                 ->map(function ($item) {
                     $item->type = 'nasional';
+
                     return $item;
                 })
                 ->merge(
@@ -80,6 +83,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                         ->get()
                         ->map(function ($item) {
                             $item->type = 'single_blockholder';
+
                             return $item;
                         })
                 )
@@ -97,7 +101,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 ->map(function ($log) {
                     return [
                         'id' => $log->id,
-                        'message' => $log->status_message ?? 'Status aplikasi diperbarui ke: ' . $log->status,
+                        'message' => $log->status_message ?? 'Status aplikasi diperbarui ke: '.$log->status,
                         'type' => $log->status === 'terbit' ? 'success' : ($log->status === 'ditolak' ? 'error' : 'info'),
                         'created_at' => $log->created_at->toISOString(),
                     ];
@@ -110,21 +114,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ];
 
             // Get application counts for sidebar badges
-            $applicationCountService = new App\Services\ApplicationCountService();
+            $applicationCountService = new App\Services\ApplicationCountService;
             $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
             return Inertia::render('dashboard', [
                 'stats' => $stats,
                 'recent_applications' => $recentApplications,
                 'recent_activities' => $recentActivities,
-                'application_counts' => $applicationCounts
+                'application_counts' => $applicationCounts,
             ]);
         }
     })->name('dashboard');
 
     // Note: Admin routes have been moved to routes/admin.php
     // Use admin.dashboard, admin.iin-nasional.show and admin.iin-single-blockholder.show instead
-
 
     // User routes (accessible by all authenticated users)
     Route::get('dashboard/notifikasi', function () {
@@ -200,7 +203,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             $filename = 'Surat Pernyataan Penggunaan Sistem Pembayaran Nasional Berbasis QRIS.doc';
             $filePath = public_path("forms/{$filename}");
 
-            if (!file_exists($filePath)) {
+            if (! file_exists($filePath)) {
                 abort(404, 'Form QRIS tidak ditemukan');
             }
 
@@ -216,7 +219,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Check if all files exist
         foreach ($formTemplates as $template) {
-            if (!Storage::disk('public')->exists($template->file_path)) {
+            if (! Storage::disk('public')->exists($template->file_path)) {
                 abort(404, "Form tidak ditemukan: {$template->name}");
             }
         }
@@ -224,6 +227,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // If only one file, download directly
         if ($formTemplates->count() === 1) {
             $template = $formTemplates->first();
+
             return Storage::disk('public')->download($template->file_path, $template->original_name);
         }
 
@@ -237,11 +241,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $zipPath = storage_path("app/temp/{$zipFileName}");
 
         // Ensure temp directory exists
-        if (!file_exists(storage_path('app/temp'))) {
+        if (! file_exists(storage_path('app/temp'))) {
             mkdir(storage_path('app/temp'), 0755, true);
         }
 
-        $zip = new \ZipArchive();
+        $zip = new \ZipArchive;
         if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
             foreach ($formTemplates as $template) {
                 $filePath = Storage::disk('public')->path($template->file_path);
@@ -254,6 +258,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('download-form');
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
-require __DIR__ . '/admin.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';

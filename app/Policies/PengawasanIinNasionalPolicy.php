@@ -41,7 +41,7 @@ class PengawasanIinNasionalPolicy
     public function update(User $user, PengawasanIinNasional $pengawasanIinNasional): bool
     {
         // Only owner can update, and only in certain statuses
-        return $user->id === $pengawasanIinNasional->user_id && 
+        return $user->id === $pengawasanIinNasional->user_id &&
                in_array($pengawasanIinNasional->status, ['pengajuan']);
     }
 
@@ -67,7 +67,7 @@ class PengawasanIinNasionalPolicy
      */
     public function uploadPaymentProof(User $user, PengawasanIinNasional $pengawasanIinNasional): bool
     {
-        return $user->id === $pengawasanIinNasional->user_id && 
+        return $user->id === $pengawasanIinNasional->user_id &&
                $pengawasanIinNasional->status === 'pembayaran';
     }
 
@@ -76,7 +76,7 @@ class PengawasanIinNasionalPolicy
      */
     public function uploadPaymentDocuments(User $user, PengawasanIinNasional $pengawasanIinNasional): bool
     {
-        return $user->hasRole('admin') && 
+        return $user->hasRole('admin') &&
                in_array($pengawasanIinNasional->status, ['pengajuan', 'pembayaran']);
     }
 
@@ -85,7 +85,7 @@ class PengawasanIinNasionalPolicy
      */
     public function uploadFieldVerificationDocuments(User $user, PengawasanIinNasional $pengawasanIinNasional): bool
     {
-        return $user->hasRole('admin') && 
+        return $user->hasRole('admin') &&
                $pengawasanIinNasional->status === 'pembayaran';
     }
 
@@ -94,7 +94,7 @@ class PengawasanIinNasionalPolicy
      */
     public function uploadIssuanceDocuments(User $user, PengawasanIinNasional $pengawasanIinNasional): bool
     {
-        return $user->hasRole('admin') && 
+        return $user->hasRole('admin') &&
                $pengawasanIinNasional->status === 'menunggu-terbit';
     }
 

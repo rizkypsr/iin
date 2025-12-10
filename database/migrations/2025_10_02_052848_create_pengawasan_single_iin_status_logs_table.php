@@ -24,7 +24,7 @@ return new class extends Migration
                 ->constrained('users', 'id', 'single_iin_changed_by_fk')
                 ->onDelete('set null');
             $table->timestamps();
-            
+
             $table->index(['pengawasan_single_iin_id', 'created_at'], 'pengawasan_single_iin_logs_idx');
         });
     }

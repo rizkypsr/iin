@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PengawasanSingleIin;
 use App\Models\PengawasanSingleIinStatusLog;
-use App\Models\IinStatusLog;
 use App\Services\ApplicationCountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,13 +20,12 @@ class PengawasanSingleIinAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
-
 
         return Inertia::render('admin/PengawasanSingleIin/Index', [
             'applications' => $applications,
-            'application_counts' => $applicationCounts
+            'application_counts' => $applicationCounts,
         ]);
     }
 
@@ -43,7 +41,7 @@ class PengawasanSingleIinAdminController extends Controller
 
         return Inertia::render('admin/PengawasanSingleIin/Show', [
             'application' => $pengawasanSingleIin,
-            'statusLogs' => $statusLogs
+            'statusLogs' => $statusLogs,
         ]);
     }
 
@@ -82,7 +80,7 @@ class PengawasanSingleIinAdminController extends Controller
             'status' => 'nullable|in:pembayaran,pembayaran-tahap-2',
         ]);
 
-        if (!$request->hasFile('payment_documents')) {
+        if (! $request->hasFile('payment_documents')) {
             return back()->withErrors(['payment_documents' => 'Silakan pilih file dokumen pembayaran']);
         }
 
@@ -93,9 +91,9 @@ class PengawasanSingleIinAdminController extends Controller
 
             foreach ($request->file('payment_documents') as $file) {
                 $stagePrefix = $isStage2 ? 'payment_stage2_' : 'payment_';
-                $filename = $pengawasanSingleIin->application_number . '_' . time() . '_' . $stagePrefix . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = $pengawasanSingleIin->application_number.'_'.time().'_'.$stagePrefix.uniqid().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('pengawasan-single-iin/payment', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -111,7 +109,7 @@ class PengawasanSingleIinAdminController extends Controller
 
                 $updateData = [
                     'payment_documents_stage_2' => $allDocuments,
-                    'payment_documents_uploaded_at_stage_2' => now()
+                    'payment_documents_uploaded_at_stage_2' => now(),
                 ];
             } else {
                 // Get existing stage 1 documents and merge with new ones
@@ -120,7 +118,7 @@ class PengawasanSingleIinAdminController extends Controller
 
                 $updateData = [
                     'payment_documents' => $allDocuments,
-                    'payment_documents_uploaded_at' => now()
+                    'payment_documents_uploaded_at' => now(),
                 ];
             }
 
@@ -131,22 +129,22 @@ class PengawasanSingleIinAdminController extends Controller
 
             // Log activity
             $stageText = $isStage2 ? ' tahap 2' : '';
-            $logNotes = 'Admin mengupload dokumen pembayaran' . $stageText . ' (' . count($uploadedFiles) . ' file)';
+            $logNotes = 'Admin mengupload dokumen pembayaran'.$stageText.' ('.count($uploadedFiles).' file)';
             if ($request->status) {
-                $logNotes .= ' dan mengubah status ke ' . $request->status;
+                $logNotes .= ' dan mengubah status ke '.$request->status;
             }
 
             // Log activity using new status log system
             $this->logStatusChange(
-                $pengawasanSingleIin, 
-                $oldStatus, 
-                $request->status ? $request->status : $oldStatus, 
+                $pengawasanSingleIin,
+                $oldStatus,
+                $request->status ? $request->status : $oldStatus,
                 $logNotes
             );
 
-            $successMessage = count($uploadedFiles) . ' dokumen pembayaran' . $stageText . ' berhasil diupload';
+            $successMessage = count($uploadedFiles).' dokumen pembayaran'.$stageText.' berhasil diupload';
             if ($request->status) {
-                $successMessage .= ' dan status diubah ke ' . $request->status;
+                $successMessage .= ' dan status diubah ke '.$request->status;
             }
 
             return back()->with('success', $successMessage);
@@ -161,7 +159,7 @@ class PengawasanSingleIinAdminController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        if (!$request->hasFile('field_verification_documents')) {
+        if (! $request->hasFile('field_verification_documents')) {
             return back()->withErrors(['field_verification_documents' => 'Silakan pilih file dokumen verifikasi lapangan']);
         }
 
@@ -170,9 +168,9 @@ class PengawasanSingleIinAdminController extends Controller
             $uploadedFiles = [];
 
             foreach ($request->file('field_verification_documents') as $file) {
-                $filename = $pengawasanSingleIin->application_number . '_' . time() . '_field_verification_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = $pengawasanSingleIin->application_number.'_'.time().'_field_verification_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('pengawasan-single-iin/field-verification', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -186,7 +184,7 @@ class PengawasanSingleIinAdminController extends Controller
 
             $updateData = [
                 'field_verification_documents' => $allDocuments,
-                'field_verification_documents_uploaded_at' => now()
+                'field_verification_documents_uploaded_at' => now(),
             ];
 
             // Change status if requested
@@ -197,24 +195,24 @@ class PengawasanSingleIinAdminController extends Controller
             $pengawasanSingleIin->update($updateData);
 
             // Log activity
-            $logNotes = 'Admin mengupload dokumen verifikasi lapangan (' . count($uploadedFiles) . ' file)';
+            $logNotes = 'Admin mengupload dokumen verifikasi lapangan ('.count($uploadedFiles).' file)';
             if ($request->upload_and_change_status && $request->status) {
-                $logNotes .= ' dan mengubah status ke ' . $request->status;
+                $logNotes .= ' dan mengubah status ke '.$request->status;
             }
             if ($request->notes) {
-                $logNotes .= '. Catatan: ' . $request->notes;
+                $logNotes .= '. Catatan: '.$request->notes;
             }
 
             // Log activity using new status log system
             $this->logStatusChange(
-                $pengawasanSingleIin, 
-                $oldStatus, 
-                $request->upload_and_change_status && $request->status ? $request->status : $oldStatus, 
+                $pengawasanSingleIin,
+                $oldStatus,
+                $request->upload_and_change_status && $request->status ? $request->status : $oldStatus,
                 $logNotes
             );
 
-            return back()->with('success', count($uploadedFiles) . ' dokumen verifikasi lapangan berhasil diupload' . 
-                ($request->upload_and_change_status && $request->status ? ' dan status diubah ke ' . $request->status : ''));
+            return back()->with('success', count($uploadedFiles).' dokumen verifikasi lapangan berhasil diupload'.
+                ($request->upload_and_change_status && $request->status ? ' dan status diubah ke '.$request->status : ''));
         });
     }
 
@@ -232,9 +230,9 @@ class PengawasanSingleIinAdminController extends Controller
             // Handle file uploads if provided
             if ($request->hasFile('field_verification_documents')) {
                 foreach ($request->file('field_verification_documents') as $file) {
-                    $filename = $pengawasanSingleIin->application_number . '_' . time() . '_field_verification_complete_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $filename = $pengawasanSingleIin->application_number.'_'.time().'_field_verification_complete_'.uniqid().'.'.$file->getClientOriginalExtension();
                     $path = $file->storeAs('pengawasan-single-iin/field-verification', $filename, 'public');
-                    
+
                     $uploadedFiles[] = [
                         'path' => $path,
                         'original_name' => $file->getClientOriginalName(),
@@ -261,23 +259,23 @@ class PengawasanSingleIinAdminController extends Controller
             // Log activity
             $logNotes = 'Admin menyelesaikan verifikasi lapangan';
             if (count($uploadedFiles) > 0) {
-                $logNotes .= ' dan mengupload dokumen tambahan (' . count($uploadedFiles) . ' file)';
+                $logNotes .= ' dan mengupload dokumen tambahan ('.count($uploadedFiles).' file)';
             }
             if ($request->notes) {
-                $logNotes .= '. Catatan: ' . $request->notes;
+                $logNotes .= '. Catatan: '.$request->notes;
             }
 
             // Log activity using new status log system
             $this->logStatusChange(
-                $pengawasanSingleIin, 
-                $oldStatus, 
-                'menunggu-terbit', 
+                $pengawasanSingleIin,
+                $oldStatus,
+                'menunggu-terbit',
                 $logNotes
             );
 
             $message = 'Verifikasi lapangan berhasil diselesaikan';
             if (count($uploadedFiles) > 0) {
-                $message .= ' dengan ' . count($uploadedFiles) . ' dokumen tambahan';
+                $message .= ' dengan '.count($uploadedFiles).' dokumen tambahan';
             }
 
             return back()->with('success', $message);
@@ -291,7 +289,7 @@ class PengawasanSingleIinAdminController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        if (!$request->hasFile('payment_documents')) {
+        if (! $request->hasFile('payment_documents')) {
             return back()->withErrors(['payment_documents' => 'Silakan pilih file dokumen pembayaran tahap 2']);
         }
 
@@ -300,9 +298,9 @@ class PengawasanSingleIinAdminController extends Controller
             $uploadedFiles = [];
 
             foreach ($request->file('payment_documents') as $file) {
-                $filename = $pengawasanSingleIin->application_number . '_' . time() . '_payment_stage2_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = $pengawasanSingleIin->application_number.'_'.time().'_payment_stage2_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('pengawasan-single-iin/payment-stage2', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -323,20 +321,20 @@ class PengawasanSingleIinAdminController extends Controller
             ]);
 
             // Log activity
-            $logNotes = 'Admin mengupload dokumen pembayaran tahap 2 (' . count($uploadedFiles) . ' file) dan mengubah status ke pembayaran tahap 2';
+            $logNotes = 'Admin mengupload dokumen pembayaran tahap 2 ('.count($uploadedFiles).' file) dan mengubah status ke pembayaran tahap 2';
             if ($request->notes) {
-                $logNotes .= '. Catatan: ' . $request->notes;
+                $logNotes .= '. Catatan: '.$request->notes;
             }
 
             // Log activity using new status log system
             $this->logStatusChange(
-                $pengawasanSingleIin, 
-                $oldStatus, 
-                'pembayaran-tahap-2', 
+                $pengawasanSingleIin,
+                $oldStatus,
+                'pembayaran-tahap-2',
                 $logNotes
             );
 
-            return back()->with('success', count($uploadedFiles) . ' dokumen pembayaran tahap 2 berhasil diupload dan status diubah ke pembayaran tahap 2');
+            return back()->with('success', count($uploadedFiles).' dokumen pembayaran tahap 2 berhasil diupload dan status diubah ke pembayaran tahap 2');
         });
     }
 
@@ -347,7 +345,7 @@ class PengawasanSingleIinAdminController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        if (!$request->hasFile('issuance_documents')) {
+        if (! $request->hasFile('issuance_documents')) {
             return back()->withErrors(['issuance_documents' => 'Silakan pilih file dokumen penerbitan']);
         }
 
@@ -355,9 +353,9 @@ class PengawasanSingleIinAdminController extends Controller
             $uploadedFiles = [];
 
             foreach ($request->file('issuance_documents') as $file) {
-                $filename = $pengawasanSingleIin->application_number . '_' . time() . '_issuance_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = $pengawasanSingleIin->application_number.'_'.time().'_issuance_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('pengawasan-single-iin/issuance', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -377,9 +375,9 @@ class PengawasanSingleIinAdminController extends Controller
 
             // Log status change using new status log system
             $this->logStatusChange(
-                $pengawasanSingleIin, 
-                'pembayaran-tahap-2', 
-                'terbit', 
+                $pengawasanSingleIin,
+                'pembayaran-tahap-2',
+                'terbit',
                 $request->notes ?: 'Dokumen penerbitan berhasil diupload'
             );
 
@@ -395,7 +393,7 @@ class PengawasanSingleIinAdminController extends Controller
             default => null
         };
 
-        if (!$path || !Storage::disk('public')->exists($path)) {
+        if (! $path || ! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan');
         }
 
@@ -405,8 +403,8 @@ class PengawasanSingleIinAdminController extends Controller
     public function downloadPaymentDocument(PengawasanSingleIin $pengawasanSingleIin, int $index)
     {
         $documents = $pengawasanSingleIin->payment_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -419,8 +417,8 @@ class PengawasanSingleIinAdminController extends Controller
     public function downloadPaymentDocumentStage2(PengawasanSingleIin $pengawasanSingleIin, int $index)
     {
         $documents = $pengawasanSingleIin->payment_documents_stage_2 ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -433,8 +431,8 @@ class PengawasanSingleIinAdminController extends Controller
     public function downloadPaymentProofDocument(PengawasanSingleIin $pengawasanSingleIin, int $index)
     {
         $documents = $pengawasanSingleIin->payment_proof_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -447,8 +445,8 @@ class PengawasanSingleIinAdminController extends Controller
     public function downloadPaymentProof(PengawasanSingleIin $pengawasanSingleIin, int $index)
     {
         $documents = $pengawasanSingleIin->payment_proof_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -461,8 +459,8 @@ class PengawasanSingleIinAdminController extends Controller
     public function downloadPaymentProofDocumentStage2(PengawasanSingleIin $pengawasanSingleIin, int $index)
     {
         $documents = $pengawasanSingleIin->payment_proof_documents_stage_2 ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -475,8 +473,8 @@ class PengawasanSingleIinAdminController extends Controller
     public function downloadPaymentProofStage2(PengawasanSingleIin $pengawasanSingleIin, int $index)
     {
         $documents = $pengawasanSingleIin->payment_proof_documents_stage_2 ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -489,8 +487,8 @@ class PengawasanSingleIinAdminController extends Controller
     public function downloadFieldVerificationDocument(PengawasanSingleIin $pengawasanSingleIin, int $index)
     {
         $documents = $pengawasanSingleIin->field_verification_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -503,8 +501,8 @@ class PengawasanSingleIinAdminController extends Controller
     public function downloadIssuanceDocument(PengawasanSingleIin $pengawasanSingleIin, int $index)
     {
         $documents = $pengawasanSingleIin->issuance_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 

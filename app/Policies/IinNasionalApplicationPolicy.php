@@ -41,7 +41,7 @@ class IinNasionalApplicationPolicy
     public function update(User $user, IinNasionalApplication $iinNasionalApplication): bool
     {
         // Only owner can update, and only in certain statuses
-        return $user->id === $iinNasionalApplication->user_id && 
+        return $user->id === $iinNasionalApplication->user_id &&
                in_array($iinNasionalApplication->status, ['pengajuan', 'perbaikan']);
     }
 
@@ -67,7 +67,7 @@ class IinNasionalApplicationPolicy
      */
     public function uploadPaymentProof(User $user, IinNasionalApplication $iinNasionalApplication): bool
     {
-        return $user->id === $iinNasionalApplication->user_id && 
+        return $user->id === $iinNasionalApplication->user_id &&
                $iinNasionalApplication->status === 'pembayaran';
     }
 
@@ -76,7 +76,7 @@ class IinNasionalApplicationPolicy
      */
     public function uploadPaymentDocuments(User $user, IinNasionalApplication $iinNasionalApplication): bool
     {
-        return $user->hasRole('admin') && 
+        return $user->hasRole('admin') &&
                in_array($iinNasionalApplication->status, ['pengajuan', 'pembayaran']);
     }
 
@@ -85,7 +85,7 @@ class IinNasionalApplicationPolicy
      */
     public function uploadFieldVerificationDocuments(User $user, IinNasionalApplication $iinNasionalApplication): bool
     {
-        return $user->hasRole('admin') && 
+        return $user->hasRole('admin') &&
                $iinNasionalApplication->status === 'pembayaran';
     }
 
@@ -94,7 +94,7 @@ class IinNasionalApplicationPolicy
      */
     public function uploadCertificate(User $user, IinNasionalApplication $iinNasionalApplication): bool
     {
-        return $user->hasRole('admin') && 
+        return $user->hasRole('admin') &&
                in_array($iinNasionalApplication->status, ['menunggu-terbit', 'terbit']);
     }
 

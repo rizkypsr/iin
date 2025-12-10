@@ -38,11 +38,28 @@ interface IinSingleBlockholderApplication {
     };
 }
 
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface PaginationMeta {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    links: PaginationLink[];
+    path: string;
+    per_page: number;
+    to: number | null;
+    total: number;
+}
+
 interface Props extends PageProps {
     applications: {
         data: IinSingleBlockholderApplication[];
-        links: any[];
-        meta: any;
+        links?: PaginationLink[];
+        meta?: PaginationMeta;
     };
     flash?: {
         success?: string;
@@ -628,23 +645,29 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                         )}
 
                         {/* Pagination */}
-                        {applications.data.length > 0 && applications.meta?.links && (
-                            <div className="flex gap-2 justify-end items-center mt-6">
-                                {applications.meta.links.map((link: any, index: number) => (
+                        {applications.data.length > 0 && (applications.links || applications.meta?.links) && (
+                            <div className="flex flex-wrap gap-2 justify-center items-center mt-6">
+                                {(applications.meta?.links || applications.links)?.map((link: any, index: number) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`rounded px-3 py-1 ${link.active
-                                            ? 'bg-blue-100 text-blue-700'
+                                        className={`rounded px-3 py-2 text-sm transition-colors ${link.active
+                                            ? 'bg-blue-400 text-white font-medium'
                                             : link.url
-                                                ? 'text-gray-600 hover:bg-gray-100'
-                                                : 'cursor-not-allowed text-gray-300'
+                                                ? 'text-gray-600 hover:bg-gray-100 border border-gray-200'
+                                                : 'cursor-not-allowed text-gray-300 border border-gray-100'
                                             }`}
-                                        disabled={!link.url}
+                                        preserveScroll
+                                        preserveState
                                     >
-                                        {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
+                                        <span dangerouslySetInnerHTML={{ __html: link.label }} />
                                     </Link>
                                 ))}
+                            </div>
+                        )}
+                        {applications.meta && (
+                            <div className="mt-4 text-center text-sm text-gray-500">
+                                Menampilkan {applications.meta.from || 0} - {applications.meta.to || 0} dari {applications.meta.total || 0} pengajuan
                             </div>
                         )}
                     </CardContent>

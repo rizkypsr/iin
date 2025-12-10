@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Models\IinNasionalApplication;
 use App\Models\IinSingleBlockholderApplication;
-use Illuminate\Support\Facades\Log;
 
 final class ApplicationCountService
 {

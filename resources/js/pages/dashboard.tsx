@@ -2,8 +2,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { PageProps } from '@/types';
+import { getStatusBadgeClass, getStatusLabel } from '@/utils/statusUtils';
 import { Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
+import { ChevronRight, FileText } from 'lucide-react';
 
 interface Application {
     id: number;
@@ -11,6 +13,7 @@ interface Application {
     application_number: string;
     created_at: string;
     status_label: string;
+    status: string;
 }
 
 interface Activity {
@@ -36,19 +39,6 @@ interface DashboardProps extends PageProps {
     };
 }
 
-const getStatusColor = (status: string) => {
-    switch (status) {
-        case 'Approved':
-            return 'bg-green-100 text-green-800';
-        case 'In Review':
-            return 'bg-yellow-100 text-yellow-800';
-        case 'Pending':
-            return 'bg-blue-100 text-blue-800';
-        default:
-            return 'bg-gray-100 text-gray-800';
-    }
-};
-
 export default function Dashboard({ auth, stats, recent_applications, recent_activities, application_counts }: DashboardProps) {
     const user = auth.user;
 
@@ -57,6 +47,16 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
         { label: 'Approved', value: stats.approved_applications.toString(), change: 'Telah disetujui' },
         { label: 'Pending', value: stats.pending_applications.toString(), change: 'Menunggu review' },
     ];
+
+    const getApplicationUrl = (app: Application) => {
+        if (app.type === 'nasional') {
+            return route('iin-nasional.show', app.id);
+        }
+        return route('iin-single-blockholder.show', app.id);
+    };
+
+    // Only show first 5 applications
+    const displayedApplications = recent_applications.slice(0, 5);
 
     return (
         <DashboardLayout title="Dashboard" user={user} applicationCounts={application_counts}>
@@ -77,7 +77,7 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
                             transition={{ duration: 0.5, delay: 0.1 * index }}
                         >
                             <Card
-                                className={`${index === 0 ? 'border-0 bg-gradient-to-r from-blue-600 to-blue-800 text-white' : 'border-blue-200/50 bg-white/95 backdrop-blur-sm'} rounded-2xl shadow-lg shadow-blue-200/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-300/40`}
+                                className={`${index === 0 ? 'border-0 bg-gradient-primary text-white' : 'bg-white/95'} rounded-2xl shadow-lg`}
                             >
                                 <CardContent className="p-6">
                                     <div className={`mb-1 text-2xl font-bold ${index === 0 ? 'text-white' : 'text-gray-900'}`}>{stat.value}</div>
@@ -91,43 +91,67 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
 
                 {/* Recent Applications */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
-                    <Card className="rounded-2xl border-blue-200/50 bg-white/95 shadow-lg shadow-blue-200/30 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-300/40">
+                    <Card className="rounded-2xl bg-white/95 shadow-lg">
                         <CardHeader>
                             <CardTitle className="text-gray-900">Aplikasi Terbaru</CardTitle>
-                            <CardDescription>Daftar aplikasi IIN yang baru diajukan</CardDescription>
+                            <CardDescription>Daftar 5 aplikasi IIN terakhir yang diajukan</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
-                                {recent_applications.length > 0 ? (
-                                    recent_applications.map((app, index) => (
-                                        <motion.div
+                            {displayedApplications.length > 0 ? (
+                                <div className="divide-y divide-gray-100">
+                                    {displayedApplications.map((app, index) => (
+                                        <Link
                                             key={app.id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.5, delay: 0.3 + 0.1 * index }}
-                                            className="flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-50/80 to-blue-100/50 p-4 transition-all duration-200 hover:shadow-md"
+                                            href={getApplicationUrl(app)}
+                                            className="block"
                                         >
-                                            <div>
-                                                <h4 className="font-medium text-gray-900">
-                                                    {app.type === 'nasional' ? 'IIN Nasional' : 'Single IIN/Blockholder'}
-                                                </h4>
-                                                <p className="text-sm text-gray-600">No: {app.application_number}</p>
-                                                <p className="text-xs text-gray-500">{new Date(app.created_at).toLocaleDateString('id-ID')}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <Badge className={getStatusColor(app.status_label)}>{app.status_label}</Badge>
-                                            </div>
-                                        </motion.div>
-                                    ))
-                                ) : (
-                                    <div className="py-8 text-center">
-                                        <p className="text-gray-500">Belum ada aplikasi yang diajukan</p>
-                                        <Link href="/iin-nasional/create" className="mt-2 inline-block text-sm text-[#01AEEC] hover:text-[#01AEEC]">
-                                            Ajukan aplikasi pertama Anda
+                                            <motion.div
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ duration: 0.3, delay: 0.1 * index }}
+                                                className="group flex items-center justify-between py-4 transition-colors hover:bg-gray-50 px-2 -mx-2 rounded-lg"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-100">
+                                                        <FileText className="h-5 w-5" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-medium text-gray-900 group-hover:text-blue-600">
+                                                            {app.type === 'nasional' ? 'IIN Nasional' : 'Single IIN/Blockholder'}
+                                                        </p>
+                                                        <p className="text-sm text-gray-500">{app.application_number}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="text-right">
+                                                        <Badge className={getStatusBadgeClass(app.status)}>
+                                                            {getStatusLabel(app.status)}
+                                                        </Badge>
+                                                        <p className="mt-1 text-xs text-gray-400">
+                                                            {new Date(app.created_at).toLocaleDateString('id-ID', {
+                                                                day: 'numeric',
+                                                                month: 'short',
+                                                                year: 'numeric',
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                    <ChevronRight className="h-5 w-5 text-gray-300 group-hover:text-blue-500" />
+                                                </div>
+                                            </motion.div>
                                         </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="py-12 text-center">
+                                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+                                        <FileText className="h-6 w-6 text-gray-400" />
                                     </div>
-                                )}
-                            </div>
+                                    <p className="text-gray-500">Belum ada aplikasi yang diajukan</p>
+                                    <Link href="/iin-nasional/create" className="mt-2 inline-block text-sm text-blue-600 hover:text-blue-700">
+                                        Ajukan aplikasi pertama Anda →
+                                    </Link>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </motion.div>

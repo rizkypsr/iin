@@ -60,10 +60,10 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    className="border-b border-purple-200/50 bg-white/70 p-6 backdrop-blur-sm"
+                    className="border-b border-blue-100/50 bg-white/70 p-6 backdrop-blur-sm"
                 >
-                    <div className="flex items-center space-x-3 rounded-xl border border-purple-200/30 bg-gradient-to-r from-purple-50/80 to-purple-100/60 p-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-800 shadow-md">
+                    <div className="flex items-center space-x-3 rounded-xl border border-blue-200/30 bg-gradient-to-r from-blue-50/80 to-blue-100/60 p-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary shadow-md">
                             <UserIcon className="h-5 w-5 text-white" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -119,7 +119,7 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                                                     : applicationCounts.iin_single_blockholder}
                                             </Badge>
                                         )}
-                                    <ChevronRight className="h-4 w-4 transform text-gray-400 transition-all duration-200 group-hover:translate-x-1 group-hover:text-purple-600" />
+                                    <ChevronRight className="h-4 w-4 transform text-gray-400 transition-all duration-200 group-hover:translate-x-1 group-hover:text-blue-600" />
                                 </Link>
                             </motion.div>
                         );
@@ -132,7 +132,7 @@ export default function DashboardSidebar({ user, applicationCounts }: DashboardS
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="border-t border-purple-500/20 bg-gradient-to-r from-purple-600 to-purple-900 p-4 backdrop-blur-lg"
+                className="border-t border-blue-500/20 bg-gradient-primary p-4 backdrop00 to-purple-900 p-4 backdrop-blur-lg"
             >
                 <Link
                     href={route('logout')}

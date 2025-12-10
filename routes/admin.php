@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\FormTemplateController;
 use App\Http\Controllers\Admin\IinNasionalAdminController;
 use App\Http\Controllers\Admin\IinSingleBlockholderAdminController;
+use App\Http\Controllers\Admin\InformationController;
 use App\Http\Controllers\Admin\PengawasanIinNasionalAdminController;
 use App\Http\Controllers\Admin\PengawasanSingleIinAdminController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\InformationController;
-use App\Http\Controllers\Admin\FormTemplateController;
+use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,36 +15,37 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Admin Dashboard
     Route::get('/', function () {
         // Get comprehensive admin statistics
-        $totalApplications = App\Models\IinNasionalApplication::count() + 
+        $totalApplications = App\Models\IinNasionalApplication::count() +
                            App\Models\IinSingleBlockholderApplication::count();
-        
+
         $pendingReview = App\Models\IinNasionalApplication::whereIn('status', ['pengajuan', 'perbaikan'])->count() +
                        App\Models\IinSingleBlockholderApplication::whereIn('status', ['pengajuan', 'perbaikan'])->count();
-        
+
         $approved = App\Models\IinNasionalApplication::where('status', 'terbit')->count() +
                    App\Models\IinSingleBlockholderApplication::where('status', 'terbit')->count();
-        
+
         $totalUsers = App\Models\User::count();
-        
+
         $awaitingPayment = App\Models\IinNasionalApplication::where('status', 'pembayaran')->count() +
                          App\Models\IinSingleBlockholderApplication::where('status', 'pembayaran')->count();
-        
+
         $fieldVerification = App\Models\IinNasionalApplication::where('status', 'verifikasi-lapangan')->count() +
                            App\Models\IinSingleBlockholderApplication::where('status', 'verifikasi-lapangan')->count();
-        
+
         $awaitingIssuance = App\Models\IinNasionalApplication::where('status', 'menunggu-terbit')->count() +
                           App\Models\IinSingleBlockholderApplication::where('status', 'menunggu-terbit')->count();
-        
+
         $rejected = App\Models\IinNasionalApplication::where('status', 'ditolak')->count() +
                    App\Models\IinSingleBlockholderApplication::where('status', 'ditolak')->count();
-        
+
         // Recent applications for activity feed
         $recentApplications = App\Models\IinNasionalApplication::with('user')
             ->latest()
             ->take(5)
             ->get()
-            ->map(function($item) {
+            ->map(function ($item) {
                 $item->type = 'nasional';
+
                 return $item;
             })
             ->merge(
@@ -52,14 +53,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
                     ->latest()
                     ->take(5)
                     ->get()
-                    ->map(function($item) {
+                    ->map(function ($item) {
                         $item->type = 'single_blockholder';
+
                         return $item;
                     })
             )
             ->sortByDesc('created_at')
             ->take(10);
-        
+
         $stats = [
             'total_applications' => $totalApplications,
             'pending_review' => $pendingReview,
@@ -68,17 +70,17 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             'awaiting_payment' => $awaitingPayment,
             'field_verification' => $fieldVerification,
             'awaiting_issuance' => $awaitingIssuance,
-            'rejected' => $rejected
+            'rejected' => $rejected,
         ];
-        
+
         // Get application counts for sidebar badges
-        $applicationCountService = new App\Services\ApplicationCountService();
+        $applicationCountService = new App\Services\ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
-        
+
         return Inertia::render('admin-dashboard', [
             'stats' => $stats,
             'recent_applications' => $recentApplications,
-            'application_counts' => $applicationCounts
+            'application_counts' => $applicationCounts,
         ]);
     })->name('dashboard');
     // User Management Routes
@@ -88,7 +90,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/users/{user}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserManagementController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
-    
+
     // IIN Nasional Admin Routes
     Route::get('/iin-nasional', [IinNasionalAdminController::class, 'index'])->name('iin-nasional.index');
     Route::get('/iin-nasional/{iinNasional}', [IinNasionalAdminController::class, 'show'])->name('iin-nasional.show');
@@ -102,7 +104,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/iin-nasional/{iinNasional}/download-payment-proof/{index}', [IinNasionalAdminController::class, 'downloadPaymentProof'])->name('iin-nasional.download-payment-proof');
     Route::get('/iin-nasional/{iinNasional}/download-field-verification-document/{index}', [IinNasionalAdminController::class, 'downloadFieldVerificationDocument'])->name('iin-nasional.download-field-verification-document');
     Route::get('/iin-nasional/{iinNasional}/download-additional-document/{index}', [IinNasionalAdminController::class, 'downloadAdditionalDocument'])->name('iin-nasional.download-additional-document');
-    
+
     // IIN Single Blockholder Admin Routes
     Route::get('/iin-single-blockholder', [IinSingleBlockholderAdminController::class, 'index'])->name('iin-single-blockholder.index');
     Route::get('/iin-single-blockholder/{iinSingleBlockholder}', [IinSingleBlockholderAdminController::class, 'show'])->name('iin-single-blockholder.show');
@@ -115,7 +117,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/iin-single-blockholder/{iinSingleBlockholder}/download-payment-proof/{index}', [IinSingleBlockholderAdminController::class, 'downloadPaymentProof'])->name('iin-single-blockholder.download-payment-proof');
     Route::get('/iin-single-blockholder/{iinSingleBlockholder}/download-field-verification-document/{index}', [IinSingleBlockholderAdminController::class, 'downloadFieldVerificationDocument'])->name('iin-single-blockholder.download-field-verification-document');
     Route::get('/iin-single-blockholder/{iinSingleBlockholder}/download-additional-document/{index}', [IinSingleBlockholderAdminController::class, 'downloadAdditionalDocument'])->name('iin-single-blockholder.download-additional-document');
-    
+
     // Pengawasan IIN Nasional Admin Routes
     Route::get('/pengawasan-iin-nasional', [PengawasanIinNasionalAdminController::class, 'index'])->name('pengawasan-iin-nasional.index');
     Route::get('/pengawasan-iin-nasional/{pengawasanIinNasional}', [PengawasanIinNasionalAdminController::class, 'show'])->name('pengawasan-iin-nasional.show');
@@ -128,7 +130,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/pengawasan-iin-nasional/{pengawasanIinNasional}/download-payment-proof/{index}', [PengawasanIinNasionalAdminController::class, 'downloadPaymentProof'])->name('pengawasan-iin-nasional.download-payment-proof');
     Route::get('/pengawasan-iin-nasional/{pengawasanIinNasional}/download-field-verification-document/{index}', [PengawasanIinNasionalAdminController::class, 'downloadFieldVerificationDocument'])->name('pengawasan-iin-nasional.download-field-verification-document');
     Route::get('/pengawasan-iin-nasional/{pengawasanIinNasional}/download-issuance-document/{index}', [PengawasanIinNasionalAdminController::class, 'downloadIssuanceDocument'])->name('pengawasan-iin-nasional.download-issuance-document');
-    
+
     // Pengawasan Single IIN Admin Routes
     Route::get('/pengawasan-single-iin', [PengawasanSingleIinAdminController::class, 'index'])->name('pengawasan-single-iin.index');
     Route::get('/pengawasan-single-iin/{pengawasanSingleIin}', [PengawasanSingleIinAdminController::class, 'show'])->name('pengawasan-single-iin.show');
@@ -145,11 +147,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/pengawasan-single-iin/{pengawasanSingleIin}/download-issuance-document/{index}', [PengawasanSingleIinAdminController::class, 'downloadIssuanceDocument'])->name('pengawasan-single-iin.download-issuance-document');
     Route::get('/pengawasan-single-iin/{pengawasanSingleIin}/download-payment-document-stage-2/{index}', [PengawasanSingleIinAdminController::class, 'downloadPaymentDocumentStage2'])->name('pengawasan-single-iin.download-payment-document-stage-2');
     Route::get('/pengawasan-single-iin/{pengawasanSingleIin}/download-payment-proof-stage-2/{index}', [PengawasanSingleIinAdminController::class, 'downloadPaymentProofStage2'])->name('pengawasan-single-iin.download-payment-proof-stage-2');
-    
+
     // Report Routes
     Route::get('/reports', [App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export', [App\Http\Controllers\ReportController::class, 'export'])->name('reports.export');
-    
+
     // Settings Routes
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/document-requirements', [SettingsController::class, 'updateDocumentRequirements'])->name('settings.update-document-requirements');

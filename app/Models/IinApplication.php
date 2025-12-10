@@ -41,8 +41,6 @@ class IinApplication extends Model
         return $this->belongsTo(User::class);
     }
 
-
-
     public function admin(): BelongsTo
     {
         return $this->belongsTo(User::class, 'admin_id');
@@ -104,7 +102,7 @@ class IinApplication extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->application_number = 'IIN-NAS-' . date('Ymd') . '-' . str_pad(
+            $model->application_number = 'IIN-NAS-'.date('Ymd').'-'.str_pad(
                 static::whereDate('created_at', today())->count() + 1,
                 4,
                 '0',

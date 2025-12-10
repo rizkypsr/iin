@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-         Schema::table('pengawasan_iin_nasional', function (Blueprint $table) {
+        Schema::table('pengawasan_iin_nasional', function (Blueprint $table) {
             $table->json('additional_documents')->nullable();
         });
 

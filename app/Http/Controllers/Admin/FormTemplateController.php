@@ -19,7 +19,7 @@ final class FormTemplateController extends Controller
         $nasionalForms = FormTemplate::getNasionalForms();
         $singleBlockholderForms = FormTemplate::getSingleBlockholderForms();
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/form-templates/index', [

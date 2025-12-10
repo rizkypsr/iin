@@ -39,7 +39,7 @@ class IinStatusLog extends Model
 
         static::creating(function ($model) {
             // Auto-set application_type and application_id if not set
-            if (!$model->application_type && !$model->application_id && $model->application) {
+            if (! $model->application_type && ! $model->application_id && $model->application) {
                 $model->application_type = $model->application->getServiceTypeAttribute();
                 $model->application_id = $model->application->id;
             }

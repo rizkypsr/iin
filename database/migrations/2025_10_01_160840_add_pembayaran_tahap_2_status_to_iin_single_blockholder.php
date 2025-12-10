@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -14,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('iin_single_blockholder_applications', function (Blueprint $table) {
             $table->enum('status', ['pengajuan', 'perbaikan', 'pembayaran', 'pembayaran-tahap-2', 'verifikasi-lapangan', 'menunggu-terbit', 'terbit'])
-                  ->default('pengajuan')
-                  ->change();
+                ->default('pengajuan')
+                ->change();
         });
     }
 
@@ -26,8 +25,8 @@ return new class extends Migration
     {
         Schema::table('iin_single_blockholder_applications', function (Blueprint $table) {
             $table->enum('status', ['pengajuan', 'perbaikan', 'pembayaran', 'verifikasi-lapangan', 'menunggu-terbit', 'terbit'])
-                  ->default('pengajuan')
-                  ->change();
+                ->default('pengajuan')
+                ->change();
         });
     }
 };

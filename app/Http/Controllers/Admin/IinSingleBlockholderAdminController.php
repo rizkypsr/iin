@@ -20,12 +20,12 @@ class IinSingleBlockholderAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/IinSingleBlockholder/Index', [
             'applications' => $applications,
-            'application_counts' => $applicationCounts
+            'application_counts' => $applicationCounts,
         ]);
     }
 
@@ -40,7 +40,7 @@ class IinSingleBlockholderAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/IinSingleBlockholder/Show', [
@@ -50,7 +50,7 @@ class IinSingleBlockholderAdminController extends Controller
                 'can_upload_certificate' => in_array($iinSingleBlockholder->status, ['menunggu-terbit', 'terbit']),
             ]),
             'statusLogs' => $statusLogs,
-            'application_counts' => $applicationCounts
+            'application_counts' => $applicationCounts,
         ]);
     }
 
@@ -98,7 +98,7 @@ class IinSingleBlockholderAdminController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $oldStatus,
                 'status_to' => $newStatus,
-                'notes' => $request->notes
+                'notes' => $request->notes,
             ]);
 
             return back()->with('success', 'Status aplikasi berhasil diperbarui');
@@ -131,7 +131,7 @@ class IinSingleBlockholderAdminController extends Controller
                 }
 
                 foreach ($request->file('certificates') as $index => $file) {
-                    $filename = $iinSingleBlockholder->application_number . '_' . time() . '_certificate_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $filename = $iinSingleBlockholder->application_number.'_'.time().'_certificate_'.uniqid().'.'.$file->getClientOriginalExtension();
                     $path = $file->storeAs('iin-single-blockholder/certificates', $filename, 'public');
 
                     if ($index === 0) {
@@ -159,12 +159,12 @@ class IinSingleBlockholderAdminController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $oldStatus,
                 'status_to' => 'terbit',
-                'notes' => $request->notes ?: 'IIN berhasil diterbitkan dengan nomor: ' . $request->iin_number
+                'notes' => $request->notes ?: 'IIN berhasil diterbitkan dengan nomor: '.$request->iin_number,
             ]);
 
             $message = 'IIN berhasil diterbitkan';
-            if (!empty($uploadedFiles)) {
-                $message .= ' dan ' . count($uploadedFiles) . ' sertifikat diupload';
+            if (! empty($uploadedFiles)) {
+                $message .= ' dan '.count($uploadedFiles).' sertifikat diupload';
             }
 
             return back()->with('success', $message);
@@ -181,42 +181,42 @@ class IinSingleBlockholderAdminController extends Controller
         ]);
 
         $uploadedFiles = [];
-        
+
         // Determine if this is stage 2 based on the status
         $isStage2 = $request->status === 'pembayaran-tahap-2';
-        $existingDocuments = $isStage2 
-            ? ($iinSingleBlockholder->payment_documents_stage_2 ?? []) 
+        $existingDocuments = $isStage2
+            ? ($iinSingleBlockholder->payment_documents_stage_2 ?? [])
             : ($iinSingleBlockholder->payment_documents ?? []);
 
         if ($request->hasFile('payment_documents')) {
             foreach ($request->file('payment_documents') as $file) {
                 $stagePrefix = $isStage2 ? 'stage2_' : '';
-                $filename = $iinSingleBlockholder->application_number . '_' . time() . '_' . uniqid() . '_' . $stagePrefix . 'payment_doc.' . $file->getClientOriginalExtension();
+                $filename = $iinSingleBlockholder->application_number.'_'.time().'_'.uniqid().'_'.$stagePrefix.'payment_doc.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-single-blockholder/payment-documents', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
         }
 
         // Merge with existing documents
         $allDocuments = array_merge($existingDocuments, $uploadedFiles);
-        
+
         $oldStatus = $iinSingleBlockholder->status;
-        
+
         // Determine which field to update based on stage
         if ($isStage2) {
             $updateData = [
                 'payment_documents_stage_2' => $allDocuments,
-                'payment_documents_uploaded_at_stage_2' => now()
+                'payment_documents_uploaded_at_stage_2' => now(),
             ];
         } else {
             $updateData = [
                 'payment_documents' => $allDocuments,
-                'payment_documents_uploaded_at' => now()
+                'payment_documents_uploaded_at' => now(),
             ];
         }
 
@@ -235,11 +235,11 @@ class IinSingleBlockholderAdminController extends Controller
 
             // Log activity
             $stageText = $isStage2 ? ' tahap 2' : '';
-            $logNotes = 'Admin mengupload dokumen pembayaran' . $stageText . ' (' . count($uploadedFiles) . ' file)';
+            $logNotes = 'Admin mengupload dokumen pembayaran'.$stageText.' ('.count($uploadedFiles).' file)';
             if ($request->upload_and_change_status && $request->status) {
-                $logNotes .= ' dan mengubah status ke ' . $request->status;
+                $logNotes .= ' dan mengubah status ke '.$request->status;
                 if ($request->notes) {
-                    $logNotes .= '. ' . $request->notes;
+                    $logNotes .= '. '.$request->notes;
                 }
             }
 
@@ -249,7 +249,7 @@ class IinSingleBlockholderAdminController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $oldStatus,
                 'status_to' => $request->upload_and_change_status && $request->status ? $request->status : $oldStatus,
-                'notes' => $logNotes
+                'notes' => $logNotes,
             ]);
 
             // Refresh the model to get updated data
@@ -258,14 +258,14 @@ class IinSingleBlockholderAdminController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => count($uploadedFiles) . ' dokumen pembayaran' . $stageText . ' berhasil diupload' . 
-                        ($request->upload_and_change_status && $request->status ? ' dan status diubah ke ' . $request->status : ''),
-                    'application' => $iinSingleBlockholder
+                    'message' => count($uploadedFiles).' dokumen pembayaran'.$stageText.' berhasil diupload'.
+                        ($request->upload_and_change_status && $request->status ? ' dan status diubah ke '.$request->status : ''),
+                    'application' => $iinSingleBlockholder,
                 ]);
             }
 
-            return back()->with('success', count($uploadedFiles) . ' dokumen pembayaran' . $stageText . ' berhasil diupload' . 
-                ($request->upload_and_change_status && $request->status ? ' dan status diubah ke ' . $request->status : ''));
+            return back()->with('success', count($uploadedFiles).' dokumen pembayaran'.$stageText.' berhasil diupload'.
+                ($request->upload_and_change_status && $request->status ? ' dan status diubah ke '.$request->status : ''));
         });
     }
 
@@ -281,26 +281,26 @@ class IinSingleBlockholderAdminController extends Controller
 
             if ($request->hasFile('field_verification_documents')) {
                 foreach ($request->file('field_verification_documents') as $file) {
-                    $filename = $iinSingleBlockholder->application_number . '_' . time() . '_' . uniqid() . '_field_verification.' . $file->getClientOriginalExtension();
+                    $filename = $iinSingleBlockholder->application_number.'_'.time().'_'.uniqid().'_field_verification.'.$file->getClientOriginalExtension();
                     $path = $file->storeAs('iin-single-blockholder/field-verification', $filename, 'public');
-                    
+
                     $uploadedFiles[] = [
                         'path' => $path,
                         'original_name' => $file->getClientOriginalName(),
-                        'uploaded_at' => now()->toISOString()
+                        'uploaded_at' => now()->toISOString(),
                     ];
                 }
             }
 
             // Merge with existing documents
             $allDocuments = array_merge($existingDocuments, $uploadedFiles);
-            
+
             $oldStatus = $iinSingleBlockholder->status;
-            
+
             $iinSingleBlockholder->update([
                 'field_verification_documents' => $allDocuments,
                 'status' => 'verifikasi-lapangan',
-                'field_verification_documents_uploaded_at' => now()
+                'field_verification_documents_uploaded_at' => now(),
             ]);
 
             // Log activity
@@ -310,10 +310,10 @@ class IinSingleBlockholderAdminController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $oldStatus,
                 'status_to' => 'verifikasi-lapangan',
-                'notes' => 'Admin mengupload dokumen verifikasi lapangan (' . count($uploadedFiles) . ' file) dan mengubah status ke verifikasi lapangan'
+                'notes' => 'Admin mengupload dokumen verifikasi lapangan ('.count($uploadedFiles).' file) dan mengubah status ke verifikasi lapangan',
             ]);
 
-            return back()->with('success', count($uploadedFiles) . ' dokumen verifikasi lapangan berhasil diupload');
+            return back()->with('success', count($uploadedFiles).' dokumen verifikasi lapangan berhasil diupload');
         });
     }
 
@@ -327,7 +327,7 @@ class IinSingleBlockholderAdminController extends Controller
             default => null
         };
 
-        if (!$path || !Storage::disk('public')->exists($path)) {
+        if (! $path || ! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan');
         }
 
@@ -337,8 +337,8 @@ class IinSingleBlockholderAdminController extends Controller
     public function downloadPaymentDocument(IinSingleBlockholderApplication $iinSingleBlockholder, int $index)
     {
         $documents = $iinSingleBlockholder->payment_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -351,8 +351,8 @@ class IinSingleBlockholderAdminController extends Controller
     public function downloadPaymentProof(IinSingleBlockholderApplication $iinSingleBlockholder, int $index)
     {
         $proofs = $iinSingleBlockholder->payment_proof_documents ?? [];
-        
-        if (!isset($proofs[$index]) || !Storage::disk('public')->exists($proofs[$index]['path'])) {
+
+        if (! isset($proofs[$index]) || ! Storage::disk('public')->exists($proofs[$index]['path'])) {
             abort(404, 'Bukti pembayaran tidak ditemukan');
         }
 
@@ -365,8 +365,8 @@ class IinSingleBlockholderAdminController extends Controller
     public function downloadFieldVerificationDocument(IinSingleBlockholderApplication $iinSingleBlockholder, int $index)
     {
         $documents = $iinSingleBlockholder->field_verification_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen verifikasi lapangan tidak ditemukan');
         }
 
@@ -379,8 +379,8 @@ class IinSingleBlockholderAdminController extends Controller
     public function downloadAdditionalDocument(IinSingleBlockholderApplication $iinSingleBlockholder, int $index)
     {
         $documents = $iinSingleBlockholder->additional_documents ?? [];
-        
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tambahan tidak ditemukan');
         }
 

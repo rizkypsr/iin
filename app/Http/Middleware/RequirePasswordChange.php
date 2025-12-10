@@ -18,30 +18,30 @@ class RequirePasswordChange
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
-        
+
         // Skip if user is not authenticated
-        if (!$user) {
+        if (! $user) {
             return $next($request);
         }
-        
+
         // Skip if already on password change route
         if ($request->routeIs('password.change') || $request->routeIs('password.update')) {
             return $next($request);
         }
-        
+
         // Skip for logout route
         if ($request->routeIs('logout')) {
             return $next($request);
         }
-        
+
         // Check if user is using default password and hasn't changed it
         $defaultPassword = env('DEFAULT_PASSWORD', 'password123');
         $isUsingDefaultPassword = Hash::check($defaultPassword, $user->password);
-        
+
         if ($isUsingDefaultPassword && is_null($user->password_changed_at)) {
             return redirect()->route('password.change');
         }
-        
+
         return $next($request);
     }
 }

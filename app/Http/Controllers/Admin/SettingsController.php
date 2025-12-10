@@ -20,12 +20,12 @@ final class SettingsController extends Controller
             'iin_single_blockholder' => DocumentRequirement::getIinSingleBlockholderRequirements(),
         ];
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/settings/index', [
             'documentRequirements' => $documentRequirements,
-            'application_counts' => $applicationCounts
+            'application_counts' => $applicationCounts,
         ]);
     }
 

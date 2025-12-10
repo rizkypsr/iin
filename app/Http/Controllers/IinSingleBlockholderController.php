@@ -22,7 +22,7 @@ class IinSingleBlockholderController extends Controller
         $applications = IinSingleBlockholderApplication::with(['user', 'admin'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(5);
 
         return Inertia::render('IinSingleBlockholder/Index', [
             'applications' => $applications,

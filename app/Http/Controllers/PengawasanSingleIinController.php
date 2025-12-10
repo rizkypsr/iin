@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\PengawasanSingleIin;
 use App\Models\PengawasanSingleIinStatusLog;
-use App\Models\IinStatusLog;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class PengawasanSingleIinController extends Controller
@@ -23,21 +22,19 @@ class PengawasanSingleIinController extends Controller
         $applications = PengawasanSingleIin::with(['user', 'admin', 'singleIinProfile'])
             ->where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-
+            ->paginate(5);
 
         return Inertia::render('PengawasanSingleIin/Index', [
-            'applications' => $applications
+            'applications' => $applications,
         ]);
     }
 
     public function create()
     {
         $user = Auth::user();
-        
+
         // Check if user has completed Single IIN profile
-        if (!$user->singleIinProfile || !$this->isProfileComplete($user->singleIinProfile)) {
+        if (! $user->singleIinProfile || ! $this->isProfileComplete($user->singleIinProfile)) {
             return back()->withErrors(['profile' => 'Anda harus melengkapi profil Single IIN terlebih dahulu sebelum mengajukan pemantauan.']);
         }
 
@@ -49,9 +46,9 @@ class PengawasanSingleIinController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        
+
         // Validate profile completion
-        if (!$user->singleIinProfile || !$this->isProfileComplete($user->singleIinProfile)) {
+        if (! $user->singleIinProfile || ! $this->isProfileComplete($user->singleIinProfile)) {
             return back()->withErrors(['profile' => 'Anda harus melengkapi profil Single IIN terlebih dahulu sebelum mengajukan pemantauan.']);
         }
 
@@ -60,12 +57,12 @@ class PengawasanSingleIinController extends Controller
         ]);
 
         // Use database transaction to ensure data consistency
-        $application = DB::transaction(function () use ($request, $user) {
-            $application = new PengawasanSingleIin();
+        $application = DB::transaction(function () use ($user) {
+            $application = new PengawasanSingleIin;
             $application->user_id = Auth::id();
             $application->single_iin_profile_id = $user->singleIinProfile->id;
             $application->submitted_at = now();
-            
+
             // Save first to generate the application_number
             $application->save();
 
@@ -95,7 +92,7 @@ class PengawasanSingleIinController extends Controller
                 'can_upload_payment_proof' => ($pengawasanSingleIin->status === 'pembayaran' || $pengawasanSingleIin->status === 'pembayaran-tahap-2') && $pengawasanSingleIin->user_id === Auth::id(),
                 'can_download_issuance_documents' => $pengawasanSingleIin->issuance_documents && Storage::disk('public')->exists($pengawasanSingleIin->issuance_documents[0]['path'] ?? ''),
             ]),
-            'statusLogs' => $statusLogs
+            'statusLogs' => $statusLogs,
         ]);
     }
 
@@ -109,7 +106,7 @@ class PengawasanSingleIinController extends Controller
 
         $uploadedFiles = [];
         $isStage2 = $pengawasanSingleIin->status === 'pembayaran-tahap-2';
-        
+
         if ($isStage2) {
             $existingProofs = $pengawasanSingleIin->payment_proof_documents_stage_2 ?? [];
         } else {
@@ -119,37 +116,37 @@ class PengawasanSingleIinController extends Controller
         if ($request->hasFile('payment_proof')) {
             foreach ($request->file('payment_proof') as $file) {
                 $stage = $isStage2 ? 'stage2' : 'stage1';
-                $filename = $pengawasanSingleIin->application_number . '_' . time() . '_' . uniqid() . '_payment_proof_' . $stage . '.' . $file->getClientOriginalExtension();
+                $filename = $pengawasanSingleIin->application_number.'_'.time().'_'.uniqid().'_payment_proof_'.$stage.'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('pengawasan-single-iin/payment-proofs', $filename, 'public');
-                
+
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
         }
 
         // Merge with existing proofs
         $allProofs = array_merge($existingProofs, $uploadedFiles);
-        
+
         return DB::transaction(function () use ($isStage2, $allProofs, $pengawasanSingleIin, $uploadedFiles) {
             if ($isStage2) {
                 $pengawasanSingleIin->update([
                     'payment_proof_documents_stage_2' => $allProofs,
-                    'payment_proof_uploaded_at_stage_2' => now()
+                    'payment_proof_uploaded_at_stage_2' => now(),
                 ]);
             } else {
                 $pengawasanSingleIin->update([
                     'payment_proof_documents' => $allProofs,
-                    'payment_proof_uploaded_at' => now()
+                    'payment_proof_uploaded_at' => now(),
                 ]);
             }
 
             // Log the upload using new status log system
-             $this->logStatusChange($pengawasanSingleIin, null, $pengawasanSingleIin->status, 'User mengupload bukti pembayaran ' . ($isStage2 ? 'tahap 2' : 'tahap 1') . ' (' . count($uploadedFiles) . ' file)');
+            $this->logStatusChange($pengawasanSingleIin, null, $pengawasanSingleIin->status, 'User mengupload bukti pembayaran '.($isStage2 ? 'tahap 2' : 'tahap 1').' ('.count($uploadedFiles).' file)');
 
-            return back()->with('success', count($uploadedFiles) . ' bukti pembayaran berhasil diupload');
+            return back()->with('success', count($uploadedFiles).' bukti pembayaran berhasil diupload');
         });
     }
 
@@ -190,21 +187,21 @@ class PengawasanSingleIinController extends Controller
         } else {
             $paymentDocuments = $pengawasanSingleIin->payment_documents ?? [];
         }
-        
-        if (!isset($paymentDocuments[$index])) {
+
+        if (! isset($paymentDocuments[$index])) {
             abort(404, 'Dokumen pembayaran tidak ditemukan');
         }
 
         $document = $paymentDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -217,21 +214,21 @@ class PengawasanSingleIinController extends Controller
         $this->authorize('view', $pengawasanSingleIin);
 
         $documents = $pengawasanSingleIin->issuance_documents ?? [];
-        
-        if (!isset($documents[$index])) {
+
+        if (! isset($documents[$index])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
         $document = $documents[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? 'issuance_document.pdf';
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -244,21 +241,21 @@ class PengawasanSingleIinController extends Controller
         } else {
             $paymentProofs = $pengawasanSingleIin->payment_proof_documents ?? [];
         }
-        
-        if (!isset($paymentProofs[$index])) {
+
+        if (! isset($paymentProofs[$index])) {
             abort(404, 'Bukti pembayaran tidak ditemukan');
         }
 
         $document = $paymentProofs[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -266,7 +263,7 @@ class PengawasanSingleIinController extends Controller
     {
         $this->authorize('downloadFile', $pengawasanSingleIin);
 
-         $pengawasanSingleIin->load(['expenseReimbursement']);
+        $pengawasanSingleIin->load(['expenseReimbursement']);
 
         $path = match ($type) {
             'certificate' => $pengawasanSingleIin->issuance_documents[$index]['path'],
@@ -279,19 +276,19 @@ class PengawasanSingleIinController extends Controller
             default => null
         };
 
-        if (!$path) {
-            abort(404, 'File path tidak ditemukan untuk tipe: ' . $type);
+        if (! $path) {
+            abort(404, 'File path tidak ditemukan untuk tipe: '.$type);
         }
 
-        if (!Storage::disk('public')->exists($path)) {
-            abort(404, 'File tidak ditemukan di storage: ' . $path);
+        if (! Storage::disk('public')->exists($path)) {
+            abort(404, 'File tidak ditemukan di storage: '.$path);
         }
 
         $fullPath = Storage::disk('public')->path($path);
-        
+
         // Get original filename with proper extension
         $originalFilename = match ($type) {
-            'agreement' => $pengawasanSingleIin->application_number . '_single_iin.' . pathinfo($path, PATHINFO_EXTENSION),
+            'agreement' => $pengawasanSingleIin->application_number.'_single_iin.'.pathinfo($path, PATHINFO_EXTENSION),
             default => basename($path)
         };
 
@@ -303,21 +300,21 @@ class PengawasanSingleIinController extends Controller
         $this->authorize('downloadFile', $pengawasanSingleIin);
 
         $fieldVerificationDocuments = $pengawasanSingleIin->field_verification_documents ?? [];
-        
-        if (!isset($fieldVerificationDocuments[$index])) {
+
+        if (! isset($fieldVerificationDocuments[$index])) {
             abort(404, 'Dokumen verifikasi lapangan tidak ditemukan');
         }
 
         $document = $fieldVerificationDocuments[$index];
         $path = $document['path'];
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan di storage');
         }
 
         $fullPath = Storage::disk('public')->path($path);
         $originalName = $document['original_name'] ?? basename($path);
-        
+
         return response()->download($fullPath, $originalName);
     }
 
@@ -329,20 +326,20 @@ class PengawasanSingleIinController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filename = $pengawasanSingleIin->application_number . '_' . time() . '_' . uniqid() . '_additional.' . $file->getClientOriginalExtension();
+            $filename = $pengawasanSingleIin->application_number.'_'.time().'_'.uniqid().'_additional.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('pengawasan-single-iin/additional-document', $filename, 'public');
 
             $existingDocuments = [
                 'path' => $path,
                 'original_name' => $file->getClientOriginalName(),
-                'uploaded_at' => now()->toISOString()
+                'uploaded_at' => now()->toISOString(),
             ];
-            
+
             $pengawasanSingleIin->update([
                 'additional_documents' => $existingDocuments,
             ]);
 
-            $this->logStatusChange($pengawasanSingleIin, null, $pengawasanSingleIin->status, 'Dokumen tambahan diupload (' . $file->getClientOriginalName() . ')');
+            $this->logStatusChange($pengawasanSingleIin, null, $pengawasanSingleIin->status, 'Dokumen tambahan diupload ('.$file->getClientOriginalName().')');
         }
 
         return back()->with('success', 'Dokumen tambahan berhasil diupload');
@@ -383,7 +380,7 @@ class PengawasanSingleIinController extends Controller
                 $paymentProofPath = null;
                 if ($request->hasFile('payment_proof_path')) {
                     $file = $request->file('payment_proof_path');
-                    $filename = 'pengawasan_single_iin_' . time() . '_expense_proof.' . $file->getClientOriginalExtension();
+                    $filename = 'pengawasan_single_iin_'.time().'_expense_proof.'.$file->getClientOriginalExtension();
                     $paymentProofPath = $file->storeAs('pengawasan-single-iin/expense-reimbursement', $filename, 'public');
                 }
 
@@ -416,7 +413,8 @@ class PengawasanSingleIinController extends Controller
                 return back()->with('success', 'Form bukti penggantian transport dan uang harian berhasil disubmit');
             });
         } catch (\Exception $e) {
-            Log::error('Error submitting expense reimbursement: ' . $e->getMessage());
+            Log::error('Error submitting expense reimbursement: '.$e->getMessage());
+
             return back()->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.']);
         }
     }

@@ -32,7 +32,7 @@ return new class extends Migration
                 'payment_proof_uploaded_at_stage_2',
                 'payment_documents_stage_2',
                 'payment_documents_uploaded_at_stage_2',
-                'payment_verified_at_stage_2'
+                'payment_verified_at_stage_2',
             ]);
         });
     }

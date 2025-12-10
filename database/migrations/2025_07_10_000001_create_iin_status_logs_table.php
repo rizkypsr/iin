@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('status_to', ['pengajuan', 'perbaikan', 'pembayaran', 'verifikasi-lapangan', 'menunggu-terbit', 'terbit']);
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             // Index for polymorphic relationship
             $table->index(['application_type', 'application_id']);
         });

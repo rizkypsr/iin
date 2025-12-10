@@ -22,7 +22,7 @@ class ProfileController extends Controller
         $user = Auth::user();
         $user->load(['iinNasionalProfile', 'singleIinProfile']);
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('dashboard/profil', [
@@ -38,12 +38,12 @@ class ProfileController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . Auth::id(),
+            'email' => 'required|string|lowercase|email|max:255|unique:users,email,'.Auth::id(),
             // IIN Nasional Profile validation
             'iin_nasional_profile.institution_name' => 'required|string|max:255',
             'iin_nasional_profile.brand' => 'required|string|max:255',
             'iin_nasional_profile.iin_national_assignment' => 'required|string|max:255',
-            'iin_nasional_profile.assignment_year' => 'required|integer|min:1900|max:' . date('Y'),
+            'iin_nasional_profile.assignment_year' => 'required|integer|min:1900|max:'.date('Y'),
             'iin_nasional_profile.regional' => 'required|string|max:255',
             'iin_nasional_profile.phone_fax' => 'required|string|max:255',
             'iin_nasional_profile.email_office' => 'required|email|max:255',
@@ -57,7 +57,7 @@ class ProfileController extends Controller
             // Single IIN Profile validation
             'single_iin_profile.institution_name' => 'required|string|max:255',
             'single_iin_profile.institution_type' => 'required|string|max:255',
-            'single_iin_profile.year' => 'required|integer|min:1900|max:' . date('Y'),
+            'single_iin_profile.year' => 'required|integer|min:1900|max:'.date('Y'),
             'single_iin_profile.iin_assignment' => 'required|string|max:255',
             'single_iin_profile.assignment_date' => 'required|date',
             'single_iin_profile.regional' => 'required|string|max:255',
@@ -83,7 +83,7 @@ class ProfileController extends Controller
         // Update or create IIN Nasional Profile
         if ($request->has('iin_nasional_profile')) {
             $iinNasionalData = array_filter($request->iin_nasional_profile);
-            if (!empty($iinNasionalData)) {
+            if (! empty($iinNasionalData)) {
                 $user->iinNasionalProfile()->updateOrCreate(
                     ['user_id' => $user->id],
                     $iinNasionalData
@@ -105,20 +105,20 @@ class ProfileController extends Controller
                 }
 
                 $file = $request->file('single_iin_profile.card_specimen');
-                $filename = 'single_iin_card_specimen_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $filename = 'single_iin_card_specimen_'.$user->id.'_'.time().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('single-iin/card-specimen', $filename, 'public');
                 $singleIinData['card_specimen'] = $path;
             } else {
-                if (isset($singleIinData['card_specimen']) && !is_string($singleIinData['card_specimen'])) {
+                if (isset($singleIinData['card_specimen']) && ! is_string($singleIinData['card_specimen'])) {
                     unset($singleIinData['card_specimen']);
                 }
             }
 
             $singleIinData = array_filter($singleIinData, function ($v) {
-                return !is_null($v) && $v !== '';
+                return ! is_null($v) && $v !== '';
             });
 
-            if (!empty($singleIinData)) {
+            if (! empty($singleIinData)) {
                 $user->singleIinProfile()->updateOrCreate(
                     ['user_id' => $user->id],
                     $singleIinData
@@ -138,7 +138,7 @@ class ProfileController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:users,email,' . Auth::id(),
+            'email' => 'required|string|lowercase|email|max:255|unique:users,email,'.Auth::id(),
         ]);
 
         $user = Auth::user();
@@ -159,7 +159,7 @@ class ProfileController extends Controller
             'iin_nasional_profile.institution_name' => 'required|string|max:255',
             'iin_nasional_profile.brand' => 'required|string|max:255',
             'iin_nasional_profile.iin_national_assignment' => 'required|string|max:255',
-            'iin_nasional_profile.assignment_year' => 'required|integer|min:1900|max:' . date('Y'),
+            'iin_nasional_profile.assignment_year' => 'required|integer|min:1900|max:'.date('Y'),
             'iin_nasional_profile.regional' => 'required|string|max:255',
             'iin_nasional_profile.phone_fax' => 'required|string|max:255',
             'iin_nasional_profile.email_office' => 'required|email|max:255',
@@ -175,7 +175,7 @@ class ProfileController extends Controller
         $user = Auth::user();
         if ($request->has('iin_nasional_profile')) {
             $iinNasionalData = array_filter($request->iin_nasional_profile);
-            if (!empty($iinNasionalData)) {
+            if (! empty($iinNasionalData)) {
                 $user->iinNasionalProfile()->updateOrCreate(
                     ['user_id' => $user->id],
                     $iinNasionalData
@@ -195,7 +195,7 @@ class ProfileController extends Controller
     {
         $request->validate([
             'single_iin_profile.institution_name' => 'required|string|max:255',
-            'single_iin_profile.year' => 'required|integer|min:1900|max:' . date('Y'),
+            'single_iin_profile.year' => 'required|integer|min:1900|max:'.date('Y'),
             'single_iin_profile.iin_assignment' => 'required|string|max:255',
             'single_iin_profile.assignment_date' => 'required|date',
             'single_iin_profile.regional' => 'required|string|max:255',
@@ -232,20 +232,20 @@ class ProfileController extends Controller
                 }
 
                 $file = $request->file('single_iin_profile.card_specimen');
-                $filename = 'single_iin_card_specimen_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $filename = 'single_iin_card_specimen_'.$user->id.'_'.time().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('single-iin/card-specimen', $filename, 'public');
                 $singleIinData['card_specimen'] = $path;
             } else {
-                if (isset($singleIinData['card_specimen']) && !is_string($singleIinData['card_specimen'])) {
+                if (isset($singleIinData['card_specimen']) && ! is_string($singleIinData['card_specimen'])) {
                     unset($singleIinData['card_specimen']);
                 }
             }
 
             $singleIinData = array_filter($singleIinData, function ($v) {
-                return !is_null($v) && $v !== '';
+                return ! is_null($v) && $v !== '';
             });
 
-            if (!empty($singleIinData)) {
+            if (! empty($singleIinData)) {
                 $user->singleIinProfile()->updateOrCreate(
                     ['user_id' => $user->id],
                     $singleIinData

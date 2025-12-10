@@ -18,6 +18,7 @@ final class FormTemplate extends Model
     ];
 
     public const TYPE_NASIONAL = 'nasional';
+
     public const TYPE_SINGLE_BLOCKHOLDER = 'single-blockholder';
 
     public static function getByType(string $type): Collection

@@ -50,11 +50,28 @@ interface PengawasanIinNasionalApplication {
     };
 }
 
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface PaginationMeta {
+    current_page: number;
+    from: number | null;
+    last_page: number;
+    links: PaginationLink[];
+    path: string;
+    per_page: number;
+    to: number | null;
+    total: number;
+}
+
 interface Props extends PageProps {
     applications: {
         data: PengawasanIinNasionalApplication[];
-        links: any[];
-        meta: any;
+        links?: PaginationLink[];
+        meta?: PaginationMeta;
     };
     errors?: {
         profile?: string;
@@ -663,19 +680,31 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
                 </motion.div>
 
                 {/* Pagination */}
-                {applications.links && applications.links.length > 3 && (
-                    <motion.div variants={itemAnimation} className="flex justify-center">
-                        <div className="flex gap-2">
-                            {applications.links.map((link: any, index: number) => (
+                {applications.data.length > 0 && (applications.links || applications.meta?.links) && (
+                    <motion.div variants={itemAnimation} className="flex flex-col items-center gap-4">
+                        <div className="flex flex-wrap gap-2 justify-center">
+                            {(applications.meta?.links || applications.links)?.map((link: PaginationLink, index: number) => (
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    className={`rounded-md px-3 py-2 text-sm ${link.active ? 'bg-blue-600 text-white' : 'border bg-white text-gray-700 hover:bg-gray-50'
-                                        } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
+                                    className={`rounded px-3 py-2 text-sm transition-colors ${link.active
+                                        ? 'bg-blue-400 text-white font-medium'
+                                        : link.url
+                                            ? 'text-gray-600 hover:bg-gray-100 border border-gray-200'
+                                            : 'cursor-not-allowed text-gray-300 border border-gray-100'
+                                        }`}
+                                    preserveScroll
+                                    preserveState
+                                >
+                                    <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                </Link>
                             ))}
                         </div>
+                        {applications.meta && (
+                            <div className="text-center text-sm text-gray-500">
+                                Menampilkan {applications.meta.from || 0} - {applications.meta.to || 0} dari {applications.meta.total || 0} pengajuan
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </motion.div>

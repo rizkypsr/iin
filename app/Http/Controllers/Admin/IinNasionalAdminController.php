@@ -8,8 +8,8 @@ use App\Models\IinStatusLog;
 use App\Services\ApplicationCountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class IinNasionalAdminController extends Controller
 {
@@ -19,12 +19,12 @@ class IinNasionalAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/IinNasional/Index', [
             'applications' => $applications,
-            'application_counts' => $applicationCounts
+            'application_counts' => $applicationCounts,
         ]);
     }
 
@@ -39,7 +39,7 @@ class IinNasionalAdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $applicationCountService = new ApplicationCountService();
+        $applicationCountService = new ApplicationCountService;
         $applicationCounts = $applicationCountService->getNewApplicationCounts();
 
         return Inertia::render('admin/IinNasional/Show', [
@@ -49,7 +49,7 @@ class IinNasionalAdminController extends Controller
                 'can_upload_certificate' => in_array($iinNasional->status, ['verifikasi-lapangan', 'terbit']),
             ]),
             'statusLogs' => $statusLogs,
-            'application_counts' => $applicationCounts
+            'application_counts' => $applicationCounts,
         ]);
     }
 
@@ -96,7 +96,7 @@ class IinNasionalAdminController extends Controller
             'user_id' => Auth::id(),
             'status_from' => $oldStatus,
             'status_to' => $newStatus,
-            'notes' => $request->notes
+            'notes' => $request->notes,
         ]);
 
         return back()->with('success', 'Status aplikasi berhasil diperbarui');
@@ -108,7 +108,7 @@ class IinNasionalAdminController extends Controller
             'certificate' => 'required|file|mimes:pdf|max:10240',
             'additional_documents.*' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
             'iin_number' => 'required|string|max:255',
-            'notes' => 'nullable|string'
+            'notes' => 'nullable|string',
         ]);
 
         $oldStatus = $iinNasional->status;
@@ -121,7 +121,7 @@ class IinNasionalAdminController extends Controller
             }
 
             $file = $request->file('certificate');
-            $filename = $iinNasional->application_number . '_' . time() . '_certificate.' . $file->getClientOriginalExtension();
+            $filename = $iinNasional->application_number.'_'.time().'_certificate.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('iin-nasional/certificates', $filename, 'public');
 
             $updateData = array_merge($updateData, [
@@ -131,7 +131,7 @@ class IinNasionalAdminController extends Controller
                 'field_verification_at' => $iinNasional->field_verification_at ?: now(),
                 'issued_at' => now(),
                 'admin_id' => Auth::id(),
-                'iin_number' => $request->iin_number
+                'iin_number' => $request->iin_number,
             ]);
         }
 
@@ -140,13 +140,13 @@ class IinNasionalAdminController extends Controller
             $uploadedAdditionalFiles = [];
 
             foreach ($request->file('additional_documents') as $file) {
-                $filename = $iinNasional->application_number . '_' . time() . '_additional_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $filename = $iinNasional->application_number.'_'.time().'_additional_'.uniqid().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional/additional-documents', $filename, 'public');
 
                 $uploadedAdditionalFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
 
@@ -163,13 +163,13 @@ class IinNasionalAdminController extends Controller
             'user_id' => Auth::id(),
             'status_from' => $oldStatus,
             'status_to' => 'terbit',
-            'notes' => $request->notes ?: 'IIN diterbitkan dengan upload sertifikat'
+            'notes' => $request->notes ?: 'IIN diterbitkan dengan upload sertifikat',
         ]);
 
         $message = 'IIN berhasil diterbitkan dan sertifikat diupload';
         if ($request->hasFile('additional_documents')) {
             $additionalCount = count($request->file('additional_documents'));
-            $message .= ' beserta ' . $additionalCount . ' dokumen tambahan';
+            $message .= ' beserta '.$additionalCount.' dokumen tambahan';
         }
 
         return back()->with('success', $message);
@@ -186,13 +186,13 @@ class IinNasionalAdminController extends Controller
 
         if ($request->hasFile('payment_documents')) {
             foreach ($request->file('payment_documents') as $file) {
-                $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_payment_doc.' . $file->getClientOriginalExtension();
+                $filename = $iinNasional->application_number.'_'.time().'_'.uniqid().'_payment_doc.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional/payment-documents', $filename, 'public');
 
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
         }
@@ -201,7 +201,7 @@ class IinNasionalAdminController extends Controller
         $allDocuments = array_merge($existingDocuments, $uploadedFiles);
 
         $iinNasional->update([
-            'payment_documents' => $allDocuments
+            'payment_documents' => $allDocuments,
         ]);
 
         // Log activity
@@ -211,10 +211,10 @@ class IinNasionalAdminController extends Controller
             'user_id' => Auth::id(),
             'status_from' => null,
             'status_to' => null,
-            'notes' => 'Admin mengupload dokumen pembayaran (' . count($uploadedFiles) . ' file)'
+            'notes' => 'Admin mengupload dokumen pembayaran ('.count($uploadedFiles).' file)',
         ]);
 
-        return back()->with('success', count($uploadedFiles) . ' dokumen pembayaran berhasil diupload');
+        return back()->with('success', count($uploadedFiles).' dokumen pembayaran berhasil diupload');
     }
 
     public function uploadFieldVerificationDocuments(Request $request, IinNasionalApplication $iinNasional)
@@ -224,7 +224,7 @@ class IinNasionalAdminController extends Controller
             'certificate' => 'nullable|file|mimes:pdf|max:10240',
             'notes' => 'nullable|string',
             'complete_verification' => 'nullable|boolean',
-            'iin_number' => 'required_if:complete_verification,true|nullable|string|max:255'
+            'iin_number' => 'required_if:complete_verification,true|nullable|string|max:255',
         ]);
 
         $uploadedFiles = [];
@@ -233,13 +233,13 @@ class IinNasionalAdminController extends Controller
 
         if ($request->hasFile('field_verification_documents')) {
             foreach ($request->file('field_verification_documents') as $file) {
-                $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_field_verification.' . $file->getClientOriginalExtension();
+                $filename = $iinNasional->application_number.'_'.time().'_'.uniqid().'_field_verification.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional/field-verification', $filename, 'public');
 
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
             }
         }
@@ -248,7 +248,7 @@ class IinNasionalAdminController extends Controller
         $allDocuments = array_merge($existingDocuments, $uploadedFiles);
 
         $updateData = [
-            'field_verification_documents' => $allDocuments
+            'field_verification_documents' => $allDocuments,
         ];
 
         // If completing verification with certificate upload
@@ -259,7 +259,7 @@ class IinNasionalAdminController extends Controller
             }
 
             $certificateFile = $request->file('certificate');
-            $certificateFilename = $iinNasional->application_number . '_' . time() . '_certificate.' . $certificateFile->getClientOriginalExtension();
+            $certificateFilename = $iinNasional->application_number.'_'.time().'_certificate.'.$certificateFile->getClientOriginalExtension();
             $certificatePath = $certificateFile->storeAs('iin-nasional/certificates', $certificateFilename, 'public');
 
             $updateData = array_merge($updateData, [
@@ -269,7 +269,7 @@ class IinNasionalAdminController extends Controller
                 'field_verification_at' => now(),
                 'issued_at' => now(),
                 'admin_id' => Auth::id(),
-                'iin_number' => $request->iin_number
+                'iin_number' => $request->iin_number,
             ]);
         }
 
@@ -283,7 +283,7 @@ class IinNasionalAdminController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => null,
                 'status_to' => null,
-                'notes' => 'Admin mengupload dokumen verifikasi lapangan (' . count($uploadedFiles) . ' file)'
+                'notes' => 'Admin mengupload dokumen verifikasi lapangan ('.count($uploadedFiles).' file)',
             ]);
         }
 
@@ -295,11 +295,11 @@ class IinNasionalAdminController extends Controller
                 'user_id' => Auth::id(),
                 'status_from' => $oldStatus,
                 'status_to' => 'terbit',
-                'notes' => $request->notes ?: 'Verifikasi lapangan selesai dan IIN diterbitkan dengan upload sertifikat'
+                'notes' => $request->notes ?: 'Verifikasi lapangan selesai dan IIN diterbitkan dengan upload sertifikat',
             ]);
         }
 
-        $message = count($uploadedFiles) . ' dokumen verifikasi lapangan berhasil diupload';
+        $message = count($uploadedFiles).' dokumen verifikasi lapangan berhasil diupload';
         if ($request->complete_verification && $request->hasFile('certificate')) {
             $message .= ' dan IIN berhasil diterbitkan';
         }
@@ -317,7 +317,7 @@ class IinNasionalAdminController extends Controller
             default => null
         };
 
-        if (!$path || !Storage::disk('public')->exists($path)) {
+        if (! $path || ! Storage::disk('public')->exists($path)) {
             abort(404, 'File tidak ditemukan');
         }
 
@@ -328,7 +328,7 @@ class IinNasionalAdminController extends Controller
     {
         $documents = $iinNasional->payment_documents ?? [];
 
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tidak ditemukan');
         }
 
@@ -342,7 +342,7 @@ class IinNasionalAdminController extends Controller
     {
         $proofs = $iinNasional->payment_proof_documents ?? [];
 
-        if (!isset($proofs[$index]) || !Storage::disk('public')->exists($proofs[$index]['path'])) {
+        if (! isset($proofs[$index]) || ! Storage::disk('public')->exists($proofs[$index]['path'])) {
             abort(404, 'Bukti pembayaran tidak ditemukan');
         }
 
@@ -356,7 +356,7 @@ class IinNasionalAdminController extends Controller
     {
         $documents = $iinNasional->field_verification_documents ?? [];
 
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen verifikasi lapangan tidak ditemukan');
         }
 
@@ -374,7 +374,7 @@ class IinNasionalAdminController extends Controller
             'files_count' => $request->hasFile('additional_documents') ? count($request->file('additional_documents')) : 0,
             'all_files' => $request->allFiles(),
             'application_id' => $iinNasional->id,
-            'existing_documents' => $iinNasional->additional_documents
+            'existing_documents' => $iinNasional->additional_documents,
         ]);
 
         $request->validate([
@@ -386,19 +386,19 @@ class IinNasionalAdminController extends Controller
 
         if ($request->hasFile('additional_documents')) {
             foreach ($request->file('additional_documents') as $file) {
-                $filename = $iinNasional->application_number . '_' . time() . '_' . uniqid() . '_additional.' . $file->getClientOriginalExtension();
+                $filename = $iinNasional->application_number.'_'.time().'_'.uniqid().'_additional.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs('iin-nasional/additional-documents', $filename, 'public');
 
                 $uploadedFiles[] = [
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toISOString()
+                    'uploaded_at' => now()->toISOString(),
                 ];
 
                 \Log::info('File uploaded:', [
                     'filename' => $filename,
                     'path' => $path,
-                    'original_name' => $file->getClientOriginalName()
+                    'original_name' => $file->getClientOriginalName(),
                 ]);
             }
         }
@@ -409,17 +409,17 @@ class IinNasionalAdminController extends Controller
         \Log::info('Before update:', [
             'existing_documents' => $existingDocuments,
             'uploaded_files' => $uploadedFiles,
-            'all_documents' => $allDocuments
+            'all_documents' => $allDocuments,
         ]);
 
         $updateResult = $iinNasional->update([
             'additional_documents' => $allDocuments,
-            'additional_documents_uploaded_at' => now()
+            'additional_documents_uploaded_at' => now(),
         ]);
 
         \Log::info('After update:', [
             'update_result' => $updateResult,
-            'fresh_additional_documents' => $iinNasional->fresh()->additional_documents
+            'fresh_additional_documents' => $iinNasional->fresh()->additional_documents,
         ]);
 
         // Log activity
@@ -429,17 +429,17 @@ class IinNasionalAdminController extends Controller
             'user_id' => Auth::id(),
             'status_from' => null,
             'status_to' => null,
-            'notes' => 'Admin mengupload dokumen tambahan (' . count($uploadedFiles) . ' file)'
+            'notes' => 'Admin mengupload dokumen tambahan ('.count($uploadedFiles).' file)',
         ]);
 
-        return back()->with('success', count($uploadedFiles) . ' dokumen tambahan berhasil diupload');
+        return back()->with('success', count($uploadedFiles).' dokumen tambahan berhasil diupload');
     }
 
     public function downloadAdditionalDocument(IinNasionalApplication $iinNasional, int $index)
     {
         $documents = $iinNasional->additional_documents ?? [];
 
-        if (!isset($documents[$index]) || !Storage::disk('public')->exists($documents[$index]['path'])) {
+        if (! isset($documents[$index]) || ! Storage::disk('public')->exists($documents[$index]['path'])) {
             abort(404, 'Dokumen tambahan tidak ditemukan');
         }
 
