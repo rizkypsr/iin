@@ -64,7 +64,7 @@ export default function Dashboard({ auth, stats, recent_applications, recent_act
                 {/* Header */}
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                     <h1 className="mb-2 bg-gradient-to-r from-[#01AEEC] to-[#01AEEC] bg-clip-text text-3xl font-bold text-transparent">Dashboard</h1>
-                    <p className="text-gray-600">Selamat datang kembali! Berikut adalah ringkasan aktivitas investasi Anda.</p>
+                    <p className="text-gray-600">Selamat datang kembali! Berikut adalah ringkasan aktivitas permohonan layanan Anda.</p>
                 </motion.div>
 
                 {/* Stats Cards */}
