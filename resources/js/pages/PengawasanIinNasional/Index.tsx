@@ -115,7 +115,7 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
         payment_proof_path: null as File | null,
     });
 
-    // Handle flash messages
+    // Handle flash messages and errors
     useEffect(() => {
         if (flash?.success) {
             showSuccessToast(flash.success);
@@ -123,7 +123,11 @@ export default function PengawasanIinNasionalIndex({ applications, auth, errors,
         if (flash?.error) {
             showErrorToast(flash.error);
         }
-    }, [flash]);
+        // Handle validation errors (e.g., profile incomplete)
+        if (errors?.profile) {
+            showErrorToast(errors.profile);
+        }
+    }, [flash, errors]);
 
     const expenseReimSubmit = (e: React.FormEvent) => {
         e.preventDefault();

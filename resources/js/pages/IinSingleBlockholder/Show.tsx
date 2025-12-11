@@ -100,6 +100,8 @@ export default function IinSingleBlockholderShow({ application, statusLogs, auth
                     window.open(route('iin-single-blockholder.download-file', [application.id, 'certificate']), '_blank');
                 }}
                 certificateType="Sertifikat Single IIN/Blockholder"
+                applicationType="single_iin"
+                applicationId={application.id}
             />
         </DashboardLayout>
     );

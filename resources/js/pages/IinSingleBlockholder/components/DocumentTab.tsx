@@ -331,6 +331,8 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                 onClose={() => setIsSurveyModalOpen(false)}
                 onDownload={() => downloadAdditionalDocument(selectedDocumentIndex)}
                 certificateType="IIN Single Blockholder"
+                applicationType="single_iin"
+                applicationId={application.id}
             />
 
             <ReimModal

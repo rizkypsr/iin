@@ -732,6 +732,8 @@ export default function IinNasionalIndex({ applications, auth }: Props) {
                     }
                 }}
                 certificateType="IIN Nasional"
+                applicationType="iin_nasional"
+                applicationId={selectedApplication?.id}
             />
 
             <QrisModal

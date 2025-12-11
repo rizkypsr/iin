@@ -167,6 +167,8 @@ export default function IinNasionalShow({ application, statusLogs, auth }: Props
                     window.open(route('iin-nasional.download-file', [application.id, 'certificate']), '_blank');
                 }}
                 certificateType="IIN Nasional"
+                applicationType="iin_nasional"
+                applicationId={application.id}
             />
 
             <QrisModal

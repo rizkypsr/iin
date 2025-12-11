@@ -193,6 +193,8 @@ export default function PengawasanIinNasionalShow({ application, statusLogs, aut
                     )
                 }}
                 certificateType="Pemberitahuan Pemantauan IIN Nasional"
+                applicationType="pengawasan_iin_nasional"
+                applicationId={application.id}
             />
         </DashboardLayout>
     );

@@ -4,6 +4,7 @@ use App\Http\Controllers\IinNasionalController;
 use App\Http\Controllers\IinSingleBlockholderController;
 use App\Http\Controllers\PengawasanIinNasionalController;
 use App\Http\Controllers\PengawasanSingleIinController;
+use App\Http\Controllers\SurveyController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -160,6 +161,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('iin-nasional/{iinNasional}/download-payment-proof/{index}', [IinNasionalController::class, 'downloadPaymentProof'])->name('iin-nasional.download-payment-proof');
     Route::get('iin-nasional/{iinNasional}/download-field-verification-document/{index}', [IinNasionalController::class, 'downloadFieldVerificationDocument'])->name('iin-nasional.download-field-verification-document');
     Route::get('iin-nasional/{iinNasional}/download-additional-document/{index}', [IinNasionalController::class, 'downloadAdditionalDocument'])->name('iin-nasional.download-additional-document');
+
+    // Survey completion routes
+    Route::get('survey/check/{applicationType}/{applicationId}', [SurveyController::class, 'check'])->name('survey.check');
+    Route::post('survey/complete/{applicationType}/{applicationId}', [SurveyController::class, 'complete'])->name('survey.complete');
 
     // IIN Single Blockholder routes
     Route::resource('iin-single-blockholder', IinSingleBlockholderController::class);

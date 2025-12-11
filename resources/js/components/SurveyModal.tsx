@@ -2,20 +2,52 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ExternalLink, FileDown } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 interface SurveyModalProps {
     isOpen: boolean;
     onClose: () => void;
     onDownload: () => void;
     certificateType?: string;
+    applicationType?: string; // 'iin_nasional', 'single_iin', 'pengawasan_iin_nasional', 'pengawasan_single_iin'
+    applicationId?: number;
 }
 
-const SurveyModal: React.FC<SurveyModalProps> = ({ isOpen, onClose, onDownload, certificateType = 'sertifikat' }) => {
+const SurveyModal: React.FC<SurveyModalProps> = ({ 
+    isOpen, 
+    onClose, 
+    onDownload, 
+    certificateType = 'sertifikat',
+    applicationType,
+    applicationId 
+}) => {
     const [isDownloadEnabled, setIsDownloadEnabled] = useState(false);
     const [hasVisitedSurvey, setHasVisitedSurvey] = useState(false);
+    const [hasCompletedSurvey, setHasCompletedSurvey] = useState(false);
+    const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+
+    // Check if user has already completed survey when modal opens
+    useEffect(() => {
+        if (isOpen && applicationType && applicationId) {
+            setIsCheckingStatus(true);
+            axios.get(route('survey.check', { applicationType, applicationId }))
+                .then((response) => {
+                    if (response.data.has_completed) {
+                        setHasCompletedSurvey(true);
+                        setIsDownloadEnabled(true);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error checking survey status:', error);
+                })
+                .finally(() => {
+                    setIsCheckingStatus(false);
+                });
+        }
+    }, [isOpen, applicationType, applicationId]);
 
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && !hasCompletedSurvey) {
             setIsDownloadEnabled(false);
             setHasVisitedSurvey(false);
 
@@ -26,17 +58,65 @@ const SurveyModal: React.FC<SurveyModalProps> = ({ isOpen, onClose, onDownload, 
 
             return () => clearTimeout(timer);
         }
-    }, [isOpen]);
+    }, [isOpen, hasCompletedSurvey]);
 
     const handleSurveyClick = () => {
         setHasVisitedSurvey(true);
         window.open('https://s.id/SurveiPersepsiLayananIIN', '_blank');
     };
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
+        // Record survey completion when downloading
+        if (applicationType && applicationId && !hasCompletedSurvey) {
+            try {
+                await axios.post(route('survey.complete', { applicationType, applicationId }), {
+                    certificate_type: certificateType,
+                });
+                setHasCompletedSurvey(true);
+            } catch (error) {
+                console.error('Error recording survey completion:', error);
+            }
+        }
+        
         onDownload();
         onClose();
     };
+
+    // If user has already completed survey, show simplified modal
+    if (hasCompletedSurvey && !isCheckingStatus) {
+        return (
+            <Dialog open={isOpen} onOpenChange={onClose}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <FileDown className="h-5 w-5" />
+                            Unduh {certificateType}
+                        </DialogTitle>
+                        <DialogDescription>
+                            Anda sudah pernah mengisi survei untuk aplikasi ini. Silakan unduh dokumen Anda.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+                        <p className="text-sm text-green-700">✓ Survei sudah pernah diisi sebelumnya</p>
+                    </div>
+
+                    <DialogFooter className="flex gap-2">
+                        <Button variant="outline" onClick={onClose}>
+                            Batal
+                        </Button>
+                        <Button
+                            onClick={handleDownload}
+                            className="bg-blue-600 hover:bg-blue-700"
+                        >
+                            <FileDown className="mr-2 h-4 w-4" />
+                            Unduh Dokumen
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        );
+    }
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -79,11 +159,11 @@ const SurveyModal: React.FC<SurveyModalProps> = ({ isOpen, onClose, onDownload, 
                     </Button>
                     <Button
                         onClick={handleDownload}
-                        disabled={!isDownloadEnabled}
-                        className={`${isDownloadEnabled ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-300'}`}
+                        disabled={!isDownloadEnabled || isCheckingStatus}
+                        className={`${isDownloadEnabled && !isCheckingStatus ? 'bg-blue-600 hover:bg-blue-700' : 'cursor-not-allowed bg-gray-300'}`}
                     >
                         <FileDown className="mr-2 h-4 w-4" />
-                        {isDownloadEnabled ? 'Unduh Dokumen' : 'Isi Survei Terlebih Dahulu'}
+                        {isCheckingStatus ? 'Memeriksa...' : (isDownloadEnabled ? 'Unduh Dokumen' : 'Isi Survei Terlebih Dahulu')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

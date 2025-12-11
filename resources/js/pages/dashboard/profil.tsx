@@ -270,7 +270,7 @@ export default function DashboardProfil() {
                                     processing={nasionalProcessing}
                                 />
                                 <div className="flex justify-end">
-                                    <Button type="button" onClick={submitNasional} disabled={nasionalProcessing} className="px-8 py-2 h-11 text-white bg-blue-600">
+                                    <Button type="button" onClick={submitNasional} disabled={nasionalProcessing} className="px-8 py-2 h-11 text-white bg-gradient-to-r from-blue-600 to-blue-700 transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg disabled:opacity-50">
                                         {nasionalProcessing ? 'Menyimpan...' : 'Simpan IIN Nasional'}
                                     </Button>
                                 </div>

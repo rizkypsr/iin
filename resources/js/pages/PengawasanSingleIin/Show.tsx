@@ -212,6 +212,8 @@ export default function PengawasanSingleIinShow({ application, statusLogs, auth 
                     )
                 }}
                 certificateType="Pemberitahuan Pemantauan Single IIN"
+                applicationType="pengawasan_single_iin"
+                applicationId={application.id}
             />
         </DashboardLayout>
     );

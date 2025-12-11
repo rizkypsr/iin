@@ -264,6 +264,8 @@ export default function DocumentTab({ application }: { application: IinNasionalA
                 onClose={() => setIsSurveyModalOpen(false)}
                 onDownload={() => downloadFile('certificate')}
                 certificateType="IIN Nasional"
+                applicationType="iin_nasional"
+                applicationId={application.id}
             />
 
 

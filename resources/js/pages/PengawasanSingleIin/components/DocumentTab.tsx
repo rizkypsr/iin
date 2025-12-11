@@ -206,6 +206,8 @@ export default function DocumentTab({ application }: { application: PengawasanSi
                 onClose={() => setIsSurveyModalOpen(false)}
                 onDownload={() => downloadFile('certificate', 0)}
                 certificateType="Pemantauan Single IIN"
+                applicationType="pengawasan_single_iin"
+                applicationId={application.id}
             />
 
             <ReimModal

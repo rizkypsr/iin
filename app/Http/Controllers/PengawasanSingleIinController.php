@@ -157,12 +157,12 @@ class PengawasanSingleIinController extends Controller
     {
         $requiredFields = [
             'institution_name',
-            'institution_type',
+            // 'institution_type',
             'year',
             'iin_assignment',
             'assignment_date',
             'regional',
-            'usage_purpose',
+            // 'usage_purpose',
             'address',
             'phone_fax',
             'email',

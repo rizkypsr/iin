@@ -683,6 +683,8 @@ export default function IinSingleBlockholderIndex({ applications, auth, flash }:
                     }
                 }}
                 certificateType="IIN Single Blockholder"
+                applicationType="single_iin"
+                applicationId={selectedApplication?.id}
             />
         </DashboardLayout>
     );
