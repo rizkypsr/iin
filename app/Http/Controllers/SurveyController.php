@@ -15,7 +15,7 @@ class SurveyController extends Controller
     public function check(string $applicationType, int $applicationId): JsonResponse
     {
         $userId = Auth::id();
-        
+
         $hasCompleted = SurveyCompletion::hasCompleted($userId, $applicationType, $applicationId);
 
         return response()->json([
@@ -29,7 +29,7 @@ class SurveyController extends Controller
     public function complete(Request $request, string $applicationType, int $applicationId): JsonResponse
     {
         $userId = Auth::id();
-        
+
         $request->validate([
             'certificate_type' => 'nullable|string|max:255',
         ]);

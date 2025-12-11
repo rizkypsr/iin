@@ -22,7 +22,7 @@ return new class extends Migration
 
             // Unique constraint to prevent duplicate entries
             $table->unique(['user_id', 'application_type', 'application_id'], 'survey_completion_unique');
-            
+
             // Index for faster lookups
             $table->index(['application_type', 'application_id']);
         });
