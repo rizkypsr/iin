@@ -620,6 +620,63 @@ class IinSingleBlockholderController extends Controller
         return response()->download($fullPath, $originalName);
     }
 
+    /**
+     * Download all certificates as a ZIP file.
+     */
+    public function downloadAllCertificates(IinSingleBlockholderApplication $iinSingleBlockholder)
+    {
+        $this->authorize('downloadFile', $iinSingleBlockholder);
+
+        $additionalDocuments = $iinSingleBlockholder->additional_documents ?? [];
+
+        if (empty($additionalDocuments)) {
+            abort(404, 'Tidak ada sertifikat untuk diunduh');
+        }
+
+        // If only one document, download directly without ZIP
+        if (count($additionalDocuments) === 1) {
+            $document = $additionalDocuments[0];
+            $path = $document['path'];
+
+            if (! Storage::disk('public')->exists($path)) {
+                abort(404, 'File tidak ditemukan di storage');
+            }
+
+            $fullPath = Storage::disk('public')->path($path);
+            $originalName = $document['original_name'] ?? basename($path);
+
+            return response()->download($fullPath, $originalName);
+        }
+
+        // Create ZIP for multiple files
+        $zipFileName = $iinSingleBlockholder->application_number.'_sertifikat.zip';
+        $zipPath = storage_path('app/temp/'.$zipFileName);
+
+        // Ensure temp directory exists
+        if (! file_exists(storage_path('app/temp'))) {
+            mkdir(storage_path('app/temp'), 0755, true);
+        }
+
+        $zip = new \ZipArchive;
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            abort(500, 'Gagal membuat file ZIP');
+        }
+
+        foreach ($additionalDocuments as $document) {
+            $path = $document['path'];
+
+            if (Storage::disk('public')->exists($path)) {
+                $filePath = Storage::disk('public')->path($path);
+                $originalName = $document['original_name'] ?? basename($path);
+                $zip->addFile($filePath, $originalName);
+            }
+        }
+
+        $zip->close();
+
+        return response()->download($zipPath, $zipFileName)->deleteFileAfterSend(true);
+    }
+
     public function downloadPaymentDocument(IinSingleBlockholderApplication $iinSingleBlockholder, int $index, string $stage = 'stage1')
     {
         $this->authorize('downloadFile', $iinSingleBlockholder);

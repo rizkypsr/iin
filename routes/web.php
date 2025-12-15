@@ -180,6 +180,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-payment-proof/{index}', [IinSingleBlockholderController::class, 'downloadPaymentProof'])->name('iin-single-blockholder.download-payment-proof');
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-field-verification-document/{index}', [IinSingleBlockholderController::class, 'downloadFieldVerificationDocument'])->name('iin-single-blockholder.download-field-verification-document');
     Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-additional-document/{index}', [IinSingleBlockholderController::class, 'downloadAdditionalDocument'])->name('iin-single-blockholder.download-additional-document');
+    Route::get('iin-single-blockholder/{iinSingleBlockholder}/download-all-certificates', [IinSingleBlockholderController::class, 'downloadAllCertificates'])->name('iin-single-blockholder.download-all-certificates');
 
     // Pengawasan IIN Nasional routes
     Route::resource('pengawasan-iin-nasional', PengawasanIinNasionalController::class);

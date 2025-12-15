@@ -9,10 +9,8 @@ import { Award, CreditCard, Download, FileText, Shield } from "lucide-react";
 import { useState } from "react";
 
 export default function DocumentTab({ application }: { application: IinSingleBlockholderApplication }) {
-    const [selectedApplication, setSelectedApplication] = useState<IinSingleBlockholderApplication | null>(null);
     const [isSurveyModalOpen, setIsSurveyModalOpen] = useState(false);
     const [isReimModalOpen, setIsReimModalOpen] = useState(false);
-    const [selectedDocumentIndex, setSelectedDocumentIndex] = useState<number>(0);
 
     const downloadFile = (type: string, index?: number) => {
         window.open(
@@ -25,9 +23,9 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
         );
     };
 
-    const downloadAdditionalDocument = (index: number) => {
+    const downloadAllCertificates = () => {
         window.open(
-            route('iin-single-blockholder.download-additional-document', [application.id, index]),
+            route('iin-single-blockholder.download-all-certificates', [application.id]),
             '_blank',
         );
     };
@@ -42,32 +40,22 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
                 <CardContent className="space-y-4">
                     {/* Certificate */}
                     {application.status === 'terbit' && application.additional_documents && application.additional_documents.length > 0 && (
-                        <div className="space-y-2">
+                        <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200">
                             <div className="flex gap-3 items-center">
                                 <div className="p-2 bg-green-100 rounded-lg">
                                     <Award className="w-5 h-5 text-green-600" />
                                 </div>
                                 <div>
                                     <p className="font-medium text-gray-800">Sertifikat Single IIN</p>
-                                    <p className="text-sm text-gray-500">Daftar sertifikat Single IIN/Blockholder</p>
+                                    <p className="text-sm text-gray-500">
+                                        {application.additional_documents.length} sertifikat Single IIN/Blockholder
+                                    </p>
                                 </div>
                             </div>
-                            {application.additional_documents.map((document: PaymentDocument, index: number) => (
-                                <div key={index} className="flex justify-between items-center p-2 ml-12 rounded-lg border border-gray-200">
-                                    <div className="flex gap-2 items-center">
-                                        <FileText className="w-4 h-4 text-gray-600" />
-                                        <span className="text-sm text-gray-700">{document.original_name}</span>
-                                    </div>
-                                    <Button variant="outline" size="sm" onClick={() => {
-                                        setSelectedApplication(application);
-                                        setSelectedDocumentIndex(index);
-                                        setIsSurveyModalOpen(true);
-                                    }}>
-                                        <Download className="mr-1 w-3 h-3" />
-                                        Download
-                                    </Button>
-                                </div>
-                            ))}
+                            <Button variant="outline" size="sm" onClick={() => setIsSurveyModalOpen(true)}>
+                                <Download className="mr-1 w-4 h-4" />
+                                Download
+                            </Button>
                         </div>
                     )}
 
@@ -329,7 +317,7 @@ export default function DocumentTab({ application }: { application: IinSingleBlo
             <SurveyModal
                 isOpen={isSurveyModalOpen}
                 onClose={() => setIsSurveyModalOpen(false)}
-                onDownload={() => downloadAdditionalDocument(selectedDocumentIndex)}
+                onDownload={downloadAllCertificates}
                 certificateType="IIN Single Blockholder"
                 applicationType="single_iin"
                 applicationId={application.id}
