@@ -254,8 +254,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $zip = new \ZipArchive;
         if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
             foreach ($formTemplates as $template) {
-                $filePath = Storage::disk('public')->path($template->file_path);
-                $zip->addFile($filePath, $template->original_name);
+                $fileContent = Storage::disk('public')->get($template->file_path);
+                if ($fileContent !== null) {
+                    $zip->addFromString($template->original_name, $fileContent);
+                }
             }
             $zip->close();
         }

@@ -666,9 +666,11 @@ class IinSingleBlockholderController extends Controller
             $path = $document['path'];
 
             if (Storage::disk('public')->exists($path)) {
-                $filePath = Storage::disk('public')->path($path);
+                $fileContent = Storage::disk('public')->get($path);
                 $originalName = $document['original_name'] ?? basename($path);
-                $zip->addFile($filePath, $originalName);
+                if ($fileContent !== null) {
+                    $zip->addFromString($originalName, $fileContent);
+                }
             }
         }
 
